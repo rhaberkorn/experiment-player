@@ -27,6 +27,10 @@ if [[ x$PKG_CONFIG = x ]]; then
 	AC_MSG_ERROR([Couldn't find pkg-config])
 fi
 
+# FIXME: this should be configurable
+AC_CHECK_PROG(DOXYGEN, doxygen, doxygen)
+AM_CONDITIONAL(USE_DOXYGEN, test x$DOXYGEN != x)
+
 #
 # Checks for libraries.
 #
@@ -97,5 +101,7 @@ case $host in
 *-*-windows*)	LIBS="$LIBS -Wl,--export-all-symbols" ;;
 esac
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile \
+		 src/Makefile \
+		 doc/Makefile doc/Doxyfile])
 AC_OUTPUT
