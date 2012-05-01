@@ -19,8 +19,10 @@ AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_CC
 AC_PROG_CC_C99
+if [[ $ac_cv_prog_cc_c99 = no ]]; then
+	AC_MSG_ERROR([C compiler does not support C99 mode!])
+fi
 AC_PROG_CC_C_O
-# FIXME: check whether c99 is actually available
 
 AC_CHECK_PROG(PKG_CONFIG, pkg-config, pkg-config)
 if [[ x$PKG_CONFIG = x ]]; then
