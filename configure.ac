@@ -25,11 +25,6 @@ if [[ $ac_cv_prog_cc_c99 = no ]]; then
 fi
 AC_PROG_CC_C_O
 
-AC_CHECK_PROG(PKG_CONFIG, pkg-config, pkg-config)
-if [[ x$PKG_CONFIG = x ]]; then
-	AC_MSG_ERROR([Couldn't find pkg-config])
-fi
-
 AC_CHECK_PROG(DOXYGEN, doxygen, doxygen)
 AC_CHECK_PROG(XSLTPROC, xsltproc, xsltproc)
 XSLT_FLAGS="--xinclude"
@@ -38,35 +33,34 @@ AC_SUBST(XSLT_FLAGS)
 #
 # Checks for libraries.
 #
-if ! $PKG_CONFIG gtk+-2.0; then
-	AC_MSG_ERROR([Required gtk+-2.0 package is missing!])
-fi
-CFLAGS="$CFLAGS `$PKG_CONFIG --cflags gtk+-2.0`"
-LIBS="$LIBS `$PKG_CONFIG --libs gtk+-2.0`"
+PKG_CHECK_MODULES(LIBGTK, [gtk+-2.0])
+CFLAGS="$CFLAGS $LIBGTK_CFLAGS"
+LIBS="$LIBS $LIBGTK_LIBS"
 
-if ! $PKG_CONFIG libvlc vlc-plugin; then
-	AC_MSG_ERROR([Required libvlc package is missing!])
-fi
-CFLAGS="$CFLAGS `$PKG_CONFIG --cflags libvlc vlc-plugin`"
-LIBS="$LIBS `$PKG_CONFIG --libs libvlc`"
+# FIXME: further restrict libvlc version
+PKG_CHECK_MODULES(LIBVLC, [libvlc >= 1.1.13 vlc-plugin])
+CFLAGS="$CFLAGS $LIBVLC_CFLAGS"
+LIBS="$LIBS $LIBVLC_LIBS"
 
-AC_CHECK_PROG(XML2_CONFIG, xml2-config, xml2-config)
-if [[ x$XML2_CONFIG != x ]]; then
-	CFLAGS="$CFLAGS `$XML2_CONFIG --cflags`"
-	LIBS="$LIBS `$XML2_CONFIG --libs`"
-elif $PKG_CONFIG libxml-2.0; then
-	CFLAGS="$CFLAGS `$PKG_CONFIG --cflags libxml-2.0`"
-	LIBS="$LIBS `$PKG_CONFIG --libs libxml-2.0`"
-else
-	AC_CHECK_LIB(xml2, xmlParseFile, , [
-		AC_MSG_ERROR([Required libxml-2.0 package or library missing!])
-	])
+PKG_CHECK_MODULES(LIBXML2, [libxml-2.0], [
+	CFLAGS="$CFLAGS $LIBXML2_CFLAGS"
+	LIBS="$LIBS $LIBXML2_LIBS"
+], [
+	AC_CHECK_PROG(XML2_CONFIG, xml2-config, xml2-config)
+	if [[ x$XML2_CONFIG != x ]]; then
+		CFLAGS="$CFLAGS `$XML2_CONFIG --cflags`"
+		LIBS="$LIBS `$XML2_CONFIG --libs`"
+	else
+		AC_CHECK_LIB(xml2, xmlParseFile, , [
+			AC_MSG_ERROR([Required libxml-2.0 package or library missing!])
+		])
 
-	AC_CHECK_HEADERS([libxml/tree.h libxml/parser.h \
-			  libxml/xpath.h libxml/xpathInternals.h], , [
-		AC_MSG_ERROR([Required libxml headers are missing!])
-	])
-fi
+		AC_CHECK_HEADERS([libxml/tree.h libxml/parser.h \
+				  libxml/xpath.h libxml/xpathInternals.h], , [
+			AC_MSG_ERROR([Required libxml headers are missing!])
+		])
+	fi
+])
 
 #
 # Checks for header files.
