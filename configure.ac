@@ -2,11 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.65)
-AC_INIT([Experiment Player], [dev], [robin.haberkorn@st.ovgu.de])
+AC_INIT([Experiment Player], [dev], [robin.haberkorn@st.ovgu.de],
+	[experiment-player])
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_SRCDIR(src/player.c)
+AC_CONFIG_SRCDIR(src/main.c)
 AC_CONFIG_HEADER(config.h)
 
 AC_CANONICAL_BUILD
@@ -29,9 +30,10 @@ if [[ x$PKG_CONFIG = x ]]; then
 	AC_MSG_ERROR([Couldn't find pkg-config])
 fi
 
-# FIXME: this should be configurable
 AC_CHECK_PROG(DOXYGEN, doxygen, doxygen)
-AM_CONDITIONAL(USE_DOXYGEN, test x$DOXYGEN != x)
+AC_CHECK_PROG(XSLTPROC, xsltproc, xsltproc)
+XSLT_FLAGS="--xinclude"
+AC_SUBST(XSLT_FLAGS)
 
 #
 # Checks for libraries.
@@ -91,6 +93,23 @@ AC_FUNC_REALLOC
 #
 # Config options
 #
+AC_ARG_ENABLE(doxygen-doc,
+	AS_HELP_STRING([--enable-doxygen-doc],
+		       [Generate Doxygen documentation [default=no]]),
+	[doxygen_doc=$enableval], [doxygen_doc=no])
+if [[ $doxygen_doc = yes -a x$DOXYGEN = x ]]; then
+        AC_MSG_ERROR([Enabled generating Doxygen documentation, but Doxygen not found! Try --disable-doxygen-doc.])
+fi
+AM_CONDITIONAL(BUILD_DOXYGEN, test $doxygen_doc = yes)
+
+AC_ARG_ENABLE(html-doc,
+	AS_HELP_STRING([--enable-html-doc],
+		       [Generate HTML documentation [default=yes]]),
+	[html_doc=$enableval], [html_doc=yes])
+if [[ $html_doc = yes -a x$XSLTPROC = x ]]; then
+        AC_MSG_ERROR([Enabled generating HTML documentation, but XSLTProc not found! Try --disable-html-doc.])
+fi
+AM_CONDITIONAL(BUILD_HTML, test $html_doc = yes)
 
 # FIXME
 AC_DEFINE(USE_BUILDER, , [foo])

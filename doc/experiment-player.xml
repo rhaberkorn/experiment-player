@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<book xmlns="http://docbook.org/ns/docbook"
+      xmlns:xlink="http://www.w3.org/1999/xlink">
+	<info>
+		<title>Experiment Player</title>
+		<subtitle>A tool for analyzing experiments...</subtitle>
+
+		<author>
+			<personname><firstname>Jens</firstname> <surname>Lammert</surname></personname>
+			<email>jens.lammert@st.ovgu.de</email>
+		</author>
+		<copyright>
+			<year>2012</year><holder>Otto-von-Guericke Universität Magdeburg</holder>
+		</copyright>
+
+		<abstract><para>
+			The following document describes how to use the experiment player...
+			<!-- TODO -->
+		</para></abstract>
+	</info>
+
+	<preface>
+		<title>Introduction</title>
+
+		<para>
+			Bla Bla...
+			<!-- TODO -->
+		</para>
+	</preface>
+</book>
