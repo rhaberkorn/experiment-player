@@ -117,6 +117,7 @@ case $host in
 esac
 
 AC_CONFIG_FILES([Makefile \
+		 lib/Makefile lib/gtk-vlc-player/Makefile \
 		 src/Makefile \
 		 doc/Makefile doc/Doxyfile])
 AC_OUTPUT
