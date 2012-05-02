@@ -1,0 +1,26 @@
+# Autotools
+/configure
+/config.h
+/config.h.in
+/config.log
+/config.status
+/config
+/aclocal.m4
+/autom4te.cache
+/libtool
+Makefile
+Makefile.in
+stamp-*
+
+# Generated
+.*/
+/doc/Doxyfile
+/doc/doxygen
+/doc/experiment-player.html
+/doc/html_titlepage.xsl
+
+/src/experiment-player
+*.o
+
+# Backup files
+*~
