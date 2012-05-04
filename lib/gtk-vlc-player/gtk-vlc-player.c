@@ -9,12 +9,11 @@
 #include <gdk/gdkwin32.h>
 #else
 #include <gdk/gdkx.h>
-#include <X11/Xlib.h>
 #endif
 
 #include <vlc/vlc.h>
 
-#include <gtk-vlc-player.h>
+#include "gtk-vlc-player.h"
 
 static void gtk_vlc_player_class_init(GtkVlcPlayerClass *klass);
 static void gtk_vlc_player_init(GtkVlcPlayer *klass);

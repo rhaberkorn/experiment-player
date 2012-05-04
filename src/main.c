@@ -2,20 +2,11 @@
 #include "config.h"
 #endif
 
-#define _GNU_SOURCE
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <assert.h>
-
-#include <gtk/gtk.h>
-#ifdef __WIN32__
-#include <gdk/gdkwin32.h>
-#else
-#include <gdk/gdkx.h>
+#ifdef HAVE_X11_XLIB_H
 #include <X11/Xlib.h>
 #endif
 
+#include <gtk/gtk.h>
 #include <gtk-vlc-player.h>
 
 int
@@ -24,7 +15,7 @@ main(int argc, char *argv[])
 	GtkWidget *window, *player;
 
 	/* init threads */
-#ifndef __WIN32__
+#ifdef HAVE_X11_XLIB_H
 	XInitThreads(); /* FIXME: really required??? */
 #endif
 	g_thread_init(NULL);
@@ -45,11 +36,10 @@ main(int argc, char *argv[])
 	gtk_container_add(GTK_CONTAINER(window), player);
 
 	gtk_vlc_player_load(GTK_VLC_PLAYER(player), argv[1]);
+	gtk_vlc_player_play(GTK_VLC_PLAYER(player));
 
 	gtk_widget_show_all(window);
 
-	gtk_vlc_player_play(GTK_VLC_PLAYER(player));
-	
 	gdk_threads_enter();
 	gtk_main();
 	gdk_threads_leave();
