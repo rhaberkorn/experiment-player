@@ -1,6 +1,6 @@
 AM_CFLAGS = -Wall
 
-vlcplayer_datadir = $(datarootdir)/gtk-vlc-player
+vlcplayer_datadir = @datarootdir@/gtk-vlc-player
 
 lib_LTLIBRARIES = libgtk-vlc-player.la
 libgtk_vlc_player_la_SOURCES = gtk-vlc-player.c gtk-vlc-player.h

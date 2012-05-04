@@ -9,9 +9,29 @@
 #include <gtk/gtk.h>
 #include <gtk-vlc-player.h>
 
+/*
+ * GtkBuilder signal callbacks
+ */
+
+void
+playpause_button_clicked_cb(GtkWidget *widget,
+			    gpointer data __attribute__((unused)))
+{
+	gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget));
+}
+
+void
+stop_button_clicked_cb(GtkWidget *widget,
+		       gpointer data __attribute__((unused)))
+{
+	gtk_vlc_player_stop(GTK_VLC_PLAYER(widget));
+}
+
+
 int
 main(int argc, char *argv[])
 {
+	GtkBuilder *builder;
 	GtkWidget *window, *player;
 
 	/* init threads */
@@ -23,20 +43,17 @@ main(int argc, char *argv[])
 
 	gtk_init(&argc, &argv);
 
-#if 0
-	GtkBuilder *builder = gtk_builder_new();
+	builder = gtk_builder_new();
 
-	gtk_builder_add_from_file(builder, file, NULL);
+	gtk_builder_add_from_file(builder, DEFAULT_UI, NULL);
 	gtk_builder_connect_signals(builder, NULL);
-#endif
 
-	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	window = GTK_WIDGET(gtk_builder_get_object(builder, "player_window"));
+	player = GTK_WIDGET(gtk_builder_get_object(builder, "player_widget"));
 
-	player = gtk_vlc_player_new();
-	gtk_container_add(GTK_CONTAINER(window), player);
+	g_object_unref(builder);
 
 	gtk_vlc_player_load(GTK_VLC_PLAYER(player), argv[1]);
-	gtk_vlc_player_play(GTK_VLC_PLAYER(player));
 
 	gtk_widget_show_all(window);
 

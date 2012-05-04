@@ -92,9 +92,21 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 
+# Experiment player data directory
+player_datadir=$datarootdir/$PACKAGE_TARNAME
+AC_SUBST(player_datadir)
+
 #
 # Config options
 #
+AC_ARG_WITH(default-ui,
+	AS_HELP_STRING([--with-default-ui=PATH],
+		       [Specify default UI definition to use [default=DATAROOTDIR/experiment-player/default.ui]]),
+	[DEFAULT_UI=$withval], [DEFAULT_UI=$player_datadir/default.ui])
+# NOTE: cannot use AC_DEFINE_UNQUOTED since installation directories
+# must be expanded by the Makefiles
+AC_SUBST(DEFAULT_UI)
+
 AC_ARG_ENABLE(doxygen-doc,
 	AS_HELP_STRING([--enable-doxygen-doc],
 		       [Generate Doxygen documentation [default=no]]),
