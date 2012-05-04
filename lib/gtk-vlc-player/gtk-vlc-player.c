@@ -214,6 +214,9 @@ gtk_vlc_player_load(GtkVlcPlayer *player, const gchar *uri)
 	libvlc_media_t *media;
 
 	media = libvlc_media_new_location(player->vlc_inst, (const char *)uri);
+	if (media == NULL)
+		return TRUE;
+
 	libvlc_media_parse(media);
 	libvlc_media_player_set_media(player->media_player, media);
 
