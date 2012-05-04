@@ -23,7 +23,7 @@ AC_PROG_CC_C99
 if [[ $ac_cv_prog_cc_c99 = no ]]; then
 	AC_MSG_ERROR([C compiler does not support C99 mode!])
 fi
-AC_PROG_CC_C_O
+AM_PROG_CC_C_O
 
 AC_CHECK_PROG(DOXYGEN, doxygen, doxygen)
 AC_CHECK_PROG(XSLTPROC, xsltproc, xsltproc)
@@ -34,23 +34,23 @@ AC_SUBST(XSLT_FLAGS)
 # Checks for libraries.
 #
 PKG_CHECK_MODULES(LIBGTK, [gtk+-2.0])
-CFLAGS="$CFLAGS $LIBGTK_CFLAGS"
-LIBS="$LIBS $LIBGTK_LIBS"
 
 # FIXME: further restrict libvlc version
 PKG_CHECK_MODULES(LIBVLC, [libvlc >= 1.1.13 vlc-plugin])
-CFLAGS="$CFLAGS $LIBVLC_CFLAGS"
-LIBS="$LIBS $LIBVLC_LIBS"
 
-PKG_CHECK_MODULES(LIBXML2, [libxml-2.0], [
-	CFLAGS="$CFLAGS $LIBXML2_CFLAGS"
-	LIBS="$LIBS $LIBXML2_LIBS"
-], [
+PKG_CHECK_MODULES(LIBXML2, [libxml-2.0], , [
 	AC_CHECK_PROG(XML2_CONFIG, xml2-config, xml2-config)
 	if [[ x$XML2_CONFIG != x ]]; then
-		CFLAGS="$CFLAGS `$XML2_CONFIG --cflags`"
-		LIBS="$LIBS `$XML2_CONFIG --libs`"
+		LIBXML2_CFLAGS="`$XML2_CONFIG --cflags`"
+		AC_SUBST(LIBXML2_CFLAGS)
+		LIBXML2_LIBS="`$XML2_CONFIG --libs`"
+		AC_SUBST(LIBXML2_LIBS)
 	else
+		temp_CFLAGS="$CFLAGS"
+		temp_LIBS="$LIBS"
+		CFLAGS=
+		LIBS=
+
 		AC_CHECK_LIB(xml2, xmlParseFile, , [
 			AC_MSG_ERROR([Required libxml-2.0 package or library missing!])
 		])
@@ -59,6 +59,14 @@ PKG_CHECK_MODULES(LIBXML2, [libxml-2.0], [
 				  libxml/xpath.h libxml/xpathInternals.h], , [
 			AC_MSG_ERROR([Required libxml headers are missing!])
 		])
+
+		LIBXML2_CFLAGS="$CFLAGS"
+		AC_SUBST(LIBXML2_CFLAGS)
+		LIBXML2_LIBS="$LIBS"
+		AC_SUBST(LIBXML2_LIBS)
+
+		CFLAGS="$temp_CFLAGS"
+		LIBS="$temp_LIBS"
 	fi
 ])
 
@@ -105,16 +113,25 @@ if [[ $html_doc = yes -a x$XSLTPROC = x ]]; then
 fi
 AM_CONDITIONAL(BUILD_HTML, test $html_doc = yes)
 
-# FIXME
-AC_DEFINE(USE_BUILDER, , [foo])
-AC_DEFINE(TRANSCRIPT_JUSTIFY, 1, [foo])
+AC_ARG_ENABLE(console,
+	AS_HELP_STRING([--enable-console],
+		       [Enable console-mode binaries [default=no]]),
+	[console=$enableval], [console=no])
+if [[ $console = no ]]; then
+	case $host in
+	*-*-windows*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -mwindows" ;;
+	esac
+fi
 
 # Export symbols
 # necessary for auto-registering GTK+ signal handlers by GTK+ builder
 case $host in
-*-*-linux*)	LIBS="$LIBS -Wl,--export-dynamic" ;;
-*-*-windows*)	LIBS="$LIBS -Wl,--export-all-symbols" ;;
+*-*-linux*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-dynamic" ;;
+*-*-windows*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-all-symbols" ;;
 esac
+
+AC_SUBST(GTKAPP_CFLAGS)
+AC_SUBST(GTKAPP_LDFLAGS)
 
 AC_CONFIG_FILES([Makefile \
 		 lib/Makefile lib/gtk-vlc-player/Makefile \
