@@ -22,19 +22,19 @@ G_BEGIN_DECLS
 	(G_TYPE_INSTANCE_GET_CLASS((obj), GTK_TYPE_VLC_PLAYER, GtkVlcPlayerClass))
 
 typedef struct _GtkVlcPlayer {
-	GtkDrawingArea parent_instance;
+	GtkAlignment parent_instance;
+
+	GtkWidget		*drawing_area;
 
 	libvlc_instance_t	*vlc_inst;
 	libvlc_media_player_t	*media_player;
 
 	gboolean		isFullscreen;
-
 	GtkWidget		*fullscreen_window;
-	GtkWidget		*orig_parent;
 } GtkVlcPlayer;
 
 typedef struct _GtkVlcPlayerClass {
-	GtkDrawingAreaClass parent_class;
+	GtkAlignmentClass parent_class;
 
 	void (*time_changed)	(GtkVlcPlayer *self, gint64 new_time, gpointer user_data);
 	void (*length_changed)	(GtkVlcPlayer *self, gint64 new_length, gpointer user_data);
