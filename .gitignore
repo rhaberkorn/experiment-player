@@ -8,19 +8,21 @@
 /aclocal.m4
 /autom4te.cache
 /libtool
+.*/
+*.la
+*.lo
+*.o
 Makefile
 Makefile.in
 stamp-*
 
 # Generated
-.*/
 /doc/Doxyfile
 /doc/doxygen
 /doc/experiment-player.html
 /doc/html_titlepage.xsl
 
 /src/experiment-player
-*.o
 
 # Backup files
 *~
