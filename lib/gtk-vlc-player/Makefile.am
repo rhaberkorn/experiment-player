@@ -7,3 +7,5 @@ libgtk_vlc_player_la_CFLAGS = @LIBGTK_CFLAGS@ @LIBVLC_CFLAGS@
 libgtk_vlc_player_la_LIBADD = @LIBGTK_LIBS@ @LIBVLC_LIBS@
 
 include_HEADERS = gtk-vlc-player.h
+
+dist_data_DATA = gtk-vlc-player-catalog.xml
