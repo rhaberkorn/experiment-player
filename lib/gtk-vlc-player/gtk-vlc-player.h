@@ -24,8 +24,6 @@ G_BEGIN_DECLS
 typedef struct _GtkVlcPlayer {
 	GtkAlignment parent_instance;
 
-	GtkWidget		*drawing_area;
-
 	libvlc_instance_t	*vlc_inst;
 	libvlc_media_player_t	*media_player;
 

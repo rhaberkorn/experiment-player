@@ -94,22 +94,23 @@ gtk_vlc_player_class_init(GtkVlcPlayerClass *klass)
 static void
 gtk_vlc_player_init(GtkVlcPlayer *klass)
 {
-	GdkColor color;
-	libvlc_event_manager_t *evman;
+	GtkWidget		*drawing_area;
+	GdkColor		color;
+	libvlc_event_manager_t	*evman;
 
 	gtk_alignment_set(GTK_ALIGNMENT(klass), 0., 0., 1., 1.);
-	klass->drawing_area = gtk_drawing_area_new();
-	gtk_container_add(GTK_CONTAINER(klass), klass->drawing_area);
+	drawing_area = gtk_drawing_area_new();
+	gtk_container_add(GTK_CONTAINER(klass), drawing_area);
 
 	gdk_color_parse("black", &color);
-	gtk_widget_modify_bg(klass->drawing_area, GTK_STATE_NORMAL, &color);
+	gtk_widget_modify_bg(drawing_area, GTK_STATE_NORMAL, &color);
 
-	g_signal_connect(G_OBJECT(klass->drawing_area), "realize",
+	g_signal_connect(G_OBJECT(drawing_area), "realize",
 			 G_CALLBACK(widget_on_realize), klass);
 
 	/* FIXME: must probably do via vlc events */
-	gtk_widget_add_events(klass->drawing_area, GDK_BUTTON_PRESS_MASK);
-	g_signal_connect(G_OBJECT(klass->drawing_area), "button-press-event",
+	gtk_widget_add_events(drawing_area, GDK_BUTTON_PRESS_MASK);
+	g_signal_connect(G_OBJECT(drawing_area), "button-press-event",
 			 G_CALLBACK(widget_on_click), klass);
 
 	klass->vlc_inst = libvlc_new(0, NULL);
