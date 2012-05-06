@@ -147,6 +147,10 @@ esac
 AC_SUBST(GTKAPP_CFLAGS)
 AC_SUBST(GTKAPP_LDFLAGS)
 
+# Some constants
+AC_DEFINE(GTK_VLC_PLAYER_ADJ_STEP, [1000.], [VLC Player time adjustment step increment])
+AC_DEFINE(GTK_VLC_PLAYER_ADJ_PAGE, [30000.], [VLC Player time adjustment page increment])
+
 AC_CONFIG_FILES([Makefile \
 		 lib/Makefile lib/gtk-vlc-player/Makefile \
 		 src/Makefile \

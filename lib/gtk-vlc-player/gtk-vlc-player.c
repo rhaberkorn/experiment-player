@@ -21,6 +21,11 @@ static void gtk_vlc_player_init(GtkVlcPlayer *klass);
 static void widget_on_realize(GtkWidget *widget, gpointer data);
 static gboolean widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer data);
 
+static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
+
+static inline void update_time(GtkVlcPlayer *player, gint64 new_time);
+static inline void update_length(GtkVlcPlayer *player, gint64 new_length);
+
 static void vlc_time_changed(const struct libvlc_event_t *event, void *userdata);
 static void vlc_length_changed(const struct libvlc_event_t *event, void *userdata);
 
@@ -62,16 +67,6 @@ static guint gtk_vlc_player_signals[LAST_SIGNAL] = {0, 0};
 static void
 gtk_vlc_player_class_init(GtkVlcPlayerClass *klass)
 {
-#if 0
-	gtk_vlc_player_signals[CLICKED_SIGNAL] =
-		g_signal_new("clicked",
-			     G_TYPE_FROM_CLASS(klass),
-			     G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-			     G_STRUCT_OFFSET(GtkVlcPlayerClass, clicked),
-			     NULL, NULL,
-			     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-#endif
-
 	gtk_vlc_player_signals[TIME_CHANGED_SIGNAL] =
 		g_signal_new("time-changed",
 			     G_TYPE_FROM_CLASS(klass),
@@ -112,6 +107,13 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 	gtk_widget_add_events(drawing_area, GDK_BUTTON_PRESS_MASK);
 	g_signal_connect(G_OBJECT(drawing_area), "button-press-event",
 			 G_CALLBACK(widget_on_click), klass);
+
+	klass->time_adjustment = gtk_adjustment_new(0., 0., 0.,
+						    GTK_VLC_PLAYER_ADJ_STEP,
+						    GTK_VLC_PLAYER_ADJ_PAGE, 0.);
+	klass->time_adj_on_value_changed_id =
+		g_signal_connect(G_OBJECT(klass->time_adjustment), "value-changed",
+				 G_CALLBACK(time_adj_on_value_changed), klass);
 
 	klass->vlc_inst = libvlc_new(0, NULL);
 	klass->media_player = libvlc_media_player_new(klass->vlc_inst);
@@ -170,31 +172,59 @@ widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 	return TRUE;
 }
 
+static void
+time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
+{
+	gtk_vlc_player_seek(GTK_VLC_PLAYER(user_data),
+			    (gint64)gtk_adjustment_get_value(adj));
+}
+
+static inline void
+update_time(GtkVlcPlayer *player, gint64 new_time)
+{
+	g_signal_emit(player, gtk_vlc_player_signals[TIME_CHANGED_SIGNAL], 0,
+		      new_time);
+
+	/* ensure that time_adj_on_value_changed() will not be executed */
+	g_signal_handler_block(G_OBJECT(player->time_adjustment),
+			       player->time_adj_on_value_changed_id);
+	gtk_adjustment_set_value(GTK_ADJUSTMENT(player->time_adjustment),
+				 (gdouble)new_time);
+	g_signal_handler_unblock(G_OBJECT(player->time_adjustment),
+				 player->time_adj_on_value_changed_id);
+}
+
+static inline void
+update_length(GtkVlcPlayer *player, gint64 new_length)
+{
+	g_signal_emit(player, gtk_vlc_player_signals[LENGTH_CHANGED_SIGNAL], 0,
+		      new_length);
+
+	gtk_adjustment_set_upper(GTK_ADJUSTMENT(player->time_adjustment),
+				 (gdouble)new_length);
+}
+
 /*
  * VLC callbacks are invoked from another thread!
  */
 static void
-vlc_time_changed(const struct libvlc_event_t *event, void *userdata)
+vlc_time_changed(const struct libvlc_event_t *event, void *user_data)
 {
-	GtkVlcPlayer *player = GTK_VLC_PLAYER(userdata);
-
 	assert(event->type == libvlc_MediaPlayerTimeChanged);
 
 	gdk_threads_enter();
-	g_signal_emit(player, gtk_vlc_player_signals[TIME_CHANGED_SIGNAL], 0,
-		      (gint64)event->u.media_player_time_changed.new_time);
+	update_time(GTK_VLC_PLAYER(user_data),
+		    (gint64)event->u.media_player_time_changed.new_time);
 	gdk_threads_leave();
 }
 
 static void
-vlc_length_changed(const struct libvlc_event_t *event, void *userdata)
+vlc_length_changed(const struct libvlc_event_t *event, void *user_data)
 {
-	GtkVlcPlayer *player = GTK_VLC_PLAYER(userdata);
-
 	assert(event->type == libvlc_MediaPlayerLengthChanged);
 
 	gdk_threads_enter();
-	g_signal_emit(player, gtk_vlc_player_signals[LENGTH_CHANGED_SIGNAL], 0,
+	update_length(GTK_VLC_PLAYER(user_data),
 		      (gint64)event->u.media_player_length_changed.new_length);
     	gdk_threads_leave();
 }
@@ -222,9 +252,8 @@ gtk_vlc_player_load(GtkVlcPlayer *player, const gchar *uri)
 	libvlc_media_player_set_media(player->media_player, media);
 
 	/* NOTE: media was parsed so get_duration works */
-	g_signal_emit(player, gtk_vlc_player_signals[LENGTH_CHANGED_SIGNAL], 0,
-		      (gint64)libvlc_media_get_duration(media));
-	g_signal_emit(player, gtk_vlc_player_signals[TIME_CHANGED_SIGNAL], 0, 0);
+	update_length(player, (gint64)libvlc_media_get_duration(media));
+	update_time(player, 0);
 
 	libvlc_media_release(media);
 
@@ -260,11 +289,25 @@ gtk_vlc_player_stop(GtkVlcPlayer *player)
 	gtk_vlc_player_pause(player);
 	libvlc_media_player_stop(player->media_player);
 
-	g_signal_emit(player, gtk_vlc_player_signals[TIME_CHANGED_SIGNAL], 0, 0);
+	update_time(player, 0);
 }
 
 void
 gtk_vlc_player_seek(GtkVlcPlayer *player, gint64 time)
 {
 	libvlc_media_player_set_time(player->media_player, (libvlc_time_t)time);
+}
+
+GtkAdjustment *
+gtk_vlc_player_get_time_adjustment(GtkVlcPlayer *player)
+{
+	return GTK_ADJUSTMENT(player->time_adjustment);
+}
+
+void
+gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
+{
+	gtk_object_unref(player->time_adjustment);
+	player->time_adjustment = GTK_OBJECT(adj);
+	gtk_object_ref(player->time_adjustment);
 }

@@ -24,6 +24,9 @@ G_BEGIN_DECLS
 typedef struct _GtkVlcPlayer {
 	GtkAlignment parent_instance;
 
+	GtkObject		*time_adjustment;
+	gulong			time_adj_on_value_changed_id;
+
 	libvlc_instance_t	*vlc_inst;
 	libvlc_media_player_t	*media_player;
 
@@ -53,6 +56,8 @@ void gtk_vlc_player_stop(GtkVlcPlayer *player);
 
 void gtk_vlc_player_seek(GtkVlcPlayer *player, gint64 time);
 
+GtkAdjustment *gtk_vlc_player_get_time_adjustment(GtkVlcPlayer *player);
+void gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj);
 
 G_END_DECLS
 

@@ -13,13 +13,17 @@
  * GtkBuilder signal callbacks
  */
 
+/* NOTE: for some strange reason the parameters are switched */
 void
-playpause_button_clicked_cb(GtkWidget *widget,
-			    gpointer data __attribute__((unused)))
+playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 {
-	gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget));
+	gtk_button_set_label(GTK_BUTTON(data),
+			     gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget))
+			     	? "gtk-media-play"
+			     	: "gtk-media-pause");
 }
 
+/* NOTE: for some strange reason the parameters are switched */
 void
 stop_button_clicked_cb(GtkWidget *widget,
 		       gpointer data __attribute__((unused)))
@@ -27,12 +31,11 @@ stop_button_clicked_cb(GtkWidget *widget,
 	gtk_vlc_player_stop(GTK_VLC_PLAYER(widget));
 }
 
-
 int
 main(int argc, char *argv[])
 {
 	GtkBuilder *builder;
-	GtkWidget *window, *player;
+	GtkWidget *window, *player, *scale;
 
 	/* init threads */
 #ifdef HAVE_X11_XLIB_H
@@ -50,10 +53,17 @@ main(int argc, char *argv[])
 
 	window = GTK_WIDGET(gtk_builder_get_object(builder, "player_window"));
 	player = GTK_WIDGET(gtk_builder_get_object(builder, "player_widget"));
+	scale = GTK_WIDGET(gtk_builder_get_object(builder, "scale_widget"));
 
-	g_object_unref(builder);
+	g_object_unref(G_OBJECT(builder));
+
+	/* connect scale with player widget */
+	gtk_range_set_adjustment(GTK_RANGE(scale),
+				 gtk_vlc_player_get_time_adjustment(GTK_VLC_PLAYER(player)));
 
 	gtk_vlc_player_load(GTK_VLC_PLAYER(player), argv[1]);
+
+	gtk_widget_set_sensitive(GTK_WIDGET(scale), TRUE);
 
 	gtk_widget_show_all(window);
 
