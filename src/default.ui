@@ -28,6 +28,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">image1</property>
                         <property name="use_stock">False</property>
+                        <signal name="activate" handler="file_menu_openmovie_item_activate_cb" object="player_window"/>
                       </object>
                     </child>
                     <child>
@@ -37,6 +38,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">image2</property>
                         <property name="use_stock">False</property>
+                        <signal name="activate" handler="file_menu_opentranscript_item_activate_cb" object="player_window"/>
                       </object>
                     </child>
                     <child>
@@ -50,6 +52,33 @@
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="quickopen_item">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Quick Open</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="quickopen_menu">
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="quickopen_menu_separator_item">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="quickopen_menu_choosedir_item">
+                        <property name="label" translatable="yes">Choose _Directory...</property>
+                        <property name="visible">True</property>
+                        <property name="use_underline">True</property>
+                        <property name="image">image3</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="quickopen_menu_choosedir_item_activate_cb" object="player_window"/>
                       </object>
                     </child>
                   </object>
@@ -155,5 +184,9 @@
   <object class="GtkImage" id="image2">
     <property name="visible">True</property>
     <property name="stock">gtk-open</property>
+  </object>
+  <object class="GtkImage" id="image3">
+    <property name="visible">True</property>
+    <property name="stock">gtk-directory</property>
   </object>
 </interface>

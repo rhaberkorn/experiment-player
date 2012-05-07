@@ -9,11 +9,15 @@
 #include <gtk/gtk.h>
 #include <gtk-vlc-player.h>
 
+static GtkWidget *window,
+		 *player,
+		 *scale;
+
 /*
  * GtkBuilder signal callbacks
+ * NOTE: for some strange reason the parameters are switched
  */
 
-/* NOTE: for some strange reason the parameters are switched */
 void
 playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 {
@@ -23,7 +27,6 @@ playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 			     	: "gtk-media-pause");
 }
 
-/* NOTE: for some strange reason the parameters are switched */
 void
 stop_button_clicked_cb(GtkWidget *widget,
 		       gpointer data __attribute__((unused)))
@@ -31,11 +34,49 @@ stop_button_clicked_cb(GtkWidget *widget,
 	gtk_vlc_player_stop(GTK_VLC_PLAYER(widget));
 }
 
+void
+file_menu_openmovie_item_activate_cb(GtkWidget *widget,
+				     gpointer data __attribute__((unused)))
+{
+	GtkWidget *dialog;
+
+	dialog = gtk_file_chooser_dialog_new("Open Movie...", GTK_WINDOW(widget),
+					     GTK_FILE_CHOOSER_ACTION_OPEN,
+					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					     NULL);
+
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+		gchar *uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
+
+		if (gtk_vlc_player_load(GTK_VLC_PLAYER(player), uri)) {
+			/* TODO */
+		} else {
+			gtk_widget_set_sensitive(scale, TRUE);
+		}
+
+		g_free(uri);
+	}
+
+	gtk_widget_destroy(dialog);
+}
+
+void
+file_menu_opentranscript_item_activate_cb(GtkWidget *widget, gpointer data)
+{
+	/* TODO */
+}
+
+void
+quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget, gpointer data)
+{
+	/* TODO */
+}
+
 int
 main(int argc, char *argv[])
 {
 	GtkBuilder *builder;
-	GtkWidget *window, *player, *scale;
 
 	/* init threads */
 #ifdef HAVE_X11_XLIB_H
@@ -60,10 +101,6 @@ main(int argc, char *argv[])
 	/* connect scale with player widget */
 	gtk_range_set_adjustment(GTK_RANGE(scale),
 				 gtk_vlc_player_get_time_adjustment(GTK_VLC_PLAYER(player)));
-
-	gtk_vlc_player_load(GTK_VLC_PLAYER(player), argv[1]);
-
-	gtk_widget_set_sensitive(GTK_WIDGET(scale), TRUE);
 
 	gtk_widget_show_all(window);
 
