@@ -326,9 +326,16 @@ gtk_vlc_player_get_time_adjustment(GtkVlcPlayer *player)
 void
 gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 {
+	g_signal_handler_disconnect(G_OBJECT(player->time_adjustment),
+				    player->time_adj_on_value_changed_id);
+
 	gtk_object_unref(player->time_adjustment);
 	player->time_adjustment = GTK_OBJECT(adj);
 	gtk_object_ref(player->time_adjustment);
+
+	player->time_adj_on_value_changed_id =
+		g_signal_connect(G_OBJECT(player->time_adjustment), "value-changed",
+				 G_CALLBACK(time_adj_on_value_changed), player);
 }
 
 GtkAdjustment *
@@ -340,7 +347,14 @@ gtk_vlc_player_get_volume_adjustment(GtkVlcPlayer *player)
 void
 gtk_vlc_player_set_volume_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 {
+	g_signal_handler_disconnect(G_OBJECT(player->volume_adjustment),
+				    player->vol_adj_on_value_changed_id);
+
 	gtk_object_unref(player->volume_adjustment);
 	player->volume_adjustment = GTK_OBJECT(adj);
 	gtk_object_ref(player->volume_adjustment);
+
+	player->vol_adj_on_value_changed_id =
+		g_signal_connect(G_OBJECT(player->volume_adjustment), "value-changed",
+				 G_CALLBACK(vol_adj_on_value_changed), player);
 }
