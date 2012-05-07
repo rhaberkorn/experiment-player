@@ -8,7 +8,7 @@
     <property name="default_width">400</property>
     <property name="default_height">300</property>
     <child>
-      <object class="GtkVBox" id="vbox">
+      <object class="GtkVBox" id="player_window_vbox">
         <property name="visible">True</property>
         <child>
           <object class="GtkMenuBar" id="menubar">
@@ -120,31 +120,22 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHScale" id="scale_widget">
+          <object class="GtkHBox" id="controls_hbox">
             <property name="visible">True</property>
-            <property name="sensitive">False</property>
-            <property name="can_focus">True</property>
-            <property name="draw_value">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkHButtonBox" id="hbuttonbox">
-            <property name="visible">True</property>
-            <property name="border_width">6</property>
-            <property name="layout_style">start</property>
             <child>
               <object class="GtkButton" id="playpause_button">
-                <property name="label">gtk-media-play</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
+                <property name="relief">none</property>
                 <signal name="clicked" handler="playpause_button_clicked_cb" object="player_widget"/>
+                <child>
+                  <object class="GtkImage" id="playpause_image">
+                    <property name="visible">True</property>
+                    <property name="stock">gtk-media-play</property>
+                    <property name="icon-size">2</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -154,12 +145,18 @@
             </child>
             <child>
               <object class="GtkButton" id="stop_button">
-                <property name="label">gtk-media-stop</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
+                <property name="relief">none</property>
                 <signal name="clicked" handler="stop_button_clicked_cb" object="player_widget"/>
+                <child>
+                  <object class="GtkImage" id="stop_image">
+                    <property name="visible">True</property>
+                    <property name="stock">gtk-media-stop</property>
+                    <property name="icon-size">2</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -167,11 +164,50 @@
                 <property name="position">1</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkHScale" id="scale_widget">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can_focus">True</property>
+                <property name="draw_value">False</property>
+              </object>
+              <packing>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkVolumeButton" id="volume_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="has_tooltip">True</property>
+                <property name="relief">none</property>
+                <property name="focus_on_click">False</property>
+                <property name="orientation">vertical</property>
+                <property name="value">1</property>
+                <property name="icons">audio-volume-muted
+audio-volume-high
+audio-volume-low
+audio-volume-medium</property>
+                <child>
+                  <object class="GtkImage" id="volume_image">
+                    <property name="visible">True</property>
+                    <property name="icon_name">audio-volume-high</property>
+                    <property name="icon-size">2</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">False</property>
-            <property name="position">3</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

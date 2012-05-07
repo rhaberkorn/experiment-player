@@ -21,10 +21,14 @@ static GtkWidget *window,
 void
 playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 {
-	gtk_button_set_label(GTK_BUTTON(data),
-			     gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget))
-			     	? "gtk-media-play"
-			     	: "gtk-media-pause");
+	GtkWidget *image = gtk_bin_get_child(GTK_BIN(data));
+	gboolean is_playing;
+
+	is_playing = gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget));
+	gtk_image_set_from_stock(GTK_IMAGE(image),
+				 is_playing ? "gtk-media-play"
+					    : "gtk-media-pause",
+				 GTK_ICON_SIZE_SMALL_TOOLBAR);
 }
 
 void
