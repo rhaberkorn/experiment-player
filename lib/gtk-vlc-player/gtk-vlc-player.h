@@ -27,6 +27,9 @@ typedef struct _GtkVlcPlayer {
 	GtkObject		*time_adjustment;
 	gulong			time_adj_on_value_changed_id;
 
+	GtkObject		*volume_adjustment;
+	gulong			vol_adj_on_value_changed_id;
+
 	libvlc_instance_t	*vlc_inst;
 	libvlc_media_player_t	*media_player;
 
@@ -55,9 +58,13 @@ gboolean gtk_vlc_player_toggle(GtkVlcPlayer *player);
 void gtk_vlc_player_stop(GtkVlcPlayer *player);
 
 void gtk_vlc_player_seek(GtkVlcPlayer *player, gint64 time);
+void gtk_vlc_player_set_volume(GtkVlcPlayer *player, gdouble volume);
 
 GtkAdjustment *gtk_vlc_player_get_time_adjustment(GtkVlcPlayer *player);
 void gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj);
+
+GtkAdjustment *gtk_vlc_player_get_volume_adjustment(GtkVlcPlayer *player);
+void gtk_vlc_player_set_volume_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj);
 
 G_END_DECLS
 

@@ -9,9 +9,10 @@
 #include <gtk/gtk.h>
 #include <gtk-vlc-player.h>
 
-static GtkWidget *window,
-		 *player,
-		 *scale;
+static GtkWidget *player_window,
+		 *player_widget,
+		 *scale_widget,
+		 *volume_button;
 
 /*
  * GtkBuilder signal callbacks
@@ -53,10 +54,10 @@ file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
 		gchar *uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
 
-		if (gtk_vlc_player_load(GTK_VLC_PLAYER(player), uri)) {
+		if (gtk_vlc_player_load(GTK_VLC_PLAYER(player_widget), uri)) {
 			/* TODO */
 		} else {
-			gtk_widget_set_sensitive(scale, TRUE);
+			gtk_widget_set_sensitive(scale_widget, TRUE);
 		}
 
 		g_free(uri);
@@ -81,6 +82,7 @@ int
 main(int argc, char *argv[])
 {
 	GtkBuilder *builder;
+	GtkAdjustment *adj;
 
 	/* init threads */
 #ifdef HAVE_X11_XLIB_H
@@ -96,17 +98,20 @@ main(int argc, char *argv[])
 	gtk_builder_add_from_file(builder, DEFAULT_UI, NULL);
 	gtk_builder_connect_signals(builder, NULL);
 
-	window = GTK_WIDGET(gtk_builder_get_object(builder, "player_window"));
-	player = GTK_WIDGET(gtk_builder_get_object(builder, "player_widget"));
-	scale = GTK_WIDGET(gtk_builder_get_object(builder, "scale_widget"));
+	player_window = GTK_WIDGET(gtk_builder_get_object(builder, "player_window"));
+	player_widget = GTK_WIDGET(gtk_builder_get_object(builder, "player_widget"));
+	scale_widget = GTK_WIDGET(gtk_builder_get_object(builder, "scale_widget"));
+	volume_button = GTK_WIDGET(gtk_builder_get_object(builder, "volume_button"));
 
 	g_object_unref(G_OBJECT(builder));
 
-	/* connect scale with player widget */
-	gtk_range_set_adjustment(GTK_RANGE(scale),
-				 gtk_vlc_player_get_time_adjustment(GTK_VLC_PLAYER(player)));
+	/* connect timeline and volume button with player widget */
+	adj = gtk_vlc_player_get_time_adjustment(GTK_VLC_PLAYER(player_widget));
+	gtk_range_set_adjustment(GTK_RANGE(scale_widget), adj);
+	adj = gtk_vlc_player_get_volume_adjustment(GTK_VLC_PLAYER(player_widget));
+	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
 
-	gtk_widget_show_all(window);
+	gtk_widget_show_all(player_window);
 
 	gdk_threads_enter();
 	gtk_main();

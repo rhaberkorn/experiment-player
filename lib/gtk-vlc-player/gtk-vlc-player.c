@@ -22,6 +22,7 @@ static void widget_on_realize(GtkWidget *widget, gpointer data);
 static gboolean widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer data);
 
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
+static void vol_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
 static inline void update_time(GtkVlcPlayer *player, gint64 new_time);
 static inline void update_length(GtkVlcPlayer *player, gint64 new_length);
@@ -115,6 +116,11 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 		g_signal_connect(G_OBJECT(klass->time_adjustment), "value-changed",
 				 G_CALLBACK(time_adj_on_value_changed), klass);
 
+	klass->volume_adjustment = gtk_adjustment_new(1., 0., 1., 0.02, 0., 0.);
+	klass->vol_adj_on_value_changed_id =
+		g_signal_connect(G_OBJECT(klass->volume_adjustment), "value-changed",
+				 G_CALLBACK(vol_adj_on_value_changed), klass);
+
 	klass->vlc_inst = libvlc_new(0, NULL);
 	klass->media_player = libvlc_media_player_new(klass->vlc_inst);
 
@@ -177,6 +183,13 @@ time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
 {
 	gtk_vlc_player_seek(GTK_VLC_PLAYER(user_data),
 			    (gint64)gtk_adjustment_get_value(adj));
+}
+
+static void
+vol_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
+{
+	gtk_vlc_player_set_volume(GTK_VLC_PLAYER(user_data),
+				  gtk_adjustment_get_value(adj));
 }
 
 static inline void
@@ -298,6 +311,12 @@ gtk_vlc_player_seek(GtkVlcPlayer *player, gint64 time)
 	libvlc_media_player_set_time(player->media_player, (libvlc_time_t)time);
 }
 
+void
+gtk_vlc_player_set_volume(GtkVlcPlayer *player, gdouble volume)
+{
+	libvlc_audio_set_volume(player->media_player, (int)(volume*100.));
+}
+
 GtkAdjustment *
 gtk_vlc_player_get_time_adjustment(GtkVlcPlayer *player)
 {
@@ -310,4 +329,18 @@ gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 	gtk_object_unref(player->time_adjustment);
 	player->time_adjustment = GTK_OBJECT(adj);
 	gtk_object_ref(player->time_adjustment);
+}
+
+GtkAdjustment *
+gtk_vlc_player_get_volume_adjustment(GtkVlcPlayer *player)
+{
+	return GTK_ADJUSTMENT(player->volume_adjustment);
+}
+
+void
+gtk_vlc_player_set_volume_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
+{
+	gtk_object_unref(player->volume_adjustment);
+	player->volume_adjustment = GTK_OBJECT(adj);
+	gtk_object_ref(player->volume_adjustment);
 }
