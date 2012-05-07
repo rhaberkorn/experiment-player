@@ -78,6 +78,13 @@ quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget, gpointer data)
 	/* TODO */
 }
 
+void
+generic_quit_cb(GtkWidget *widget __attribute__((unused)),
+		gpointer data __attribute__((unused)))
+{
+	gtk_main_quit();
+}
+
 int
 main(int argc, char *argv[])
 {

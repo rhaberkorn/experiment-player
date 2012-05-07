@@ -7,6 +7,7 @@
     <property name="title" translatable="yes">Experiment Player</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>
+    <signal name="destroy" handler="generic_quit_cb"/>
     <child>
       <object class="GtkVBox" id="player_window_vbox">
         <property name="visible">True</property>
@@ -52,6 +53,7 @@
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="generic_quit_cb"/>
                       </object>
                     </child>
                   </object>
