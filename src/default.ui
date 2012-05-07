@@ -190,11 +190,7 @@ audio-volume-high
 audio-volume-low
 audio-volume-medium</property>
                 <child>
-                  <object class="GtkImage" id="volume_image">
-                    <property name="visible">True</property>
-                    <property name="icon_name">audio-volume-high</property>
-                    <property name="icon-size">2</property>
-                  </object>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
