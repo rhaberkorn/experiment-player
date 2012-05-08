@@ -69,6 +69,13 @@
                   <object class="GtkMenu" id="quickopen_menu">
                     <property name="visible">True</property>
                     <child>
+                      <object class="GtkMenuItem" id="quickopen_menu_empty_item">
+                        <property name="visible">True</property>
+                        <property name="sensitive">False</property>
+                        <property name="label" translatable="yes">No experiments found</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="quickopen_menu_separator_item">
                         <property name="visible">True</property>
                       </object>
@@ -81,6 +88,15 @@
                         <property name="image">image3</property>
                         <property name="use_stock">False</property>
                         <signal name="activate" handler="quickopen_menu_choosedir_item_activate_cb" object="player_window"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="quickopen_menu_refresh_item">
+                        <property name="label">gtk-refresh</property>
+                        <property name="visible">True</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="quickopen_menu_refresh_item_activate_cb" object="quickopen_menu"/>
                       </object>
                     </child>
                   </object>
@@ -191,9 +207,6 @@
 audio-volume-high
 audio-volume-low
 audio-volume-medium</property>
-                <child>
-                  <placeholder/>
-                </child>
               </object>
               <packing>
                 <property name="expand">False</property>

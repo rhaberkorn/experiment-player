@@ -2,6 +2,17 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+#include <libgen.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <fnmatch.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #ifdef HAVE_X11_XLIB_H
 #include <X11/Xlib.h>
 #endif
@@ -9,10 +20,27 @@
 #include <gtk/gtk.h>
 #include <gtk-vlc-player.h>
 
-static GtkWidget *player_window,
-		 *player_widget,
+static int quickopen_filter_cb(const struct dirent *name);
+static void destroy_all_check_menu_items_cb(GtkWidget *widget, gpointer data);
+static void refresh_quickopen_menu(GtkMenu *menu);
+static void reconfigure_all_check_menu_items_cb(GtkWidget *widget, gpointer user_data);
+static void quickopen_item_on_activate(GtkWidget *widget, gpointer user_data);
+static gboolean load_media_file(const gchar *uri);
+
+#define BUILDER_INIT(BUILDER, VAR) do {					\
+	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\
+} while (0)
+
+static GtkWidget *player_window;
+
+static GtkWidget *player_widget,
 		 *scale_widget,
 		 *volume_button;
+
+static GtkWidget *quickopen_menu,
+		 *quickopen_menu_empty_item;
+
+static char *current_filename = NULL;
 
 /*
  * GtkBuilder signal callbacks
@@ -54,11 +82,10 @@ file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
 		gchar *uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
 
-		if (gtk_vlc_player_load(GTK_VLC_PLAYER(player_widget), uri)) {
+		if (load_media_file(uri)) {
 			/* TODO */
-		} else {
-			gtk_widget_set_sensitive(scale_widget, TRUE);
 		}
+		refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
 		g_free(uri);
 	}
@@ -79,10 +106,125 @@ quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget, gpointer data)
 }
 
 void
+quickopen_menu_refresh_item_activate_cb(GtkWidget *widget,
+					gpointer data __attribute__((unused)))
+{
+	refresh_quickopen_menu(GTK_MENU(widget));
+}
+
+void
 generic_quit_cb(GtkWidget *widget __attribute__((unused)),
 		gpointer data __attribute__((unused)))
 {
 	gtk_main_quit();
+}
+
+static int
+quickopen_filter_cb(const struct dirent *name)
+{
+	char d_name[sizeof(name->d_name)], *p;
+	struct stat info;
+
+	if (fnmatch("*.mp4;*.avi", name->d_name, 0))
+		return 0;
+
+	strcpy(d_name, name->d_name);
+	if ((p = strrchr(d_name, '.')) == NULL)
+		return 0;
+	strcpy(++p, "flk");
+
+	return !stat(d_name, &info) && S_ISREG(info.st_mode);
+}
+
+static void
+destroy_all_check_menu_items_cb(GtkWidget *widget,
+				gpointer data __attribute__((unused)))
+{
+	if (GTK_IS_CHECK_MENU_ITEM(widget))
+		gtk_widget_destroy(widget);
+}
+
+static void
+refresh_quickopen_menu(GtkMenu *menu)
+{
+	static int namelist_c = 0;
+	static struct dirent **namelist = NULL;
+
+	gtk_container_foreach(GTK_CONTAINER(menu),
+			      destroy_all_check_menu_items_cb, NULL);
+
+	while (namelist_c)
+		free(namelist[--namelist_c]);
+	free(namelist);
+
+	namelist_c = scandir(".", &namelist, quickopen_filter_cb, alphasort);
+	if (namelist_c < 0)
+		return;
+
+	for (int i = namelist_c - 1; i >= 0; i--) {
+		char *d_name = strdup(namelist[i]->d_name);
+		char *item_name, *p;
+		GtkWidget *item;
+
+		item_name = basename(d_name);
+		if ((p = strrchr(item_name, '.')) != NULL)
+			*p = '\0';
+
+		item = gtk_check_menu_item_new_with_label((const gchar *)item_name);
+		gtk_check_menu_item_set_draw_as_radio(GTK_CHECK_MENU_ITEM(item), TRUE);
+		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
+					       !strcmp(current_filename ? : "",
+					       	       namelist[i]->d_name));
+
+		free(d_name);
+
+		g_signal_connect(G_OBJECT(item), "activate",
+				 G_CALLBACK(quickopen_item_on_activate),
+				 namelist[i]->d_name);
+
+		gtk_menu_shell_prepend(GTK_MENU_SHELL(menu), item);
+		gtk_widget_show(item);
+	}
+
+	if (namelist_c > 0)
+		gtk_widget_hide(quickopen_menu_empty_item);
+	else
+		gtk_widget_show(quickopen_menu_empty_item);
+}
+
+static void
+reconfigure_all_check_menu_items_cb(GtkWidget *widget, gpointer user_data)
+{
+	if (GTK_IS_CHECK_MENU_ITEM(widget))
+		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget),
+					       widget == GTK_WIDGET(user_data));
+}
+
+static void
+quickopen_item_on_activate(GtkWidget *widget, gpointer user_data)
+{
+	const gchar *filename = (const gchar *)user_data;
+
+	gtk_container_foreach(GTK_CONTAINER(quickopen_menu),
+			      reconfigure_all_check_menu_items_cb, widget);
+
+	if (load_media_file(filename)) {
+		/* FIXME */
+	}
+}
+
+static gboolean
+load_media_file(const gchar *uri)
+{
+	if (gtk_vlc_player_load(GTK_VLC_PLAYER(player_widget), uri))
+		return TRUE;
+
+	free(current_filename);
+	current_filename = strdup(uri);
+
+	gtk_widget_set_sensitive(scale_widget, TRUE);
+
+	return FALSE;
 }
 
 int
@@ -105,10 +247,14 @@ main(int argc, char *argv[])
 	gtk_builder_add_from_file(builder, DEFAULT_UI, NULL);
 	gtk_builder_connect_signals(builder, NULL);
 
-	player_window = GTK_WIDGET(gtk_builder_get_object(builder, "player_window"));
-	player_widget = GTK_WIDGET(gtk_builder_get_object(builder, "player_widget"));
-	scale_widget = GTK_WIDGET(gtk_builder_get_object(builder, "scale_widget"));
-	volume_button = GTK_WIDGET(gtk_builder_get_object(builder, "volume_button"));
+	BUILDER_INIT(builder, player_window);
+
+	BUILDER_INIT(builder, player_widget);
+	BUILDER_INIT(builder, scale_widget);
+	BUILDER_INIT(builder, volume_button);
+
+	BUILDER_INIT(builder, quickopen_menu);
+	BUILDER_INIT(builder, quickopen_menu_empty_item);
 
 	g_object_unref(G_OBJECT(builder));
 
@@ -119,6 +265,7 @@ main(int argc, char *argv[])
 	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
 
 	gtk_widget_show_all(player_window);
+	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
 	gdk_threads_enter();
 	gtk_main();
