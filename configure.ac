@@ -141,7 +141,7 @@ AC_ARG_ENABLE(console,
 	[console=$enableval], [console=no])
 if [[ $console = no ]]; then
 	case $host in
-	*-*-windows*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -mwindows" ;;
+	*-*-mingw32*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -mwindows" ;;
 	esac
 fi
 
@@ -149,7 +149,7 @@ fi
 # necessary for auto-registering GTK+ signal handlers by GTK+ builder
 case $host in
 *-*-linux*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-dynamic" ;;
-*-*-windows*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-all-symbols" ;;
+*-*-mingw32*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-all-symbols" ;;
 esac
 
 AC_SUBST(GTKAPP_CFLAGS)
@@ -163,8 +163,5 @@ AC_DEFINE(DEFAULT_QUICKOPEN_DIR, ["."], [Default directory for listing experimen
 AC_DEFINE(EXPERIMENT_MOVIE_FILTER, ["*.mp4;*.avi"], [Filters for (quick) opening movies])
 AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT, ["flk"], [File extension of experiment transcripts])
 
-AC_CONFIG_FILES([Makefile \
-		 lib/Makefile lib/gtk-vlc-player/Makefile \
-		 src/Makefile \
-		 doc/Makefile doc/Doxyfile])
+AC_CONFIG_FILES([Makefile lib/Makefile lib/gtk-vlc-player/Makefile src/Makefile doc/Makefile doc/Doxyfile])
 AC_OUTPUT
