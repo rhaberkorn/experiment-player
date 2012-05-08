@@ -148,8 +148,12 @@ AC_SUBST(GTKAPP_CFLAGS)
 AC_SUBST(GTKAPP_LDFLAGS)
 
 # Some constants
-AC_DEFINE(GTK_VLC_PLAYER_ADJ_STEP, [1000.], [VLC Player time adjustment step increment])
-AC_DEFINE(GTK_VLC_PLAYER_ADJ_PAGE, [30000.], [VLC Player time adjustment page increment])
+AC_DEFINE(GTK_VLC_PLAYER_ADJ_STEP, [1000.],	[VLC Player time adjustment step increment])
+AC_DEFINE(GTK_VLC_PLAYER_ADJ_PAGE, [30000.],	[VLC Player time adjustment page increment])
+
+AC_DEFINE(DEFAULT_QUICKOPEN_DIR, ["."], [Default directory for listing experiments])
+AC_DEFINE(EXPERIMENT_MOVIE_FILTER, ["*.mp4;*.avi"], [Filters for (quick) opening movies])
+AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT, ["flk"], [File extension of experiment transcripts])
 
 AC_CONFIG_FILES([Makefile \
 		 lib/Makefile lib/gtk-vlc-player/Makefile \

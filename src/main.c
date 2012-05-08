@@ -146,26 +146,33 @@ generic_quit_cb(GtkWidget *widget __attribute__((unused)),
 static int
 quickopen_filter_cb(const struct dirent *name)
 {
-	char *flk_name, *p;
+	char *filters, *filter;
+	char *trans_name, *p;
 	struct stat info;
 
 	int rc;
 
-	if (fnmatch("*.mp4", name->d_name, 0))
+	filters = strdup(EXPERIMENT_MOVIE_FILTER);
+	for (filter = strtok_r(filters, ";", &p);
+	     filter != NULL && fnmatch(filter, name->d_name, 0);
+	     filter = strtok_r(NULL, ";", &p));
+	free(filters);
+	if (filter == NULL)
 		return 0;
 
-	flk_name = malloc(strlen(quickopen_directory) + 1 + strlen(name->d_name) + 1);
-	strcpy(flk_name, quickopen_directory);
-	strcat(flk_name, "/");
-	strcat(flk_name, name->d_name);
-	if ((p = strrchr(flk_name, '.')) == NULL) {
-		free(flk_name);
+	trans_name = malloc(strlen(quickopen_directory) + 1 + strlen(name->d_name) +
+			    sizeof(EXPERIMENT_TRANSCRIPT_EXT));
+	strcpy(trans_name, quickopen_directory);
+	strcat(trans_name, "/");
+	strcat(trans_name, name->d_name);
+	if ((p = strrchr(trans_name, '.')) == NULL) {
+		free(trans_name);
 		return 0;
 	}
-	strcpy(++p, "flk");
+	strcpy(++p, EXPERIMENT_TRANSCRIPT_EXT);
 
-	rc = !stat(flk_name, &info) && S_ISREG(info.st_mode);
-	free(flk_name);
+	rc = !stat(trans_name, &info) && S_ISREG(info.st_mode);
+	free(trans_name);
 	return rc;
 }
 
@@ -315,7 +322,7 @@ main(int argc, char *argv[])
 
 	gtk_widget_show_all(player_window);
 
-	quickopen_directory = strdup(".");
+	quickopen_directory = strdup(DEFAULT_QUICKOPEN_DIR);
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
 	gdk_threads_enter();
