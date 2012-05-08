@@ -31,6 +31,10 @@ static gboolean load_media_file(const gchar *uri);
 	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\
 } while (0)
 
+/* shortcut OR (S1 ? : S2) might not always work under windows */
+#define SOR(S1, S2) \
+	((S1) != NULL ? (S1) : (S2))
+
 static GtkWidget *player_window;
 
 static GtkWidget *player_widget,
@@ -41,6 +45,7 @@ static GtkWidget *quickopen_menu,
 		 *quickopen_menu_empty_item;
 
 static char *current_filename = NULL;
+static gchar *quickopen_directory;
 
 /*
  * GtkBuilder signal callbacks
@@ -100,9 +105,26 @@ file_menu_opentranscript_item_activate_cb(GtkWidget *widget, gpointer data)
 }
 
 void
-quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget, gpointer data)
+quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget,
+					  gpointer data __attribute__((unused)))
 {
-	/* TODO */
+	GtkWidget *dialog;
+
+	dialog = gtk_file_chooser_dialog_new("Choose Directory...", GTK_WINDOW(widget),
+					     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+					     NULL);
+
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+		g_free(quickopen_directory);
+		quickopen_directory =
+			gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+		refresh_quickopen_menu(GTK_MENU(quickopen_menu));
+	}
+
+	gtk_widget_destroy(dialog);
 }
 
 void
@@ -122,18 +144,27 @@ generic_quit_cb(GtkWidget *widget __attribute__((unused)),
 static int
 quickopen_filter_cb(const struct dirent *name)
 {
-	char d_name[sizeof(name->d_name)], *p;
+	char *flk_name, *p;
 	struct stat info;
 
-	if (fnmatch("*.mp4;*.avi", name->d_name, 0))
+	int rc;
+
+	if (fnmatch("*.mp4", name->d_name, 0))
 		return 0;
 
-	strcpy(d_name, name->d_name);
-	if ((p = strrchr(d_name, '.')) == NULL)
+	flk_name = malloc(strlen(quickopen_directory) + 1 + strlen(name->d_name) + 1);
+	strcpy(flk_name, quickopen_directory);
+	strcat(flk_name, "/");
+	strcat(flk_name, name->d_name);
+	if ((p = strrchr(flk_name, '.')) == NULL) {
+		free(flk_name);
 		return 0;
+	}
 	strcpy(++p, "flk");
 
-	return !stat(d_name, &info) && S_ISREG(info.st_mode);
+	rc = !stat(flk_name, &info) && S_ISREG(info.st_mode);
+	free(flk_name);
+	return rc;
 }
 
 static void
@@ -147,49 +178,65 @@ destroy_all_check_menu_items_cb(GtkWidget *widget,
 static void
 refresh_quickopen_menu(GtkMenu *menu)
 {
-	static int namelist_c = 0;
-	static struct dirent **namelist = NULL;
+	struct dirent **namelist;
+	int n;
+
+	static char **fullnames = NULL;
 
 	gtk_container_foreach(GTK_CONTAINER(menu),
 			      destroy_all_check_menu_items_cb, NULL);
 
-	while (namelist_c)
-		free(namelist[--namelist_c]);
-	free(namelist);
+	if (fullnames != NULL) {
+		for (char **cur = fullnames; *cur != NULL; cur++)
+			free(*cur);
+		free(fullnames);
+	}
 
-	namelist_c = scandir(".", &namelist, quickopen_filter_cb, alphasort);
-	if (namelist_c < 0)
+	n = scandir(quickopen_directory, &namelist,
+		    quickopen_filter_cb, alphasort);
+	if (n < 0)
 		return;
 
-	for (int i = namelist_c - 1; i >= 0; i--) {
-		char *d_name = strdup(namelist[i]->d_name);
-		char *item_name, *p;
+	if (n > 0)
+		gtk_widget_hide(quickopen_menu_empty_item);
+	else
+		gtk_widget_show(quickopen_menu_empty_item);
+
+	fullnames = malloc((n+1) * sizeof(char *));
+	fullnames[n] = NULL;
+
+	while (n--) {
+		char *item_name = strdup(namelist[n]->d_name);
+		char *p;
+
 		GtkWidget *item;
 
-		item_name = basename(d_name);
+		fullnames[n] = malloc(strlen(quickopen_directory) + 1 +
+				      strlen(namelist[n]->d_name) + 1);
+		strcpy(fullnames[n], quickopen_directory);
+		strcat(fullnames[n], "/");
+		strcat(fullnames[n], namelist[n]->d_name);
+
 		if ((p = strrchr(item_name, '.')) != NULL)
 			*p = '\0';
 
 		item = gtk_check_menu_item_new_with_label((const gchar *)item_name);
 		gtk_check_menu_item_set_draw_as_radio(GTK_CHECK_MENU_ITEM(item), TRUE);
 		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
-					       !strcmp(current_filename ? : "",
-					       	       namelist[i]->d_name));
+					       !strcmp(SOR(current_filename, ""),
+					       	       fullnames[n]));
 
-		free(d_name);
+		free(item_name);
 
 		g_signal_connect(G_OBJECT(item), "activate",
-				 G_CALLBACK(quickopen_item_on_activate),
-				 namelist[i]->d_name);
+				 G_CALLBACK(quickopen_item_on_activate), fullnames[n]);
 
 		gtk_menu_shell_prepend(GTK_MENU_SHELL(menu), item);
 		gtk_widget_show(item);
-	}
 
-	if (namelist_c > 0)
-		gtk_widget_hide(quickopen_menu_empty_item);
-	else
-		gtk_widget_show(quickopen_menu_empty_item);
+		free(namelist[n]);
+	}
+	free(namelist);
 }
 
 static void
@@ -265,6 +312,8 @@ main(int argc, char *argv[])
 	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
 
 	gtk_widget_show_all(player_window);
+
+	quickopen_directory = strdup(".");
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
 	gdk_threads_enter();
