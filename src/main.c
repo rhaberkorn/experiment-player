@@ -137,6 +137,13 @@ quickopen_menu_refresh_item_activate_cb(GtkWidget *widget,
 }
 
 void
+help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
+				  gpointer data __attribute__((unused)))
+{
+	gtk_show_uri(NULL, HELP_URI, GDK_CURRENT_TIME, NULL);
+}
+
+void
 generic_quit_cb(GtkWidget *widget __attribute__((unused)),
 		gpointer data __attribute__((unused)))
 {

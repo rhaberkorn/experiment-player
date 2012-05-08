@@ -4,7 +4,8 @@ bin_PROGRAMS = experiment-player
 experiment_player_SOURCES = main.c
 
 experiment_player_CFLAGS = $(AM_CFLAGS)
-experiment_player_CPPFLAGS = -DDEFAULT_UI='"@DEFAULT_UI@"'
+experiment_player_CPPFLAGS = -DDEFAULT_UI='"@DEFAULT_UI@"' \
+			     -DHELP_URI='"@HELP_URI@"'
 experiment_player_LDFLAGS =
 experiment_player_LDADD =
 

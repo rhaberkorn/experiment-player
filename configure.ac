@@ -109,6 +109,14 @@ AC_ARG_WITH(default-ui,
 # must be expanded by the Makefiles
 AC_SUBST(DEFAULT_UI)
 
+AC_ARG_WITH(help-uri,
+	AS_HELP_STRING([--with-help-uri=URI],
+		       [Specify help (manual) URI [default=file://DOCDIR/experiment-player.html]]),
+	[HELP_URI=$withval], [HELP_URI=file://$docdir/experiment-player.html])
+# NOTE: cannot use AC_DEFINE_UNQUOTED since installation directories
+# must be expanded by the Makefiles
+AC_SUBST(HELP_URI)
+
 AC_ARG_ENABLE(doxygen-doc,
 	AS_HELP_STRING([--enable-doxygen-doc],
 		       [Generate Doxygen documentation [default=no]]),

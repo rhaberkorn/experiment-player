@@ -112,6 +112,16 @@
                   <object class="GtkMenu" id="help_menu">
                     <property name="visible">True</property>
                     <child>
+                      <object class="GtkImageMenuItem" id="help_menu_manual_item">
+                        <property name="label" translatable="yes">Read _Manual...</property>
+                        <property name="visible">True</property>
+                        <property name="use_underline">True</property>
+                        <property name="image">image4</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="help_menu_manual_item_activate_cb"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="help_menu_about_item">
                         <property name="label">gtk-about</property>
                         <property name="visible">True</property>
@@ -235,5 +245,9 @@ audio-volume-medium</property>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
     <property name="stock">gtk-directory</property>
+  </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="stock">gtk-help</property>
   </object>
 </interface>
