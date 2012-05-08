@@ -115,6 +115,8 @@ quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget,
 					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 					     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 					     NULL);
+	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),
+					    quickopen_directory);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
 		g_free(quickopen_directory);
