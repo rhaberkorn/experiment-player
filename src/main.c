@@ -23,6 +23,7 @@ static void refresh_quickopen_menu(GtkMenu *menu);
 static void reconfigure_all_check_menu_items_cb(GtkWidget *widget, gpointer user_data);
 static void quickopen_item_on_activate(GtkWidget *widget, gpointer user_data);
 
+static inline void button_image_set_from_stock(GtkWidget *widget, const gchar *name);
 static gboolean load_media_file(const gchar *uri);
 
 #define BUILDER_INIT(BUILDER, VAR) do {					\
@@ -33,6 +34,7 @@ static GtkWidget *player_window;
 
 static GtkWidget *player_widget,
 		 *scale_widget,
+		 *playpause_button,
 		 *volume_button;
 
 static GtkWidget *quickopen_menu,
@@ -49,14 +51,11 @@ static gchar *quickopen_directory;
 void
 playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 {
-	GtkWidget *image = gtk_bin_get_child(GTK_BIN(data));
-	gboolean is_playing;
+	gboolean is_playing = gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget));
 
-	is_playing = gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget));
-	gtk_image_set_from_stock(GTK_IMAGE(image),
-				 is_playing ? "gtk-media-play"
-					    : "gtk-media-pause",
-				 GTK_ICON_SIZE_SMALL_TOOLBAR);
+	button_image_set_from_stock(GTK_WIDGET(data),
+				    is_playing ? "gtk-media-play"
+					       : "gtk-media-pause");
 }
 
 void
@@ -64,6 +63,7 @@ stop_button_clicked_cb(GtkWidget *widget,
 		       gpointer data __attribute__((unused)))
 {
 	gtk_vlc_player_stop(GTK_VLC_PLAYER(widget));
+	button_image_set_from_stock(playpause_button, "gtk-media-play");
 }
 
 void
@@ -272,6 +272,15 @@ quickopen_item_on_activate(GtkWidget *widget, gpointer user_data)
 	}
 }
 
+static inline void
+button_image_set_from_stock(GtkWidget *widget, const gchar *name)
+{
+	GtkWidget *image = gtk_bin_get_child(GTK_BIN(widget));
+
+	gtk_image_set_from_stock(GTK_IMAGE(image), name,
+				 GTK_ICON_SIZE_SMALL_TOOLBAR);
+}
+
 static gboolean
 load_media_file(const gchar *uri)
 {
@@ -310,6 +319,7 @@ main(int argc, char *argv[])
 
 	BUILDER_INIT(builder, player_widget);
 	BUILDER_INIT(builder, scale_widget);
+	BUILDER_INIT(builder, playpause_button);
 	BUILDER_INIT(builder, volume_button);
 
 	BUILDER_INIT(builder, quickopen_menu);
