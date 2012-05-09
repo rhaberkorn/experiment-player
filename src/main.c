@@ -113,6 +113,9 @@ load_media_file(const gchar *uri)
 
 	gtk_widget_set_sensitive(controls_hbox, TRUE);
 
+	button_image_set_from_stock(GTK_BUTTON(playpause_button),
+				    "gtk-media-play");
+
 	return FALSE;
 }
 

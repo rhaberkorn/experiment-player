@@ -157,6 +157,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
+                <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="playpause_button_clicked_cb" object="player_widget"/>
                 <child>
                   <object class="GtkImage" id="playpause_image">
@@ -178,6 +179,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">none</property>
+                <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="stop_button_clicked_cb" object="player_widget"/>
                 <child>
                   <object class="GtkImage" id="stop_image">
