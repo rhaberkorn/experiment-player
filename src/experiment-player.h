@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 
 gboolean load_media_file(const gchar *file);
+void show_message_dialog_gerror(GError *err);
 
 extern GtkWidget *player_window;
 

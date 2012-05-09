@@ -8,6 +8,8 @@
 #include <X11/Xlib.h>
 #endif
 
+#include <glib.h>
+
 #include <gtk/gtk.h>
 #include <gtk-vlc-player.h>
 
@@ -87,7 +89,12 @@ void
 help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 				  gpointer data __attribute__((unused)))
 {
-	gtk_show_uri(NULL, HELP_URI, GDK_CURRENT_TIME, NULL);
+	GError *err = NULL;
+
+	if (!gtk_show_uri(NULL, HELP_URI, GDK_CURRENT_TIME, &err)) {
+		show_message_dialog_gerror(err);
+		g_error_free(err);
+	}
 }
 
 void
@@ -121,6 +128,24 @@ load_media_file(const gchar *file)
 				    "gtk-media-play");
 
 	return FALSE;
+}
+
+void
+show_message_dialog_gerror(GError *err)
+{
+	GtkWidget *dialog;
+
+	if (err == NULL)
+		return;
+
+	dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
+					GTK_MESSAGE_ERROR, GTK_BUTTONS_OK,
+					"%s", err->message);
+	gtk_window_set_title(GTK_WINDOW(dialog), "Error");
+
+	gtk_dialog_run(GTK_DIALOG(dialog));
+
+	gtk_widget_destroy(dialog);
 }
 
 int
