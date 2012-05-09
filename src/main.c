@@ -2,6 +2,8 @@
 #include "config.h"
 #endif
 
+#include <locale.h>
+
 #ifdef HAVE_X11_XLIB_H
 #include <X11/Xlib.h>
 #endif
@@ -126,6 +128,14 @@ main(int argc, char *argv[])
 {
 	GtkBuilder *builder;
 	GtkAdjustment *adj;
+
+	/* FIXME: support internationalization instead of enforcing English */
+#ifdef __WIN32__
+	g_setenv("LC_ALL", "English", TRUE);
+#else
+	g_setenv("LC_ALL", "en", TRUE);
+#endif
+	setlocale(LC_ALL, "");
 
 	/* init threads */
 #ifdef HAVE_X11_XLIB_H
