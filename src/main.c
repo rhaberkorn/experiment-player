@@ -18,12 +18,12 @@
 #include <gtk-vlc-player.h>
 
 static inline gboolean quickopen_filter(const gchar *name);
-static void destroy_all_check_menu_items_cb(GtkWidget *widget, gpointer data);
+static gint quickopen_item_cmp(gconstpointer a, gconstpointer b);
 static void refresh_quickopen_menu(GtkMenu *menu);
 static void reconfigure_all_check_menu_items_cb(GtkWidget *widget, gpointer user_data);
 static void quickopen_item_on_activate(GtkWidget *widget, gpointer user_data);
 
-static inline void button_image_set_from_stock(GtkWidget *widget, const gchar *name);
+static inline void button_image_set_from_stock(GtkButton *widget, const gchar *name);
 static gboolean load_media_file(const gchar *uri);
 
 #define BUILDER_INIT(BUILDER, VAR) do {					\
@@ -54,7 +54,7 @@ playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 {
 	gboolean is_playing = gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget));
 
-	button_image_set_from_stock(GTK_WIDGET(data),
+	button_image_set_from_stock(GTK_BUTTON(data),
 				    is_playing ? "gtk-media-play"
 					       : "gtk-media-pause");
 }
@@ -64,7 +64,8 @@ stop_button_clicked_cb(GtkWidget *widget,
 		       gpointer data __attribute__((unused)))
 {
 	gtk_vlc_player_stop(GTK_VLC_PLAYER(widget));
-	button_image_set_from_stock(playpause_button, "gtk-media-play");
+	button_image_set_from_stock(GTK_BUTTON(playpause_button),
+				    "gtk-media-play");
 }
 
 void
@@ -183,25 +184,27 @@ quickopen_filter(const gchar *name)
 	return res;
 }
 
-static void
-destroy_all_check_menu_items_cb(GtkWidget *widget,
-				gpointer data __attribute__((unused)))
+static gint
+quickopen_item_cmp(gconstpointer a, gconstpointer b)
 {
-	if (GTK_IS_CHECK_MENU_ITEM(widget))
-		gtk_widget_destroy(widget);
+	return -g_strcmp0(gtk_menu_item_get_label(*(GtkMenuItem **)a),
+			  gtk_menu_item_get_label(*(GtkMenuItem **)b));
 }
 
 static void
 refresh_quickopen_menu(GtkMenu *menu)
 {
-	static gchar **fullnames = NULL;
+	static gchar		**fullnames = NULL;
+	static GPtrArray	*items = NULL;
+
 	int fullnames_n;
 
 	GDir *dir;
 	const gchar *name;
 
-	gtk_container_foreach(GTK_CONTAINER(menu),
-			      destroy_all_check_menu_items_cb, NULL);
+	if (items != NULL)
+		g_ptr_array_free(items, TRUE);
+	items = g_ptr_array_new_with_free_func((GDestroyNotify)gtk_widget_destroy);
 
 	g_strfreev(fullnames);
 	fullnames = NULL;
@@ -223,28 +226,34 @@ refresh_quickopen_menu(GtkMenu *menu)
 		item_name = g_strdup(name);
 		if ((p = g_strrstr(item_name, ".")) != NULL)
 			*p = '\0';
-
 		item = gtk_check_menu_item_new_with_label(item_name);
-		gtk_check_menu_item_set_draw_as_radio(GTK_CHECK_MENU_ITEM(item), TRUE);
+		g_ptr_array_add(items, item);
+		g_free(item_name);
+
+		gtk_check_menu_item_set_draw_as_radio(GTK_CHECK_MENU_ITEM(item),
+						      TRUE);
 		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
 					       !g_strcmp0(current_filename,
 					       	          fullnames[fullnames_n]));
-
-		g_free(item_name);
 
 		g_signal_connect(G_OBJECT(item), "activate",
 				 G_CALLBACK(quickopen_item_on_activate),
 				 fullnames[fullnames_n]);
 
-		gtk_menu_shell_insert(GTK_MENU_SHELL(menu), item, fullnames_n);
-		gtk_widget_show(item);
-
 		fullnames_n++;
 	}
 	if (fullnames != NULL)
 		fullnames[fullnames_n] = NULL;
+	g_ptr_array_sort(items, quickopen_item_cmp);
 
 	g_dir_close(dir);
+
+	for (int i = 0; i < items->len; i++) {
+		GtkWidget *item = GTK_WIDGET(g_ptr_array_index(items, i));
+
+		gtk_menu_shell_prepend(GTK_MENU_SHELL(menu), item);
+		gtk_widget_show(item);
+	}
 
 	if (fullnames_n > 0)
 		gtk_widget_hide(quickopen_menu_empty_item);
@@ -274,7 +283,7 @@ quickopen_item_on_activate(GtkWidget *widget, gpointer user_data)
 }
 
 static inline void
-button_image_set_from_stock(GtkWidget *widget, const gchar *name)
+button_image_set_from_stock(GtkButton *widget, const gchar *name)
 {
 	GtkWidget *image = gtk_bin_get_child(GTK_BIN(widget));
 
