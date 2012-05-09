@@ -2,38 +2,32 @@
 #include "config.h"
 #endif
 
-#include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <stdlib.h>
-#include <libgen.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <fnmatch.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef HAVE_X11_XLIB_H
 #include <X11/Xlib.h>
 #endif
 
+#include <glib.h>
+#include <glib/gprintf.h>
+#include <glib/gstdio.h>
+
 #include <gtk/gtk.h>
 #include <gtk-vlc-player.h>
 
-static int quickopen_filter_cb(const struct dirent *name);
+static inline gboolean quickopen_filter(const gchar *name);
 static void destroy_all_check_menu_items_cb(GtkWidget *widget, gpointer data);
 static void refresh_quickopen_menu(GtkMenu *menu);
 static void reconfigure_all_check_menu_items_cb(GtkWidget *widget, gpointer user_data);
 static void quickopen_item_on_activate(GtkWidget *widget, gpointer user_data);
+
 static gboolean load_media_file(const gchar *uri);
 
 #define BUILDER_INIT(BUILDER, VAR) do {					\
 	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\
 } while (0)
-
-/* shortcut OR (S1 ? : S2) might not always work under windows */
-#define SOR(S1, S2) \
-	((S1) != NULL ? (S1) : (S2))
 
 static GtkWidget *player_window;
 
@@ -44,7 +38,7 @@ static GtkWidget *player_widget,
 static GtkWidget *quickopen_menu,
 		 *quickopen_menu_empty_item;
 
-static char *current_filename = NULL;
+static gchar *current_filename = NULL;
 static gchar *quickopen_directory;
 
 /*
@@ -150,37 +144,42 @@ generic_quit_cb(GtkWidget *widget __attribute__((unused)),
 	gtk_main_quit();
 }
 
-static int
-quickopen_filter_cb(const struct dirent *name)
+static inline gboolean
+quickopen_filter(const gchar *name)
 {
-	char *filters, *filter;
-	char *trans_name, *p;
-	struct stat info;
+	gchar *name_reversed = g_strreverse(g_strdup(name));
+	gchar **filters, **filter;
 
-	int rc;
+	gchar *trans_name, *p;
+	gboolean res;
 
-	filters = strdup(EXPERIMENT_MOVIE_FILTER);
-	for (filter = strtok_r(filters, ";", &p);
-	     filter != NULL && fnmatch(filter, name->d_name, 0);
-	     filter = strtok_r(NULL, ";", &p));
-	free(filters);
-	if (filter == NULL)
-		return 0;
+	filters = g_strsplit(EXPERIMENT_MOVIE_FILTER, ";", 0);
+	for (filter = filters; *filter != NULL; filter++) {
+		GPatternSpec *pattern = g_pattern_spec_new(*filter);
 
-	trans_name = malloc(strlen(quickopen_directory) + 1 + strlen(name->d_name) +
-			    sizeof(EXPERIMENT_TRANSCRIPT_EXT));
-	strcpy(trans_name, quickopen_directory);
-	strcat(trans_name, "/");
-	strcat(trans_name, name->d_name);
-	if ((p = strrchr(trans_name, '.')) == NULL) {
-		free(trans_name);
-		return 0;
+		res = g_pattern_match(pattern, strlen(name), name, name_reversed);
+		g_pattern_spec_free(pattern);
+		if (res)
+			break;
 	}
-	strcpy(++p, EXPERIMENT_TRANSCRIPT_EXT);
+	res = *filter == NULL;
+	g_strfreev(filters);
+	g_free(name_reversed);
+	if (res)
+		return FALSE;
 
-	rc = !stat(trans_name, &info) && S_ISREG(info.st_mode);
-	free(trans_name);
-	return rc;
+	trans_name = g_strconcat(quickopen_directory, "/", name,
+				 EXPERIMENT_TRANSCRIPT_EXT, NULL);
+	if ((p = g_strrstr(trans_name, ".")) == NULL) {
+		g_free(trans_name);
+		return FALSE;
+	}
+	g_stpcpy(++p, EXPERIMENT_TRANSCRIPT_EXT);
+
+	res = !g_access(trans_name, F_OK | R_OK);
+	g_free(trans_name);
+
+	return res;
 }
 
 static void
@@ -194,65 +193,62 @@ destroy_all_check_menu_items_cb(GtkWidget *widget,
 static void
 refresh_quickopen_menu(GtkMenu *menu)
 {
-	struct dirent **namelist;
-	int n;
+	static gchar **fullnames = NULL;
+	int fullnames_n;
 
-	static char **fullnames = NULL;
+	GDir *dir;
+	const gchar *name;
 
 	gtk_container_foreach(GTK_CONTAINER(menu),
 			      destroy_all_check_menu_items_cb, NULL);
 
-	if (fullnames != NULL) {
-		for (char **cur = fullnames; *cur != NULL; cur++)
-			free(*cur);
-		free(fullnames);
+	g_strfreev(fullnames);
+	fullnames = NULL;
+	fullnames_n = 0;
+
+	dir = g_dir_open(quickopen_directory, 0, NULL);
+
+	while ((name = g_dir_read_name(dir)) != NULL) {
+		if (!quickopen_filter(name))
+			continue;
+
+		gchar *item_name, *p;
+		GtkWidget *item;
+
+		fullnames = g_realloc(fullnames, (fullnames_n+2) * sizeof(gchar *));
+		fullnames[fullnames_n] = g_strconcat(quickopen_directory, "/",
+						     name, NULL);
+
+		item_name = g_strdup(name);
+		if ((p = g_strrstr(item_name, ".")) != NULL)
+			*p = '\0';
+
+		item = gtk_check_menu_item_new_with_label(item_name);
+		gtk_check_menu_item_set_draw_as_radio(GTK_CHECK_MENU_ITEM(item), TRUE);
+		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
+					       !g_strcmp0(current_filename,
+					       	          fullnames[fullnames_n]));
+
+		g_free(item_name);
+
+		g_signal_connect(G_OBJECT(item), "activate",
+				 G_CALLBACK(quickopen_item_on_activate),
+				 fullnames[fullnames_n]);
+
+		gtk_menu_shell_insert(GTK_MENU_SHELL(menu), item, fullnames_n);
+		gtk_widget_show(item);
+
+		fullnames_n++;
 	}
+	if (fullnames != NULL)
+		fullnames[fullnames_n] = NULL;
 
-	n = scandir(quickopen_directory, &namelist,
-		    quickopen_filter_cb, alphasort);
-	if (n < 0)
-		return;
+	g_dir_close(dir);
 
-	if (n > 0)
+	if (fullnames_n > 0)
 		gtk_widget_hide(quickopen_menu_empty_item);
 	else
 		gtk_widget_show(quickopen_menu_empty_item);
-
-	fullnames = malloc((n+1) * sizeof(char *));
-	fullnames[n] = NULL;
-
-	while (n--) {
-		char *item_name = strdup(namelist[n]->d_name);
-		char *p;
-
-		GtkWidget *item;
-
-		fullnames[n] = malloc(strlen(quickopen_directory) + 1 +
-				      strlen(namelist[n]->d_name) + 1);
-		strcpy(fullnames[n], quickopen_directory);
-		strcat(fullnames[n], "/");
-		strcat(fullnames[n], namelist[n]->d_name);
-
-		if ((p = strrchr(item_name, '.')) != NULL)
-			*p = '\0';
-
-		item = gtk_check_menu_item_new_with_label((const gchar *)item_name);
-		gtk_check_menu_item_set_draw_as_radio(GTK_CHECK_MENU_ITEM(item), TRUE);
-		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
-					       !strcmp(SOR(current_filename, ""),
-					       	       fullnames[n]));
-
-		free(item_name);
-
-		g_signal_connect(G_OBJECT(item), "activate",
-				 G_CALLBACK(quickopen_item_on_activate), fullnames[n]);
-
-		gtk_menu_shell_prepend(GTK_MENU_SHELL(menu), item);
-		gtk_widget_show(item);
-
-		free(namelist[n]);
-	}
-	free(namelist);
 }
 
 static void
@@ -282,8 +278,8 @@ load_media_file(const gchar *uri)
 	if (gtk_vlc_player_load(GTK_VLC_PLAYER(player_widget), uri))
 		return TRUE;
 
-	free(current_filename);
-	current_filename = strdup(uri);
+	g_free(current_filename);
+	current_filename = g_strdup(uri);
 
 	gtk_widget_set_sensitive(scale_widget, TRUE);
 
@@ -329,7 +325,7 @@ main(int argc, char *argv[])
 
 	gtk_widget_show_all(player_window);
 
-	quickopen_directory = strdup(DEFAULT_QUICKOPEN_DIR);
+	quickopen_directory = g_strdup(DEFAULT_QUICKOPEN_DIR);
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
 	gdk_threads_enter();
