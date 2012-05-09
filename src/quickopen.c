@@ -86,8 +86,9 @@ quickopen_filter(const gchar *name)
 	if (res)
 		return FALSE;
 
-	trans_name = g_strconcat(quickopen_directory, "/", name,
-				 EXPERIMENT_TRANSCRIPT_EXT, NULL);
+	trans_name = g_build_filename(quickopen_directory, name, NULL);
+	trans_name = g_realloc(trans_name, strlen(trans_name) +
+					   sizeof(EXPERIMENT_TRANSCRIPT_EXT));
 	if ((p = g_strrstr(trans_name, ".")) == NULL) {
 		g_free(trans_name);
 		return FALSE;
@@ -136,8 +137,8 @@ refresh_quickopen_menu(GtkMenu *menu)
 		GtkWidget *item;
 
 		fullnames = g_realloc(fullnames, (fullnames_n+2) * sizeof(gchar *));
-		fullnames[fullnames_n] = g_strconcat(quickopen_directory, "/",
-						     name, NULL);
+		fullnames[fullnames_n] = g_build_filename(quickopen_directory,
+							  name, NULL);
 
 		item_name = g_strdup(name);
 		if ((p = g_strrstr(item_name, ".")) != NULL)
