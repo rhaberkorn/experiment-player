@@ -83,6 +83,16 @@ case $host in
 		AC_MSG_ERROR([Missing X11/Xlib.h!])
 	])
 	;;
+*-*-mingw*)
+	AC_CHECK_HEADERS([windows.h], , [
+		AC_MSG_ERROR([Missing Windows headers!])
+	])
+	AC_CHECK_HEADERS([shellapi.h], , [
+		AC_MSG_ERROR([Missing Windows headers!])
+	], [
+		#include <windows.h>
+	])
+	;;
 esac
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -141,7 +151,7 @@ AC_ARG_ENABLE(console,
 	[console=$enableval], [console=no])
 if [[ $console = no ]]; then
 	case $host in
-	*-*-mingw32*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -mwindows" ;;
+	*-*-mingw*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -mwindows" ;;
 	esac
 fi
 
@@ -149,7 +159,7 @@ fi
 # necessary for auto-registering GTK+ signal handlers by GTK+ builder
 case $host in
 *-*-linux*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-dynamic" ;;
-*-*-mingw32*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-all-symbols" ;;
+*-*-mingw*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-all-symbols" ;;
 esac
 
 AC_SUBST(GTKAPP_CFLAGS)

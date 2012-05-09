@@ -8,6 +8,11 @@
 #include <X11/Xlib.h>
 #endif
 
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#include <shellapi.h>
+#endif
+
 #include <glib.h>
 
 #include <gtk/gtk.h>
@@ -90,8 +95,19 @@ help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 				  gpointer data __attribute__((unused)))
 {
 	GError *err = NULL;
+	gboolean res;
 
-	if (!gtk_show_uri(NULL, HELP_URI, GDK_CURRENT_TIME, &err)) {
+#ifdef HAVE_WINDOWS_H
+	res = (int)ShellExecute(NULL, "open", HELP_URI,
+				NULL, NULL, SW_SHOWNORMAL) <= 32;
+	if (res)
+		err = g_error_new(g_quark_from_static_string("Cannot open!"), 0,
+				  "Cannot open '%s'!", HELP_URI);
+#else
+	res = !gtk_show_uri(NULL, HELP_URI, GDK_CURRENT_TIME, &err);
+#endif
+
+	if (res) {
 		show_message_dialog_gerror(err);
 		g_error_free(err);
 	}
