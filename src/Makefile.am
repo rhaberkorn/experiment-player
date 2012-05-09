@@ -7,7 +7,7 @@ experiment_player_SOURCES = main.c quickopen.c \
 experiment_player_CFLAGS = $(AM_CFLAGS)
 experiment_player_CPPFLAGS = -DDEFAULT_UI='"@DEFAULT_UI@"' \
 			     -DHELP_URI='"@HELP_URI@"'
-experiment_player_LDFLAGS =
+experiment_player_LDFLAGS = -export-dynamic
 experiment_player_LDADD =
 
 if USE_W32_RES

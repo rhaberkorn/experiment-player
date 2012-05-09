@@ -160,16 +160,9 @@ AC_ARG_ENABLE(console,
 	[console=$enableval], [console=no])
 if [[ $console = no ]]; then
 	case $host in
-	*-*-mingw*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -mwindows" ;;
+	*-*-mingw*) GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -mwindows" ;;
 	esac
 fi
-
-# Export symbols
-# necessary for auto-registering GTK+ signal handlers by GTK+ builder
-case $host in
-*-*-linux*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-dynamic" ;;
-*-*-mingw*)	GTKAPP_LDFLAGS="$GTKAPP_LDFLAGS -Wl,--export-all-symbols" ;;
-esac
 
 AC_SUBST(GTKAPP_CFLAGS)
 AC_SUBST(GTKAPP_LDFLAGS)
