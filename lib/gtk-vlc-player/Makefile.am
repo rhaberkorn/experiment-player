@@ -8,7 +8,8 @@ libgtk_vlc_player_la_SOURCES = gtk-vlc-player.c gtk-vlc-player.h
 libgtk_vlc_player_la_CFLAGS = $(AM_CFLAGS) \
 			      @LIBGTK_CFLAGS@ @LIBVLC_CFLAGS@
 libgtk_vlc_player_la_LIBADD = @LIBGTK_LIBS@ @LIBVLC_LIBS@
-libgtk_vlc_player_la_LDFLAGS = -no-undefined -shared -module
+libgtk_vlc_player_la_LDFLAGS = -no-undefined -shared -bindir @bindir@ \
+			       -avoid-version
 
 include_HEADERS = gtk-vlc-player.h
 

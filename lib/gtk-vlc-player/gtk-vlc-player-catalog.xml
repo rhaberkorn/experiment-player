@@ -4,7 +4,7 @@
 	Install into $GLADE_CATALOG_PATH (default: /usr/share/glade3/catalogs)
 -->
 
-<glade-catalog name="gtk-vlc-player" library="libgtk-vlc-player.so" depends="gtk+">
+<glade-catalog name="gtk-vlc-player" library="gtk-vlc-player" depends="gtk+">
 	<glade-widget-classes>
 		<glade-widget-class name="GtkVlcPlayer"
 				    generic-name="gtk-vlc-player"
