@@ -33,6 +33,7 @@ static gboolean load_media_file(const gchar *uri);
 static GtkWidget *player_window;
 
 static GtkWidget *player_widget,
+		 *controls_hbox,
 		 *scale_widget,
 		 *playpause_button,
 		 *volume_button;
@@ -290,7 +291,7 @@ load_media_file(const gchar *uri)
 	g_free(current_filename);
 	current_filename = g_strdup(uri);
 
-	gtk_widget_set_sensitive(scale_widget, TRUE);
+	gtk_widget_set_sensitive(controls_hbox, TRUE);
 
 	return FALSE;
 }
@@ -318,6 +319,7 @@ main(int argc, char *argv[])
 	BUILDER_INIT(builder, player_window);
 
 	BUILDER_INIT(builder, player_widget);
+	BUILDER_INIT(builder, controls_hbox);
 	BUILDER_INIT(builder, scale_widget);
 	BUILDER_INIT(builder, playpause_button);
 	BUILDER_INIT(builder, volume_button);

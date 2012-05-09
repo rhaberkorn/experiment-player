@@ -150,6 +150,7 @@
         <child>
           <object class="GtkHBox" id="controls_hbox">
             <property name="visible">True</property>
+            <property name="sensitive">False</property>
             <child>
               <object class="GtkButton" id="playpause_button">
                 <property name="visible">True</property>
@@ -195,8 +196,8 @@
             <child>
               <object class="GtkHScale" id="scale_widget">
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
+                <property name="restrict_to_fill_level">False</property>
                 <property name="draw_value">False</property>
               </object>
               <packing>
