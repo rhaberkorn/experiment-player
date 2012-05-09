@@ -60,14 +60,16 @@ file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 					     NULL);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-		gchar *uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dialog));
+		gchar *file;
 
-		if (load_media_file(uri)) {
+		file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+		if (load_media_file(file)) {
 			/* TODO */
 		}
 		refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
-		g_free(uri);
+		g_free(file);
 	}
 
 	gtk_widget_destroy(dialog);
@@ -103,13 +105,13 @@ button_image_set_from_stock(GtkButton *widget, const gchar *name)
 }
 
 gboolean
-load_media_file(const gchar *uri)
+load_media_file(const gchar *file)
 {
-	if (gtk_vlc_player_load(GTK_VLC_PLAYER(player_widget), uri))
+	if (gtk_vlc_player_load_filename(GTK_VLC_PLAYER(player_widget), file))
 		return TRUE;
 
 	g_free(current_filename);
-	current_filename = g_strdup(uri);
+	current_filename = g_strdup(file);
 
 	gtk_widget_set_sensitive(controls_hbox, TRUE);
 

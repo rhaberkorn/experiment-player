@@ -50,7 +50,9 @@ GType gtk_vlc_player_get_type(void);
  * API
  */
 GtkWidget *gtk_vlc_player_new(void);
-gboolean gtk_vlc_player_load(GtkVlcPlayer *player, const gchar *uri);
+
+gboolean gtk_vlc_player_load_filename(GtkVlcPlayer *player, const gchar *file);
+gboolean gtk_vlc_player_load_uri(GtkVlcPlayer *player, const gchar *uri);
 
 void gtk_vlc_player_play(GtkVlcPlayer *player);
 void gtk_vlc_player_pause(GtkVlcPlayer *player);

@@ -30,6 +30,16 @@ static inline void update_length(GtkVlcPlayer *player, gint64 new_length);
 static void vlc_time_changed(const struct libvlc_event_t *event, void *userdata);
 static void vlc_length_changed(const struct libvlc_event_t *event, void *userdata);
 
+static void vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media);
+
+enum {
+	TIME_CHANGED_SIGNAL,
+	LENGTH_CHANGED_SIGNAL,
+	LAST_SIGNAL
+};
+
+static guint gtk_vlc_player_signals[LAST_SIGNAL] = {0, 0};
+
 GType
 gtk_vlc_player_get_type(void)
 {
@@ -55,15 +65,6 @@ gtk_vlc_player_get_type(void)
 
 	return type;
 }
-
-enum {
-	TIME_CHANGED_SIGNAL,
-	LENGTH_CHANGED_SIGNAL,
-	LAST_SIGNAL
-};
-
-
-static guint gtk_vlc_player_signals[LAST_SIGNAL] = {0, 0};
 
 static void
 gtk_vlc_player_class_init(GtkVlcPlayerClass *klass)
@@ -252,22 +253,40 @@ gtk_vlc_player_new(void)
 	return GTK_WIDGET(g_object_new(GTK_TYPE_VLC_PLAYER, NULL));
 }
 
-gboolean
-gtk_vlc_player_load(GtkVlcPlayer *player, const gchar *uri)
+static void
+vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media)
 {
-	libvlc_media_t *media;
-
-	media = libvlc_media_new_location(player->vlc_inst, (const char *)uri);
-	if (media == NULL)
-		return TRUE;
-
 	libvlc_media_parse(media);
 	libvlc_media_player_set_media(player->media_player, media);
 
 	/* NOTE: media was parsed so get_duration works */
 	update_length(player, (gint64)libvlc_media_get_duration(media));
 	update_time(player, 0);
+}
 
+gboolean
+gtk_vlc_player_load_filename(GtkVlcPlayer *player, const gchar *file)
+{
+	libvlc_media_t *media;
+
+	media = libvlc_media_new_path(player->vlc_inst, (const char *)file);
+	if (media == NULL)
+		return TRUE;
+	vlc_player_load_media(player, media);
+	libvlc_media_release(media);
+
+	return FALSE;
+}
+
+gboolean
+gtk_vlc_player_load_uri(GtkVlcPlayer *player, const gchar *uri)
+{
+	libvlc_media_t *media;
+
+	media = libvlc_media_new_location(player->vlc_inst, (const char *)uri);
+	if (media == NULL)
+		return TRUE;
+	vlc_player_load_media(player, media);
 	libvlc_media_release(media);
 
 	return FALSE;

@@ -3,7 +3,7 @@
 
 #include <gtk/gtk.h>
 
-gboolean load_media_file(const gchar *uri);
+gboolean load_media_file(const gchar *file);
 
 extern GtkWidget *player_window;
 
