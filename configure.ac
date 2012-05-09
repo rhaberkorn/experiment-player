@@ -32,6 +32,15 @@ AC_CHECK_PROG(XSLTPROC, xsltproc, xsltproc)
 XSLT_FLAGS="--xinclude"
 AC_SUBST(XSLT_FLAGS)
 
+case $host in
+*-*-mingw*)
+	AC_CHECK_PROG(RC, windres, windres)
+	if [[ x$RC = x ]]; then
+		AC_MSG_WARN([Resource compiler not found... Binary will not have an icon!])
+	fi
+esac
+AM_CONDITIONAL(USE_W32_RES, test x$RC != x)
+
 #
 # Checks for libraries.
 #

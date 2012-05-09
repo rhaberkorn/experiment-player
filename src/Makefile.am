@@ -10,6 +10,10 @@ experiment_player_CPPFLAGS = -DDEFAULT_UI='"@DEFAULT_UI@"' \
 experiment_player_LDFLAGS =
 experiment_player_LDADD =
 
+if USE_W32_RES
+experiment_player_LDADD += icon.$(OBJEXT)
+endif
+
 experiment_player_CPPFLAGS += -I@top_srcdir@/lib/gtk-vlc-player
 experiment_player_LDADD += @top_srcdir@/lib/gtk-vlc-player/libgtk-vlc-player.la
 
@@ -19,4 +23,10 @@ experiment_player_LDADD += @LIBGTK_LIBS@
 experiment_player_CFLAGS += @GTKAPP_CFLAGS@
 experiment_player_LDFLAGS += @GTKAPP_LDFLAGS@
 
-dist_player_data_DATA = default.ui
+dist_player_data_DATA = default.ui \
+			experiment-player.ico
+
+EXTRA_DIST = icon.rc
+
+icon.$(OBJEXT) : icon.rc experiment-player.ico
+	@RC@ $< $@
