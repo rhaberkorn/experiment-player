@@ -4,6 +4,7 @@
   <!-- interface-requires gtk-vlc-player 0.0 -->
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="player_window">
+    <property name="visible">True</property>
     <property name="title" translatable="yes">Experiment Player</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>

@@ -96,8 +96,10 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 	libvlc_event_manager_t	*evman;
 
 	gtk_alignment_set(GTK_ALIGNMENT(klass), 0., 0., 1., 1.);
+
 	drawing_area = gtk_drawing_area_new();
 	gtk_container_add(GTK_CONTAINER(klass), drawing_area);
+	gtk_widget_show(drawing_area);
 
 	gdk_color_parse("black", &color);
 	gtk_widget_modify_bg(drawing_area, GTK_STATE_NORMAL, &color);
@@ -105,7 +107,6 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 	g_signal_connect(G_OBJECT(drawing_area), "realize",
 			 G_CALLBACK(widget_on_realize), klass);
 
-	/* FIXME: must probably do via vlc events */
 	gtk_widget_add_events(drawing_area, GDK_BUTTON_PRESS_MASK);
 	g_signal_connect(G_OBJECT(drawing_area), "button-press-event",
 			 G_CALLBACK(widget_on_click), klass);
@@ -135,7 +136,6 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 
 	klass->isFullscreen = FALSE;
 	klass->fullscreen_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_hide(klass->fullscreen_window);
 }
 
 static void
@@ -151,7 +151,6 @@ widget_on_realize(GtkWidget *widget, gpointer user_data)
 #endif
 }
 
-/* FIXME: might have to use libvlc events */
 static gboolean
 widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
@@ -163,15 +162,16 @@ widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 	//DEBUG("player_widget double-click");
 
 	if (player->isFullscreen) {
-		gtk_window_unfullscreen(GTK_WINDOW(player->fullscreen_window));
 		gtk_widget_reparent(widget, GTK_WIDGET(player));
+		gtk_widget_show(widget);
+		gtk_window_unfullscreen(GTK_WINDOW(player->fullscreen_window));
 		gtk_widget_hide(player->fullscreen_window);
 
 		player->isFullscreen = FALSE;
 	} else {
-		gtk_widget_show(player->fullscreen_window);
-		gtk_widget_reparent(widget, player->fullscreen_window);
 		gtk_window_fullscreen(GTK_WINDOW(player->fullscreen_window));
+		gtk_widget_reparent(widget, player->fullscreen_window);
+		gtk_widget_show_all(player->fullscreen_window);
 
 		player->isFullscreen = TRUE;
 	}

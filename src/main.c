@@ -211,8 +211,6 @@ main(int argc, char *argv[])
 	adj = gtk_vlc_player_get_volume_adjustment(GTK_VLC_PLAYER(player_widget));
 	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
 
-	gtk_widget_show_all(player_window);
-
 	quickopen_directory = g_strdup(DEFAULT_QUICKOPEN_DIR);
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
