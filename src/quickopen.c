@@ -172,10 +172,7 @@ refresh_quickopen_menu(GtkMenu *menu)
 		gtk_widget_show(item);
 	}
 
-	if (fullnames_n > 0)
-		gtk_widget_hide(quickopen_menu_empty_item);
-	else
-		gtk_widget_show(quickopen_menu_empty_item);
+	gtk_widget_set_visible(quickopen_menu_empty_item, !fullnames_n);
 }
 
 static void
