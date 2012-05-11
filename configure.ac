@@ -175,5 +175,5 @@ AC_DEFINE(DEFAULT_QUICKOPEN_DIR, ["."], [Default directory for listing experimen
 AC_DEFINE(EXPERIMENT_MOVIE_FILTER, ["*.mp4;*.avi"], [Filters for (quick) opening movies])
 AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT, ["flk"], [File extension of experiment transcripts])
 
-AC_CONFIG_FILES([Makefile lib/Makefile lib/gtk-vlc-player/Makefile src/Makefile doc/Makefile doc/Doxyfile])
+AC_CONFIG_FILES([Makefile lib/Makefile lib/gtk-vlc-player/Makefile lib/experiment-reader/Makefile lib/gtk-experiment-widgets/Makefile src/Makefile doc/Makefile doc/Doxyfile])
 AC_OUTPUT

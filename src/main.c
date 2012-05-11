@@ -16,7 +16,10 @@
 #include <glib.h>
 
 #include <gtk/gtk.h>
+
 #include <gtk-vlc-player.h>
+#include <gtk-experiment-navigator.h>
+#include <experiment-reader.h>
 
 #include "experiment-player.h"
 

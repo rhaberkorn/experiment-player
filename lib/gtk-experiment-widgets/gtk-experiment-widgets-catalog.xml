@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Install into $GLADE_CATALOG_PATH (default: /usr/share/glade3/catalogs)
+-->
+
+<glade-catalog name="gtk-experiment-widgets"
+	       library="gtk-experiment-widgets" depends="gtk+">
+	<glade-widget-classes>
+		<glade-widget-class name="GtkExperimentNavigator"
+				    generic-name="gtk-experiment-navigator"
+				    title="Experiment Navigator"/>
+	</glade-widget-classes>
+
+	<glade-widget-group name="gtk-experiment-widgets"
+			    title="Experiment Widgets">
+		<glade-widget-class-ref name="GtkExperimentNavigator"/>
+	</glade-widget-group>
+</glade-catalog>

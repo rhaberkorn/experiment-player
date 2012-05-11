@@ -14,11 +14,17 @@ if USE_W32_RES
 experiment_player_LDADD += icon.$(OBJEXT)
 endif
 
+experiment_player_CFLAGS += @LIBGTK_CFLAGS@
+experiment_player_LDADD += @LIBGTK_LIBS@
+
 experiment_player_CPPFLAGS += -I@top_srcdir@/lib/gtk-vlc-player
 experiment_player_LDADD += @top_srcdir@/lib/gtk-vlc-player/libgtk-vlc-player.la
 
-experiment_player_CFLAGS += @LIBGTK_CFLAGS@
-experiment_player_LDADD += @LIBGTK_LIBS@
+experiment_player_CPPFLAGS += -I@top_srcdir@/lib/gtk-experiment-widgets
+experiment_player_LDADD += @top_srcdir@/lib/gtk-experiment-widgets/libgtk-experiment-widgets.la
+
+experiment_player_CPPFLAGS += -I@top_srcdir@/lib/experiment-reader
+#experiment_player_LDADD += @top_srcdir@/lib/experiment-reader/libexperiment-reader.la
 
 experiment_player_CFLAGS += @GTKAPP_CFLAGS@
 experiment_player_LDFLAGS += @GTKAPP_LDFLAGS@

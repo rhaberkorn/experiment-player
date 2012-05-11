@@ -1,2 +1,3 @@
 
-SUBDIRS = gtk-vlc-player
+SUBDIRS = gtk-vlc-player \
+	  experiment-reader gtk-experiment-widgets
