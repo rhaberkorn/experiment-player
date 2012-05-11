@@ -25,13 +25,14 @@
 
 static inline void button_image_set_from_stock(GtkButton *widget, const gchar *name);
 
-GtkWidget *player_window;
-
 GtkWidget *player_widget,
 	  *controls_hbox,
 	  *scale_widget,
 	  *playpause_button,
 	  *volume_button;
+
+GtkWidget *navigator_scrolledwindow,
+	  *navigator_widget;
 
 gchar *current_filename = NULL;
 
@@ -88,9 +89,31 @@ file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 }
 
 void
-file_menu_opentranscript_item_activate_cb(GtkWidget *widget, gpointer data)
+file_menu_opentranscript_item_activate_cb(GtkWidget *widget,
+					  gpointer data __attribute__((unused)))
 {
-	/* TODO */
+	GtkWidget *dialog;
+
+	dialog = gtk_file_chooser_dialog_new("Open Transcript...", GTK_WINDOW(widget),
+					     GTK_FILE_CHOOSER_ACTION_OPEN,
+					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+					     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+					     NULL);
+
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
+		gchar *file;
+
+		file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+
+		if (load_transcript_file(file)) {
+			/* TODO */
+		}
+		refresh_quickopen_menu(GTK_MENU(quickopen_menu));
+
+		g_free(file);
+	}
+
+	gtk_widget_destroy(dialog);
 }
 
 void
@@ -114,6 +137,13 @@ help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 		show_message_dialog_gerror(err);
 		g_error_free(err);
 	}
+}
+
+void
+navigator_widget_time_selected_cb(GtkWidget *widget, gint64 selected_time,
+				  gpointer user_data __attribute__((unused)))
+{
+	gtk_vlc_player_seek(GTK_VLC_PLAYER(widget), selected_time);
 }
 
 void
@@ -142,9 +172,23 @@ load_media_file(const gchar *file)
 	current_filename = g_strdup(file);
 
 	gtk_widget_set_sensitive(controls_hbox, TRUE);
+	gtk_widget_set_sensitive(navigator_scrolledwindow, TRUE);
 
 	button_image_set_from_stock(GTK_BUTTON(playpause_button),
 				    "gtk-media-play");
+
+	return FALSE;
+}
+
+gboolean
+load_transcript_file(const gchar *file)
+{
+	gboolean res;
+
+	/* FIXME */
+	res = gtk_experiment_navigator_load_filename(GTK_EXPERIMENT_NAVIGATOR(navigator_widget), file);
+	if (res)
+		return TRUE;
 
 	return FALSE;
 }
@@ -195,8 +239,6 @@ main(int argc, char *argv[])
 	gtk_builder_add_from_file(builder, DEFAULT_UI, NULL);
 	gtk_builder_connect_signals(builder, NULL);
 
-	BUILDER_INIT(builder, player_window);
-
 	BUILDER_INIT(builder, player_widget);
 	BUILDER_INIT(builder, controls_hbox);
 	BUILDER_INIT(builder, scale_widget);
@@ -205,6 +247,9 @@ main(int argc, char *argv[])
 
 	BUILDER_INIT(builder, quickopen_menu);
 	BUILDER_INIT(builder, quickopen_menu_empty_item);
+
+	BUILDER_INIT(builder, navigator_scrolledwindow);
+	BUILDER_INIT(builder, navigator_widget);
 
 	g_object_unref(G_OBJECT(builder));
 

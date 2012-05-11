@@ -187,6 +187,7 @@ static void
 quickopen_item_on_activate(GtkWidget *widget, gpointer user_data)
 {
 	const gchar *filename = (const gchar *)user_data;
+	gchar *trans_name, *p;
 
 	gtk_container_foreach(GTK_CONTAINER(quickopen_menu),
 			      reconfigure_all_check_menu_items_cb, widget);
@@ -194,4 +195,20 @@ quickopen_item_on_activate(GtkWidget *widget, gpointer user_data)
 	if (load_media_file(filename)) {
 		/* FIXME */
 	}
+
+	trans_name = g_strdup(filename);
+	trans_name = g_realloc(trans_name, strlen(trans_name) +
+					   sizeof(EXPERIMENT_TRANSCRIPT_EXT));
+	if ((p = g_strrstr(trans_name, ".")) == NULL) {
+		g_free(trans_name);
+		/* FIXME */
+		return;
+	}
+	g_stpcpy(++p, EXPERIMENT_TRANSCRIPT_EXT);
+
+	if (load_transcript_file(trans_name)) {
+		/* FIXME */
+	}
+
+	g_free(trans_name);
 }

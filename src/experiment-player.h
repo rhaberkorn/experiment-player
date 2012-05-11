@@ -4,15 +4,18 @@
 #include <gtk/gtk.h>
 
 gboolean load_media_file(const gchar *file);
-void show_message_dialog_gerror(GError *err);
+gboolean load_transcript_file(const gchar *file);
 
-extern GtkWidget *player_window;
+void show_message_dialog_gerror(GError *err);
 
 extern GtkWidget *player_widget,
 		 *controls_hbox,
 		 *scale_widget,
 		 *playpause_button,
 		 *volume_button;
+
+extern GtkWidget *navigator_scrolledwindow,
+		 *navigator_widget;
 
 extern gchar *current_filename;
 
