@@ -14,7 +14,7 @@ libgtk_experiment_widgets_la_CFLAGS += @LIBGTK_CFLAGS@
 libgtk_experiment_widgets_la_LIBADD += @LIBGTK_LIBS@
 
 libgtk_experiment_widgets_la_CPPFLAGS += -I@top_srcdir@/lib/experiment-reader
-#libgtk_experiment_widgets_la_LIBADD += @top_srcdir@/lib/experiment-reader/libexperiment-reader.la
+libgtk_experiment_widgets_la_LIBADD += @top_srcdir@/lib/experiment-reader/libexperiment-reader.la
 
 include_HEADERS = gtk-experiment-navigator.h
 

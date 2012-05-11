@@ -44,6 +44,8 @@ AM_CONDITIONAL(USE_W32_RES, test x$RC != x)
 #
 # Checks for libraries.
 #
+PKG_CHECK_MODULES(LIBGLIB, [gobject-2.0 glib-2.0])
+
 PKG_CHECK_MODULES(LIBGTK, [gtk+-2.0])
 
 # FIXME: further restrict libvlc version
@@ -173,7 +175,7 @@ AC_DEFINE(GTK_VLC_PLAYER_ADJ_PAGE, [30000.],	[VLC Player time adjustment page in
 
 AC_DEFINE(DEFAULT_QUICKOPEN_DIR, ["."], [Default directory for listing experiments])
 AC_DEFINE(EXPERIMENT_MOVIE_FILTER, ["*.mp4;*.avi"], [Filters for (quick) opening movies])
-AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT, ["flk"], [File extension of experiment transcripts])
+AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT, ["xml"], [File extension of experiment transcripts])
 
 AC_CONFIG_FILES([Makefile lib/Makefile lib/gtk-vlc-player/Makefile lib/experiment-reader/Makefile lib/gtk-experiment-widgets/Makefile src/Makefile doc/Makefile doc/Doxyfile])
 AC_OUTPUT

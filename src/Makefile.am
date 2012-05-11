@@ -24,7 +24,7 @@ experiment_player_CPPFLAGS += -I@top_srcdir@/lib/gtk-experiment-widgets
 experiment_player_LDADD += @top_srcdir@/lib/gtk-experiment-widgets/libgtk-experiment-widgets.la
 
 experiment_player_CPPFLAGS += -I@top_srcdir@/lib/experiment-reader
-#experiment_player_LDADD += @top_srcdir@/lib/experiment-reader/libexperiment-reader.la
+experiment_player_LDADD += @top_srcdir@/lib/experiment-reader/libexperiment-reader.la
 
 experiment_player_CFLAGS += @GTKAPP_CFLAGS@
 experiment_player_LDFLAGS += @GTKAPP_LDFLAGS@

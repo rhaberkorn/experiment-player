@@ -183,13 +183,21 @@ load_media_file(const gchar *file)
 gboolean
 load_transcript_file(const gchar *file)
 {
+	ExperimentReader *reader;
 	gboolean res;
 
-	/* FIXME */
-	res = gtk_experiment_navigator_load_filename(GTK_EXPERIMENT_NAVIGATOR(navigator_widget), file);
-	if (res)
+	reader = experiment_reader_new(file);
+	if (reader == NULL)
 		return TRUE;
 
+	res = gtk_experiment_navigator_load(GTK_EXPERIMENT_NAVIGATOR(navigator_widget),
+					    reader);
+	if (res) {
+		g_object_unref(G_OBJECT(reader));
+		return TRUE;
+	}
+
+	g_object_unref(reader);
 	return FALSE;
 }
 

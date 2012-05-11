@@ -1,0 +1,130 @@
+﻿<!-- ==========================================================
+		Elements refering to the target transcript structure
+     ========================================================== -->
+
+<!ELEMENT session (head, speakers, recording, timeline, greeting, experiment, farewell)>
+
+<!ELEMENT greeting (topic)+>
+<!ELEMENT experiment (initial-narrative, last-minute)>
+<!ELEMENT farewell (topic)+>
+
+<!ELEMENT initial-narrative (topic+)>
+<!ELEMENT last-minute (phase, phase, phase, phase, phase, phase)>
+
+<!ELEMENT phase (topic)+>
+<!ATTLIST phase id NMTOKEN #REQUIRED >
+
+<!ELEMENT topic (contribution)+>
+<!ATTLIST topic 
+	id (bz_1|bz_2|
+		i_1|i_2|i_3|i_4|i_5|i_6|i_7|i_8|i_10|i_12|i_14|i_15|i_16|i_17|i_19|i_20|
+		lm_1_1|lm_1_2|lm_1_3|lm_1_5|lm_1_6|lm_1_7|lm_1_8|
+		lm_2_1|lm_2_4|lm_2_6|lm_2_9|
+		lm_2_11|lm_2_13|lm_2_15|lm_2_16|lm_2_17|lm_2_20|
+		lm_2_23|lm_2_25|lm_2_27|lm_2_28|lm_2_30|
+		lm_2_31|lm_2_38|
+		lm_3_1|lm_3_2|lm_3_3|lm_3_4|lm_3_6|lm_3_7|lm_3_8|
+		lm_4_1|lm_4_2|lm_4_4|lm_4_6|
+		lm_5_1|lm_5_2|lm_5_5|lm_5_7|
+		lm_5_19|lm_5_20|
+		lm_5_21|lm_5_22|lm_5_24|lm_5_30|
+		lm_5_31|lm_5_32|lm_5_33|
+		a_6_1|a_6_3|a_6_5|
+		v_1) #REQUIRED
+>
+
+
+
+<!-- ==========================================================
+		Elements inspired by Folker-Schema
+     ========================================================== -->
+
+<!ELEMENT head ANY>
+
+
+<!ELEMENT speakers (speaker)*>
+<!ELEMENT speaker (#PCDATA|name)*>
+<!ATTLIST speaker
+	speaker-id ID #REQUIRED
+>
+
+<!ELEMENT name (#PCDATA)>
+
+<!ELEMENT recording EMPTY>
+<!ATTLIST recording
+	path CDATA #IMPLIED
+>
+
+
+<!ELEMENT timeline (timepoint, (timepoint)+)>
+<!ELEMENT timepoint EMPTY>
+<!ATTLIST timepoint
+	timepoint-id ID #REQUIRED
+	absolute-time NMTOKEN #REQUIRED
+>
+
+
+<!ELEMENT contribution (#PCDATA|segment|unparsed|breathe|non-phonological|uncertain|pause|time|phrase)*>
+<!ATTLIST contribution
+	speaker-reference IDREF #IMPLIED
+	start-reference IDREF #REQUIRED
+	end-reference IDREF #REQUIRED
+	parse-level NMTOKEN #IMPLIED
+	id (addition|elaboration|removal|repetition|rejection|weight_limit|weight_limit_extended|
+	save_comment|make_comment|enumeration|selected_category|remaining_time|acknowledgement) #IMPLIED
+>
+
+
+<!ELEMENT segment (#PCDATA)>
+<!ATTLIST segment
+	start-reference IDREF #IMPLIED
+	end-reference IDREF #IMPLIED
+>
+
+
+<!ELEMENT unparsed (time)*>
+
+
+<!ELEMENT breathe EMPTY>
+<!ATTLIST breathe
+	type (in|out) #IMPLIED
+	length NMTOKEN #REQUIRED
+>
+
+
+<!ELEMENT non-phonological EMPTY>
+<!ATTLIST non-phonological
+	description CDATA #REQUIRED
+>
+
+
+<!ELEMENT uncertain (#PCDATA|time|stress|lengthening|alternative)*>
+
+
+<!ELEMENT alternative (#PCDATA|time|stress|lengthening)*>
+
+
+<!ELEMENT pause EMPTY>
+<!ATTLIST pause
+	duration NMTOKEN #REQUIRED
+>
+
+
+<!ELEMENT time EMPTY>
+<!ATTLIST time
+	timepoint-reference IDREF #REQUIRED
+>
+
+
+<!ELEMENT phrase (#PCDATA|breathe|non-phonological|uncertain|pause|time|stress|lengthening)*>
+<!ATTLIST phrase
+	type (intonation-phrase|fragment|unaccentuated) #REQUIRED
+	boundary-intonation (high-rise|rise|steady|fall|low-fall) #IMPLIED
+>
+
+
+<!ELEMENT stress (time)*>
+<!ELEMENT lengthening EMPTY>
+<!ATTLIST lengthening
+	length NMTOKEN #IMPLIED
+>
