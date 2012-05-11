@@ -7,7 +7,7 @@ libexperiment_reader_la_SOURCES = experiment-reader.c experiment-reader.h
 
 libexperiment_reader_la_CFLAGS = $(AM_CFLAGS)
 libexperiment_reader_la_CPPFLAGS =
-libexperiment_reader_la_LDFLAGS = -bindir @bindir@
+libexperiment_reader_la_LDFLAGS = -no-undefined -bindir @bindir@
 libexperiment_reader_la_LIBADD =
 
 libexperiment_reader_la_CFLAGS += @LIBGLIB_CFLAGS@
