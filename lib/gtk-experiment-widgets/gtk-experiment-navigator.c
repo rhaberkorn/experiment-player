@@ -1,3 +1,9 @@
+/**
+ * @file
+ * GTK widget, extending a \e GtkTreeView, for displaying an experiments
+ * structure for navigational purposes.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -23,18 +29,24 @@ static void time_cell_data_cb(GtkTreeViewColumn *col,
 
 static inline void select_time(GtkExperimentNavigator *navi, gint64 selected_time);
 
+/** @private */
 enum {
 	TIME_SELECTED_SIGNAL,
 	LAST_SIGNAL
 };
 static guint gtk_experiment_navigator_signals[LAST_SIGNAL] = {0};
 
+/**
+ * @private
+ * Enumeration of tree store columns that serves as an Id
+ */
 enum {
 	COL_SECTION_NAME,
 	COL_TIME,
 	NUM_COLS
 };
 
+/** @private */
 GType
 gtk_experiment_navigator_get_type(void)
 {
@@ -74,6 +86,15 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 			     1, G_TYPE_INT64);
 }
 
+/**
+ * Internal constructor for the \e GtkExperimentNavigator widget.
+ * It has to create and fill the \e GtkTreeStore (MVC model), add view columns
+ * and add cell renderers to the view columns.
+ * It should connect the necessary signals to respond to row activations
+ * (double click) in order to emit the \e time-selected signal.
+ *
+ * @param klass Newly constructed \e GtkExperimentNavigator instance
+ */
 static void
 gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 {
@@ -92,6 +113,7 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	/*
 	 * Create some sample(!) store rows and content
 	 */
+	/** @todo remove sample code */
 	gtk_tree_store_append(store, &toplevel, NULL);
 	gtk_tree_store_set(store, &toplevel,
 			   COL_SECTION_NAME, "FOO", -1);
@@ -133,9 +155,19 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	/* destroy store/model automatically with view */
 	g_object_unref(store);
 
-	/* TODO */
+	/** @todo better \e TreeViewColumn formatting */
+	/** @todo connect signals to respond to row activations */
 }
 
+/**
+ * Cell data function to invoke when rendering the "Time" column.
+ *
+ * @param col       \e GtkTreeViewColumn to render for
+ * @param renderer  Cell renderer to use for rendering
+ * @param model     \e GtkTreeModel associated with the view
+ * @param iter      Row identifier
+ * @param user_data Callback user data
+ */
 static void
 time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 		  GtkCellRenderer *renderer,
@@ -148,11 +180,19 @@ time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 	gtk_tree_model_get(model, iter,
 			   COL_TIME, &time_val, -1);
 
-	g_snprintf(buf, sizeof(buf), "%lldms", time_val); /* FIXME */
+	/** @todo Improve readability (e.g. h:mm:ss) */
+	g_snprintf(buf, sizeof(buf), "%lldms", time_val);
 
 	g_object_set(renderer, "text", buf, NULL);
 }
 
+/**
+ * Emit "time-selected" signal on a \e GtkExperimentNavigator instance.
+ * It should be emitted when a row entry was selected.
+ *
+ * @param navi          Widget to emit the signal
+ * @param selected_time Selected time in milliseconds
+ */
 static inline void
 select_time(GtkExperimentNavigator *navi, gint64 selected_time)
 {
@@ -164,24 +204,47 @@ select_time(GtkExperimentNavigator *navi, gint64 selected_time)
  * API
  */
 
+/**
+ * Construct new \e GtkExperimentNavigator widget instance.
+ *
+ * @return New \e GtkExperimentNavigator widget instance
+ */
 GtkWidget *
 gtk_experiment_navigator_new(void)
 {
 	return GTK_WIDGET(g_object_new(GTK_TYPE_EXPERIMENT_NAVIGATOR, NULL));
 }
 
+/**
+ * Fills the \e GtkExperimentNavigator widget with the structure specified
+ * in an experiment-XML file (see session.dtd).
+ * Any existing contents should be cleared.
+ *
+ * @param navi Object instance to display the structure in
+ * @param exp  \e ExperimentReader instance symbolizing the XML-file
+ * @return \e TRUE on error, else \e FALSE
+ */
 gboolean
 gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
 			      ExperimentReader *exp)
 {
-	/* TODO */
+	/** @todo Clear contents, process XML file and fill \e TreeViewStore */
 	return TRUE;
 }
 
+/**
+ * Fills the \e GtkExperimentNavigator widget with the structure specified
+ * in an experiment-XML file (see session.dtd).
+ * Any existing contents should be cleared.
+ *
+ * @param navi Object instance to display the structure in
+ * @param exp  Filename of XML-file to open and use for configuring \e navi
+ * @return \e TRUE on error, else \e FALSE
+ */
 gboolean
 gtk_experiment_navigator_load_filename(GtkExperimentNavigator *navi,
 				       const gchar *exp)
 {
-	/* TODO */
+	/** @todo Clear contents, process XML file and fill \e TreeViewStore */
 	return TRUE;
 }
