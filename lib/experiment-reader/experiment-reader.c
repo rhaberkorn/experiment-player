@@ -1,3 +1,9 @@
+/**
+ * @file
+ * Auxiliary class to handle "session" XML files (augmented Folker).
+ * It is a GObject that must be freed using \e g_object_unref.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -23,13 +29,16 @@ static gboolean generic_foreach_topic(xmlDoc *doc, xmlNodeSet *nodes,
 				      ExperimentReaderTopicCallback callback,
 				      gpointer data);
 
+/** @private */
 #define EXPERIMENT_READER_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), EXPERIMENT_TYPE_READER, ExperimentReaderPrivate))
 
+/** @private */
 struct _ExperimentReaderPrivate {
 	xmlDoc *doc;
 };
 
+/** @private */
 GType
 experiment_reader_get_type(void)
 {
@@ -150,6 +159,12 @@ generic_foreach_topic(xmlDoc *doc, xmlNodeSet *nodes,
  * API
  */
 
+/**
+ * Constructs a new ExperimentReader object.
+ *
+ * @param filename Filename of XML file to open
+ * @return A new \e ExperimentReader object. Free with \e g_object_unref.
+ */
 ExperimentReader *
 experiment_reader_new(const gchar *filename)
 {
@@ -162,15 +177,23 @@ experiment_reader_new(const gchar *filename)
 		return NULL;
 	}
 
-	/* TODO: validate against session.dtd */
+	/** @todo validate against session.dtd */
 
 	return reader;
 }
 
+/**
+ * Calls \e callback with \e userdata for each \b topic in the \b greetings
+ * section of the experiment.
+ *
+ * @param reader   \e ExperimentReader instance
+ * @param callback Function to invoke
+ * @param userdata User data to pass to \e callback
+ */
 void
 experiment_reader_foreach_greeting_topic(ExperimentReader *reader,
 					 ExperimentReaderTopicCallback callback,
-					 gpointer data)
+					 gpointer userdata)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -180,17 +203,26 @@ experiment_reader_foreach_greeting_topic(ExperimentReader *reader,
 					  xpathCtx);
 
 	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
-			      callback, data);
+			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 }
 
+/**
+ * Calls \e callback with \e userdata for each \b topic in the
+ * \b initial-narrative subsection of the \b experiment section of
+ * the experiment.
+ *
+ * @param reader   \e ExperimentReader instance
+ * @param callback Function to invoke
+ * @param userdata User data to pass to \e callback
+ */
 void
-experiment_reader_foreach_exp_initial_narrative_topic(reader, callback, data)
+experiment_reader_foreach_exp_initial_narrative_topic(reader, callback, userdata)
 	ExperimentReader		*reader;
 	ExperimentReaderTopicCallback	callback;
-	gpointer			data;
+	gpointer			userdata;
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -201,18 +233,28 @@ experiment_reader_foreach_exp_initial_narrative_topic(reader, callback, data)
 					  xpathCtx);
 
 	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
-			      callback, data);
+			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 }
 
+/**
+ * Calls \e callback with \e userdata for each \b topic in a \b phase of
+ * the \b last-minute subsection of the \b experiment section of
+ * the experiment.
+ *
+ * @param reader   \e ExperimentReader instance
+ * @param phase    \b Phase section (integer between 1 and 6)
+ * @param callback Function to invoke
+ * @param userdata User data to pass to \e callback
+ */
 void
-experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, data)
+experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, userdata)
 	ExperimentReader		*reader;
 	gint				phase;
 	ExperimentReaderTopicCallback	callback;
-	gpointer			data;
+	gpointer			userdata;
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -229,16 +271,24 @@ experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, d
 	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
 
 	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
-			      callback, data);
+			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 }
 
+/**
+ * Calls \e callback with \e userdata for each \b topic in the \b farewell
+ * section of the experiment.
+ *
+ * @param reader   \e ExperimentReader instance
+ * @param callback Function to invoke
+ * @param userdata User data to pass to \e callback
+ */
 void
 experiment_reader_foreach_farewell_topic(ExperimentReader *reader,
 					 ExperimentReaderTopicCallback callback,
-					 gpointer data)
+					 gpointer userdata)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -248,7 +298,7 @@ experiment_reader_foreach_farewell_topic(ExperimentReader *reader,
 					  xpathCtx);
 
 	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
-			      callback, data);
+			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
