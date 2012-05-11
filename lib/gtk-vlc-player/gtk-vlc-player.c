@@ -164,14 +164,15 @@ widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 	if (player->isFullscreen) {
 		gtk_widget_reparent(widget, GTK_WIDGET(player));
 		gtk_widget_show(widget);
-		gtk_window_unfullscreen(GTK_WINDOW(player->fullscreen_window));
 		gtk_widget_hide(player->fullscreen_window);
+		gtk_window_unfullscreen(GTK_WINDOW(player->fullscreen_window));
 
 		player->isFullscreen = FALSE;
 	} else {
 		gtk_window_fullscreen(GTK_WINDOW(player->fullscreen_window));
+		gtk_widget_show(player->fullscreen_window);
 		gtk_widget_reparent(widget, player->fullscreen_window);
-		gtk_widget_show_all(player->fullscreen_window);
+		gtk_widget_show(widget);
 
 		player->isFullscreen = TRUE;
 	}
