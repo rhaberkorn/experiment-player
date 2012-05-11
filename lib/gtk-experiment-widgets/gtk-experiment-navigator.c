@@ -122,7 +122,7 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	gtk_tree_store_append(store, &child, &toplevel);
 	gtk_tree_store_set(store, &child,
 			   COL_SECTION_NAME, "BAR",
-			   COL_TIME, 5*60*1000 /* 5 minutes */,
+			   COL_TIME, (gint64)5*60*1000 /* 5 minutes */,
 			   -1);
 
 	/*
