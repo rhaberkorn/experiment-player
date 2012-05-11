@@ -9,6 +9,7 @@
 #endif
 
 #include <assert.h>
+#include <inttypes.h>
 
 #include <glib.h>
 #include <glib/gprintf.h>
@@ -181,7 +182,7 @@ time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 			   COL_TIME, &time_val, -1);
 
 	/** @todo Improve readability (e.g. h:mm:ss) */
-	g_snprintf(buf, sizeof(buf), "%lldms", time_val);
+	g_snprintf(buf, sizeof(buf), "%" PRId64 "ms", time_val);
 
 	g_object_set(renderer, "text", buf, NULL);
 }
