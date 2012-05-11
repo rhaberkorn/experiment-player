@@ -34,11 +34,34 @@ typedef struct _ExperimentReaderClass {
 GType experiment_reader_get_type(void);
 
 /*
+ * Callbacks
+ */
+typedef void (*ExperimentReaderTopicCallback)(const gchar *topic_id,
+					      gint64 start_time,
+					      gpointer data);
+
+/*
  * API
  */
 ExperimentReader *experiment_reader_new(const gchar *filename);
 
-
+void experiment_reader_foreach_greeting_topic(
+	ExperimentReader		*reader,
+	ExperimentReaderTopicCallback	callback,
+	gpointer			data);
+void experiment_reader_foreach_exp_initial_narrative_topic(
+	ExperimentReader		*reader,
+	ExperimentReaderTopicCallback	callback,
+	gpointer			data);
+void experiment_reader_foreach_exp_last_minute_phase_topic(
+	ExperimentReader		*reader,
+	gint				phase,
+	ExperimentReaderTopicCallback	callback,
+	gpointer			data);
+void experiment_reader_foreach_farewell_topic(
+	ExperimentReader		*reader,
+	ExperimentReaderTopicCallback	callback,
+	gpointer			data);
 
 G_END_DECLS
 
