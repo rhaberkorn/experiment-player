@@ -147,6 +147,12 @@ if [[ $doxygen_doc = yes -a x$DOXYGEN = x ]]; then
 fi
 AM_CONDITIONAL(BUILD_DOXYGEN, test $doxygen_doc = yes)
 
+AC_ARG_ENABLE(doxygen-extract-private,
+	AS_HELP_STRING([--enable-doxygen-extract-private],
+		       [Include private and static members in Doxygen documentation [default=no]]),
+	[DOXYGEN_EXTRACT_PRIVATE=${enableval^^}], [DOXYGEN_EXTRACT_PRIVATE=NO])
+AC_SUBST(DOXYGEN_EXTRACT_PRIVATE)
+
 AC_ARG_ENABLE(html-doc,
 	AS_HELP_STRING([--enable-html-doc],
 		       [Generate HTML documentation [default=yes]]),
