@@ -48,6 +48,7 @@ typedef struct _ExperimentReaderClass {
 	GObjectClass parent_class;	/**< Parent class structure */
 } ExperimentReaderClass;
 
+/** @private */
 GType experiment_reader_get_type(void);
 
 /*

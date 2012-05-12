@@ -38,31 +38,11 @@ struct _ExperimentReaderPrivate {
 	xmlDoc *doc;
 };
 
-/** @private */
-GType
-experiment_reader_get_type(void)
-{
-	static GType type = 0;
-
-	if (!type) {
-		const GTypeInfo info = {
-			sizeof(ExperimentReaderClass),
-			NULL, /* base_init */
-			NULL, /* base_finalize */
-			(GClassInitFunc)experiment_reader_class_init,
-			NULL, /* class_finalize */
-			NULL, /* class_data */
-			sizeof(ExperimentReader),
-			0,    /* n_preallocs */
-			(GInstanceInitFunc)experiment_reader_init,
-		};
-
-		type = g_type_register_static(G_TYPE_OBJECT,
-					      "ExperimentReader", &info, 0);
-	}
-
-	return type;
-}
+/**
+ * @private
+ * will create experiment_reader_get_type and set experiment_reader_parent_class
+ */
+G_DEFINE_TYPE(ExperimentReader, experiment_reader, G_TYPE_OBJECT);
 
 static void
 experiment_reader_class_init(ExperimentReaderClass *klass)
@@ -92,7 +72,7 @@ experiment_reader_finalize(GObject *gobject)
 		xmlFreeDoc(reader->priv->doc);
 
 	/* Chain up to the parent class */
-	//G_OBJECT_CLASS(experiment_reader_parent_class)->finalize(gobject);
+	G_OBJECT_CLASS(experiment_reader_parent_class)->finalize(gobject);
 }
 
 static gint64
