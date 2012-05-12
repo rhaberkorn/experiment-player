@@ -24,6 +24,7 @@ if BUILD_DOXYGEN
 noinst_DATA = doxygen/
 endif
 
+.PHONY: doxygen/
 doxygen/ : Doxyfile
 	@DOXYGEN@ $<
 
