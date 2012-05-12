@@ -4,8 +4,6 @@
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
-#include <vlc/vlc.h>
-
 G_BEGIN_DECLS
 
 #define GTK_TYPE_VLC_PLAYER \
@@ -21,20 +19,13 @@ G_BEGIN_DECLS
 #define GTK_VLC_PLAYER_GET_CLASS(obj) \
 	(G_TYPE_INSTANCE_GET_CLASS((obj), GTK_TYPE_VLC_PLAYER, GtkVlcPlayerClass))
 
+/** @private */
+typedef struct _GtkVlcPlayerPrivate GtkVlcPlayerPrivate;
+
 typedef struct _GtkVlcPlayer {
 	GtkAlignment parent_instance;
 
-	GtkObject		*time_adjustment;
-	gulong			time_adj_on_value_changed_id;
-
-	GtkObject		*volume_adjustment;
-	gulong			vol_adj_on_value_changed_id;
-
-	libvlc_instance_t	*vlc_inst;
-	libvlc_media_player_t	*media_player;
-
-	gboolean		isFullscreen;
-	GtkWidget		*fullscreen_window;
+	GtkVlcPlayerPrivate *priv;	/**< @private */
 } GtkVlcPlayer;
 
 typedef struct _GtkVlcPlayerClass {
