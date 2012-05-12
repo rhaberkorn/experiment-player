@@ -214,7 +214,7 @@ gtk_experiment_navigator_new(void)
  * Any existing contents should be cleared.
  *
  * @param navi Object instance to display the structure in
- * @param exp  \e ExperimentReader instance symbolizing the XML-file
+ * @param exp  \e ExperimentReader instance of opened XML-file
  * @return \e TRUE on error, else \e FALSE
  */
 gboolean
@@ -229,7 +229,10 @@ gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
 /**
  * Fills the \e GtkExperimentNavigator widget with the structure specified
  * in an experiment-XML file (see session.dtd).
- * Any existing contents should be cleared.
+ * It accepts an XML filename and is otherwise identical to
+ * gtk_experiment_navigator_load.
+ *
+ * @ref gtk_experiment_navigator_load
  *
  * @param navi Object instance to display the structure in
  * @param exp  Filename of XML-file to open and use for configuring \e navi
