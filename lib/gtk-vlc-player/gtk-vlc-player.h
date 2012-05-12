@@ -1,3 +1,9 @@
+/**
+ * @file
+ * Header file necessary to include when using the \e GtkVlcPlayer
+ * widget.
+ */
+
 #ifndef __GTK_VLC_PLAYER_H
 #define __GTK_VLC_PLAYER_H
 
@@ -8,6 +14,11 @@ G_BEGIN_DECLS
 
 #define GTK_TYPE_VLC_PLAYER \
 	(gtk_vlc_player_get_type())
+/**
+ * Cast instance pointer to \e GtkVlcPlayer
+ *
+ * @param obj Object to cast to \e GtkVlcPlayer
+ */
 #define GTK_VLC_PLAYER(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_VLC_PLAYER, GtkVlcPlayer))
 #define GTK_VLC_PLAYER_CLASS(klass) \
@@ -22,19 +33,35 @@ G_BEGIN_DECLS
 /** @private */
 typedef struct _GtkVlcPlayerPrivate GtkVlcPlayerPrivate;
 
+/**
+ * \e GtkVlcPlayer instance structure
+ */
 typedef struct _GtkVlcPlayer {
-	GtkAlignment parent_instance;
+	GtkAlignment parent_instance;	/**< Parent instance structure */
 
 	GtkVlcPlayerPrivate *priv;	/**< @private */
 } GtkVlcPlayer;
 
+/**
+ * \e GtkExperimentNavigator class structure
+ */
 typedef struct _GtkVlcPlayerClass {
-	GtkAlignmentClass parent_class;
+	GtkAlignmentClass parent_class;	/**< Parent class structure */
 
+	/**
+	 * Callback function to invoke when emitting the "time-changed"
+	 * signal. Do not set manually.
+	 */
 	void (*time_changed)	(GtkVlcPlayer *self, gint64 new_time, gpointer user_data);
+
+	/**
+	 * Callback function to invoke when emitting the "length-changed"
+	 * signal. Do not set manually.
+	 */
 	void (*length_changed)	(GtkVlcPlayer *self, gint64 new_length, gpointer user_data);
 } GtkVlcPlayerClass;
 
+/** @private */
 GType gtk_vlc_player_get_type(void);
 
 /*
