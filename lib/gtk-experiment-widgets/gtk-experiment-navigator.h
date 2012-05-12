@@ -38,7 +38,7 @@ G_BEGIN_DECLS
 typedef struct _GtkExperimentNavigator {
 	GtkTreeView parent_instance;	/**< Parent instance structure */
 
-	/** @todo Add necessary attributes */
+	/** @todo Add necessary instance attributes */
 } GtkExperimentNavigator;
 
 /**

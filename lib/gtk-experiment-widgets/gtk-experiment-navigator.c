@@ -1,6 +1,6 @@
 /**
  * @file
- * GTK widget, extending a \e GtkTreeView, for displaying an experiments
+ * GTK widget, extending a \e GtkTreeView, for displaying an experiment's
  * structure for navigational purposes.
  */
 
@@ -39,12 +39,13 @@ static guint gtk_experiment_navigator_signals[LAST_SIGNAL] = {0};
 
 /**
  * @private
- * Enumeration of tree store columns that serves as an Id
+ * Enumeration of tree store columns that serve as Ids when manipulating
+ * the store.
  */
 enum {
-	COL_SECTION_NAME,
-	COL_TIME,
-	NUM_COLS
+	COL_NAME,	/**< Name of the section, subsection or topic (\e G_TYPE_STRING) */
+	COL_START_TIME,	/**< Start time of the entity (\e G_TYPE_UINT64 in milliseconds) */
+	NUM_COLS	/**< Number of columns */
 };
 
 /** @private */
@@ -89,10 +90,10 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 
 /**
  * Internal constructor for the \e GtkExperimentNavigator widget.
- * It has to create and fill the \e GtkTreeStore (MVC model), add view columns
- * and add cell renderers to the view columns.
+ * It has to create the \e GtkTreeStore (MVC model), add and configure
+ * view columns and add cell renderers to the view columns.
  * It should connect the necessary signals to respond to row activations
- * (double click) in order to emit the \e time-selected signal.
+ * (double click) in order to emit the "time-selected" signal.
  *
  * @param klass Newly constructed \e GtkExperimentNavigator instance
  */
@@ -117,16 +118,18 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	/** @todo remove sample code */
 	gtk_tree_store_append(store, &toplevel, NULL);
 	gtk_tree_store_set(store, &toplevel,
-			   COL_SECTION_NAME, "FOO", -1);
+			   COL_NAME,		"greeting",
+			   -1);
 
 	gtk_tree_store_append(store, &child, &toplevel);
 	gtk_tree_store_set(store, &child,
-			   COL_SECTION_NAME, "BAR",
-			   COL_TIME, (gint64)5*60*1000 /* 5 minutes */,
+			   COL_NAME,		"bz_1",
+			   COL_START_TIME,	(gint64)5*60*1000 /* 5 minutes */,
 			   -1);
 
 	/*
-	 * Create TreeView column corresponding to the TreeStore column COL_SECTION_NAME
+	 * Create TreeView column corresponding to the
+	 * TreeStore column \e COL_NAME
 	 */
 	col = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_title(col, "Name");
@@ -134,10 +137,15 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 
 	renderer = gtk_cell_renderer_text_new();
 	gtk_tree_view_column_pack_start(col, renderer, TRUE);
-	gtk_tree_view_column_add_attribute(col, renderer, "text", COL_SECTION_NAME);
+	gtk_tree_view_column_add_attribute(col, renderer, "text", COL_NAME);
+	/**
+	 * @todo Perhaps an icon should be rendered in front of the name to
+	 *       indicate the entity's type (section, subsection, topic...)
+	 */
 
 	/*
-	 * Create TreeView column corresponding to the TreeStore column COL_TIME
+	 * Create TreeView column corresponding to the
+	 * TreeStore column \e COL_START_TIME
 	 */
 	col = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_title(col, "Time");
@@ -179,9 +187,10 @@ time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 	gchar	buf[20];
 
 	gtk_tree_model_get(model, iter,
-			   COL_TIME, &time_val, -1);
+			   COL_START_TIME, &time_val, -1);
 
 	/** @todo Improve readability (e.g. h:mm:ss) */
+	/** @todo Do we always want to render the time column??? */
 	g_snprintf(buf, sizeof(buf), "%" PRId64 "ms", time_val);
 
 	g_object_set(renderer, "text", buf, NULL);
@@ -230,6 +239,7 @@ gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
 			      ExperimentReader *exp)
 {
 	/** @todo Clear contents, process XML file and fill \e TreeViewStore */
+
 	return TRUE;
 }
 
@@ -247,5 +257,6 @@ gtk_experiment_navigator_load_filename(GtkExperimentNavigator *navi,
 				       const gchar *exp)
 {
 	/** @todo Clear contents, process XML file and fill \e TreeViewStore */
+
 	return TRUE;
 }
