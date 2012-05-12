@@ -266,7 +266,7 @@ experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, u
 	/* Evaluate xpath expression */
 	xmlStrPrintf(expr, sizeof(expr),
 		     (const xmlChar *)"/session/experiment/last-minute/"
-		     		      "phase[%d]/topic",
+				      "phase[@id = '%d']/topic",
 		     phase);
 	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
 
