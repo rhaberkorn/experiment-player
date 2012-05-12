@@ -19,6 +19,7 @@ Makefile.in
 stamp-*
 
 # Generated
+cclosure-marshallers.[ch]
 /doc/Doxyfile
 /doc/doxygen
 /doc/experiment-player.html

@@ -27,6 +27,12 @@ if [[ $ac_cv_prog_cc_c99 = no ]]; then
 fi
 AM_PROG_CC_C_O
 
+# might not be used if built from source distro
+AC_CHECK_PROG(GLIB_GENMARSHAL, glib-genmarshal, glib-genmarshal)
+if [[ x$GLIB_GENMARSHAL = x ]]; then
+	AC_MSG_ERROR([glib-genmarshal not found!])
+fi
+
 AC_CHECK_PROG(DOXYGEN, doxygen, doxygen)
 AC_CHECK_PROG(XSLTPROC, xsltproc, xsltproc)
 XSLT_FLAGS="--xinclude"

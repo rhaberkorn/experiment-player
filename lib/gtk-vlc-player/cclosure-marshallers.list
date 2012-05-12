@@ -1,0 +1,2 @@
+# Standard marshallers for "time-changed" and "length-changed" signal callbacks
+VOID:INT64

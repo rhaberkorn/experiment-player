@@ -1,8 +1,11 @@
 AM_CFLAGS = -Wall
 
+BUILT_SOURCES = cclosure-marshallers.c cclosure-marshallers.h
+
 lib_LTLIBRARIES = libgtk-experiment-widgets.la
 libgtk_experiment_widgets_la_SOURCES = gtk-experiment-navigator.c \
 				       gtk-experiment-navigator.h
+nodist_libgtk_experiment_widgets_la_SOURCES = $(BUILT_SOURCES)
 
 libgtk_experiment_widgets_la_CFLAGS = $(AM_CFLAGS)
 libgtk_experiment_widgets_la_CPPFLAGS =
@@ -19,3 +22,14 @@ libgtk_experiment_widgets_la_LIBADD += @top_srcdir@/lib/experiment-reader/libexp
 include_HEADERS = gtk-experiment-navigator.h
 
 dist_player_data_DATA = gtk-experiment-widgets-catalog.xml
+
+dist_noinst_DATA = cclosure-marshallers.list
+CLEANFILES = $(BUILT_SOURCES)
+
+MARSHAL_PREFIX = gtk_experiment_navigator_marshal
+
+cclosure-marshallers.c : cclosure-marshallers.list
+	@GLIB_GENMARSHAL@ --prefix $(MARSHAL_PREFIX) --body $< >$@
+
+cclosure-marshallers.h : cclosure-marshallers.list
+	@GLIB_GENMARSHAL@ --prefix $(MARSHAL_PREFIX) --header $< >$@

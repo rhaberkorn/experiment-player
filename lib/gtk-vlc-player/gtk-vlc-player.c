@@ -13,6 +13,7 @@
 
 #include <vlc/vlc.h>
 
+#include "cclosure-marshallers.h"
 #include "gtk-vlc-player.h"
 
 static void gtk_vlc_player_class_init(GtkVlcPlayerClass *klass);
@@ -83,15 +84,14 @@ gtk_vlc_player_class_init(GtkVlcPlayerClass *klass)
 	gobject_class->dispose = gtk_vlc_player_dispose;
 	gobject_class->finalize = gtk_vlc_player_finalize;
 
-	/** @todo use correct marshal, this one could fail on 32-bit platforms */
 	gtk_vlc_player_signals[TIME_CHANGED_SIGNAL] =
 		g_signal_new("time-changed",
 			     G_TYPE_FROM_CLASS(klass),
 			     G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
 			     G_STRUCT_OFFSET(GtkVlcPlayerClass, time_changed),
 			     NULL, NULL,
-			     g_cclosure_marshal_VOID__LONG, G_TYPE_NONE,
-			     1, G_TYPE_INT64);
+			     gtk_vlc_player_marshal_VOID__INT64,
+			     G_TYPE_NONE, 1, G_TYPE_INT64);
 
 	gtk_vlc_player_signals[LENGTH_CHANGED_SIGNAL] =
 		g_signal_new("length-changed",
@@ -99,8 +99,8 @@ gtk_vlc_player_class_init(GtkVlcPlayerClass *klass)
 			     G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
 			     G_STRUCT_OFFSET(GtkVlcPlayerClass, length_changed),
 			     NULL, NULL,
-			     g_cclosure_marshal_VOID__LONG, G_TYPE_NONE,
-			     1, G_TYPE_INT64);
+			     gtk_vlc_player_marshal_VOID__INT64,
+			     G_TYPE_NONE, 1, G_TYPE_INT64);
 
 	g_type_class_add_private(klass, sizeof(GtkVlcPlayerPrivate));
 }

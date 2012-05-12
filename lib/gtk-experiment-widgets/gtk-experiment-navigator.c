@@ -17,6 +17,7 @@
 #include <gtk/gtk.h>
 #include <experiment-reader.h>
 
+#include "cclosure-marshallers.h"
 #include "gtk-experiment-navigator.h"
 
 static void gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass);
@@ -58,15 +59,14 @@ G_DEFINE_TYPE(GtkExperimentNavigator, gtk_experiment_navigator, GTK_TYPE_TREE_VI
 static void
 gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 {
-	/** @todo use correct marshal, this one could fail on 32-bit platforms */
 	gtk_experiment_navigator_signals[TIME_SELECTED_SIGNAL] =
 		g_signal_new("time-selected",
 			     G_TYPE_FROM_CLASS(klass),
 			     G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
 			     G_STRUCT_OFFSET(GtkExperimentNavigatorClass, time_selected),
 			     NULL, NULL,
-			     g_cclosure_marshal_VOID__LONG, G_TYPE_NONE,
-			     1, G_TYPE_INT64);
+			     gtk_experiment_navigator_marshal_VOID__INT64,
+			     G_TYPE_NONE, 1, G_TYPE_INT64);
 }
 
 /**
