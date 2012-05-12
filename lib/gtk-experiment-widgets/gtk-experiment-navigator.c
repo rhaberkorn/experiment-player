@@ -89,6 +89,8 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 
 	/*
 	 * Create tree store (and model)
+	 * NOTE: GtkTreeStore is directly derived from GObject and has a
+	 * reference count of 1 after creation.
 	 */
 	store = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_UINT64);
 
