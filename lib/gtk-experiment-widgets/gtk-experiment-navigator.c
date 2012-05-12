@@ -48,32 +48,12 @@ enum {
 	NUM_COLS	/**< Number of columns */
 };
 
-/** @private */
-GType
-gtk_experiment_navigator_get_type(void)
-{
-	static GType type = 0;
-
-	if (!type) {
-		/* FIXME: destructor needed */
-		const GTypeInfo info = {
-			sizeof(GtkExperimentNavigatorClass),
-			NULL, /* base_init */
-			NULL, /* base_finalize */
-			(GClassInitFunc)gtk_experiment_navigator_class_init,
-			NULL, /* class_finalize */
-			NULL, /* class_data */
-			sizeof(GtkExperimentNavigator),
-			0,    /* n_preallocs */
-			(GInstanceInitFunc)gtk_experiment_navigator_init,
-		};
-
-		type = g_type_register_static(GTK_TYPE_TREE_VIEW,
-					      "GtkExperimentNavigator", &info, 0);
-	}
-
-	return type;
-}
+/**
+ * @private
+ * will create gtk_experiment_navigator_get_type and set
+ * gtk_experiment_navigator_parent_class
+ */
+G_DEFINE_TYPE(GtkExperimentNavigator, gtk_experiment_navigator, GTK_TYPE_TREE_VIEW);
 
 static void
 gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
@@ -89,7 +69,7 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 }
 
 /**
- * Internal constructor for the \e GtkExperimentNavigator widget.
+ * Instance initializer for the \e GtkExperimentNavigator widget.
  * It has to create the \e GtkTreeStore (MVC model), add and configure
  * view columns and add cell renderers to the view columns.
  * It should connect the necessary signals to respond to row activations
