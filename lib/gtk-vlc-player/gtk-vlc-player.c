@@ -83,6 +83,7 @@ gtk_vlc_player_class_init(GtkVlcPlayerClass *klass)
 	gobject_class->dispose = gtk_vlc_player_dispose;
 	gobject_class->finalize = gtk_vlc_player_finalize;
 
+	/** @todo use correct marshal, this one could fail on 32-bit platforms */
 	gtk_vlc_player_signals[TIME_CHANGED_SIGNAL] =
 		g_signal_new("time-changed",
 			     G_TYPE_FROM_CLASS(klass),
@@ -115,7 +116,7 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 	gtk_alignment_set(GTK_ALIGNMENT(klass), 0., 0., 1., 1.);
 
 	drawing_area = gtk_drawing_area_new();
-	/** @bug use styles */
+	/** @todo use styles */
 	gdk_color_parse("black", &color);
 	gtk_widget_modify_bg(drawing_area, GTK_STATE_NORMAL, &color);
 
@@ -212,6 +213,11 @@ widget_on_realize(GtkWidget *widget, gpointer user_data)
 #endif
 }
 
+/**
+ * @bug
+ * We don't get the signal on Windows (MinGW), after a movie starts playing.
+ * Using GtkEventBoxes does \b NOT help.
+ */
 static gboolean
 widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {

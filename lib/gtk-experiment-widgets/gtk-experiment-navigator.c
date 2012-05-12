@@ -58,6 +58,7 @@ G_DEFINE_TYPE(GtkExperimentNavigator, gtk_experiment_navigator, GTK_TYPE_TREE_VI
 static void
 gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 {
+	/** @todo use correct marshal, this one could fail on 32-bit platforms */
 	gtk_experiment_navigator_signals[TIME_SELECTED_SIGNAL] =
 		g_signal_new("time-selected",
 			     G_TYPE_FROM_CLASS(klass),
