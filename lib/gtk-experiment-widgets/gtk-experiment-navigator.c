@@ -23,6 +23,9 @@
 static void gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass);
 static void gtk_experiment_navigator_init(GtkExperimentNavigator *klass);
 
+static void gtk_experiment_navigator_dispose(GObject *gobject);
+static void gtk_experiment_navigator_finalize(GObject *gobject);
+
 static void time_cell_data_cb(GtkTreeViewColumn *col,
 			      GtkCellRenderer *renderer,
 			      GtkTreeModel *model, GtkTreeIter *iter,
@@ -30,6 +33,42 @@ static void time_cell_data_cb(GtkTreeViewColumn *col,
 
 
 static inline void select_time(GtkExperimentNavigator *navi, gint64 selected_time);
+
+/**
+ * @private
+ * Unreference object given by variable, but only once.
+ * Use it in \ref gtk_experiment_navigator_dispose to unreference object
+ * references in public or private instance attributes.
+ *
+ * @sa gtk_experiment_navigator_dispose
+ *
+ * @param VAR Variable to unreference
+ */
+#define GOBJECT_UNREF_SAFE(VAR) do {	\
+	if ((VAR) != NULL) {		\
+		g_object_unref(VAR);	\
+		VAR = NULL;		\
+	}				\
+} while (0)
+
+/** @private */
+#define GTK_EXPERIMENT_NAVIGATOR_GET_PRIVATE(obj) \
+	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GTK_TYPE_EXPERIMENT_NAVIGATOR, GtkExperimentNavigatorPrivate))
+
+/**
+ * @private
+ * Private instance attribute structure.
+ * You can access these attributes using \c klass->priv->attribute.
+ */
+struct _GtkExperimentNavigatorPrivate {
+	gint dummy; /**< unused dummy attribute, may be deleted when other attributes are added */
+
+	/**
+	 * @todo
+	 * Add necessary \b private instance attributes. They must be
+	 * initialized in the instance initializer function.
+	 */
+};
 
 /** @private */
 enum {
@@ -44,21 +83,28 @@ static guint gtk_experiment_navigator_signals[LAST_SIGNAL] = {0};
  * the store.
  */
 enum {
-	COL_NAME,	/**< Name of the section, subsection or topic (\e G_TYPE_STRING) */
-	COL_START_TIME,	/**< Start time of the entity (\e G_TYPE_UINT64 in milliseconds) */
+	COL_NAME,	/**< Name of the section, subsection or topic (\c G_TYPE_STRING) */
+	COL_START_TIME,	/**< Start time of the entity (\c G_TYPE_UINT64 in milliseconds) */
 	NUM_COLS	/**< Number of columns */
+
+	/** @todo Add additional tree store columns as necessary */
 };
 
 /**
  * @private
- * will create gtk_experiment_navigator_get_type and set
- * gtk_experiment_navigator_parent_class
+ * Will create \e gtk_experiment_navigator_get_type and set
+ * \e gtk_experiment_navigator_parent_class
  */
 G_DEFINE_TYPE(GtkExperimentNavigator, gtk_experiment_navigator, GTK_TYPE_TREE_VIEW);
 
 static void
 gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 {
+	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+
+	gobject_class->dispose = gtk_experiment_navigator_dispose;
+	gobject_class->finalize = gtk_experiment_navigator_finalize;
+
 	gtk_experiment_navigator_signals[TIME_SELECTED_SIGNAL] =
 		g_signal_new("time-selected",
 			     G_TYPE_FROM_CLASS(klass),
@@ -67,14 +113,18 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 			     NULL, NULL,
 			     gtk_experiment_navigator_marshal_VOID__INT64,
 			     G_TYPE_NONE, 1, G_TYPE_INT64);
+
+	g_type_class_add_private(klass, sizeof(GtkExperimentNavigatorPrivate));
 }
 
 /**
- * Instance initializer for the \e GtkExperimentNavigator widget.
+ * @brief Instance initializer function for the \e GtkExperimentNavigator widget
+ *
  * It has to create the \e GtkTreeStore (MVC model), add and configure
  * view columns and add cell renderers to the view columns.
  * It should connect the necessary signals to respond to row activations
  * (double click) in order to emit the "time-selected" signal.
+ * It should also initialize all used \b public and \b private attributes.
  *
  * @param klass Newly constructed \e GtkExperimentNavigator instance
  */
@@ -88,6 +138,7 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	GtkTreeStore	*store;
 	GtkTreeIter	toplevel, child;
 
+	klass->priv = GTK_EXPERIMENT_NAVIGATOR_GET_PRIVATE(klass);
 	/*
 	 * Create tree store (and model)
 	 * NOTE: GtkTreeStore is directly derived from GObject and has a
@@ -122,13 +173,14 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	gtk_tree_view_column_pack_start(col, renderer, TRUE);
 	gtk_tree_view_column_add_attribute(col, renderer, "text", COL_NAME);
 	/**
-	 * @todo Perhaps an icon should be rendered in front of the name to
-	 *       indicate the entity's type (section, subsection, topic...)
+	 * @todo
+	 * Perhaps an icon should be rendered in front of the name to
+	 * indicate the entity's type (section, subsection, topic...)
 	 */
 
 	/*
 	 * Create TreeView column corresponding to the
-	 * TreeStore column \e COL_START_TIME
+	 * TreeStore column \c COL_START_TIME
 	 */
 	col = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_title(col, "Time");
@@ -149,10 +201,88 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 
 	/** @todo better \e TreeViewColumn formatting */
 	/** @todo connect signals to respond to row activations */
+	/**
+	 * @todo
+	 * Initialize necessary \b public and \b private attributes.
+	 * When using object references, they must be unreferenced in
+	 * \ref gtk_experiment_navigator_dispose.
+	 * Keep in mind that when using objects derived from \e GtkObject,
+	 * they will not be reference-counted like ordinary \e GObjects (you
+	 * will not own an ordinary reference after object creation that can
+	 * be unreferenced).
+	 * In order to get an ordinary reference, use \e g_object_ref_sink
+	 * on the object after creation.
+	 */
 }
 
 /**
- * Cell data function to invoke when rendering the "Time" column.
+ * @brief Instance disposal function
+ *
+ * Its purpose is to unreference \e GObjects
+ * the instance keeps references to (object pointers saved in the
+ * instance attributes).
+ * Keep in mind that this function may be called more than once, so
+ * you must guard against unreferencing an object more than once (since you
+ * will only own a single reference).
+ * Also keep in mind that instance methods may be invoked \b after the instance
+ * disposal function was executed but \b before instance finalization. This
+ * case has to be handled gracefully in the instance methods.
+ *
+ * @sa GOBJECT_UNREF_SAFE
+ * @sa gtk_experiment_navigator_finalize
+ * @sa gtk_experiment_navigator_init
+ *
+ * @param gobject \e GObject to dispose
+ */
+static void
+gtk_experiment_navigator_dispose(GObject *gobject)
+{
+	GtkExperimentNavigator *navi = GTK_EXPERIMENT_NAVIGATOR(gobject);
+
+	/*
+	 * destroy might be called more than once, but we have only one
+	 * reference for each object
+	 */
+	/**
+	 * @todo
+	 * Unreference all \e GObject references kept in public or
+	 * private attributes. Use \ref GOBJECT_UNREF_SAFE.
+	 * For example, to unreference private object \c widget:
+	 * @code
+	 * 	GOBJECT_UNREF_SAFE(navi->priv->widget);
+	 * @endcode
+	 */
+
+	/* Chain up to the parent class */
+	G_OBJECT_CLASS(gtk_experiment_navigator_parent_class)->dispose(gobject);
+}
+
+/**
+ * @brief Instance finalization function
+ *
+ * Its purpose is to free all remaining allocated memory referenced
+ * in public and private instance attributes (e.g. a string).
+ * For freeing (unreferencing) objects,
+ * use \ref gtk_experiment_navigator_dispose.
+ *
+ * @sa gtk_experiment_navigator_dispose
+ * @sa gtk_experiment_navigator_init
+ *
+ * @param gobject \e GObject to finalize
+ */
+static void
+gtk_experiment_navigator_finalize(GObject *gobject)
+{
+	GtkExperimentNavigator *navi = GTK_EXPERIMENT_NAVIGATOR(gobject);
+
+	/** @todo Free all memory referenced in public and private attributes */
+
+	/* Chain up to the parent class */
+	G_OBJECT_CLASS(gtk_experiment_navigator_parent_class)->finalize(gobject);
+}
+
+/**
+ * @brief Cell data function to invoke when rendering the "Time" column.
  *
  * @param col       \e GtkTreeViewColumn to render for
  * @param renderer  Cell renderer to use for rendering
@@ -180,10 +310,13 @@ time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 }
 
 /**
- * Emit "time-selected" signal on a \e GtkExperimentNavigator instance.
+ * @brief Emit "time-selected" signal on a \e GtkExperimentNavigator instance.
+ *
  * It should be emitted when a row entry was selected.
  *
- * @param navi          Widget to emit the signal
+ * @sa GtkExperimentNavigatorClass::time_selected
+ *
+ * @param navi          Widget to emit the signal on
  * @param selected_time Selected time in milliseconds
  */
 static inline void
@@ -198,7 +331,7 @@ select_time(GtkExperimentNavigator *navi, gint64 selected_time)
  */
 
 /**
- * Construct new \e GtkExperimentNavigator widget instance.
+ * @brief Construct new \e GtkExperimentNavigator widget instance.
  *
  * @return New \e GtkExperimentNavigator widget instance
  */
@@ -215,13 +348,14 @@ gtk_experiment_navigator_new(void)
  *
  * @param navi Object instance to display the structure in
  * @param exp  \e ExperimentReader instance of opened XML-file
- * @return \e TRUE on error, else \e FALSE
+ * @return \c TRUE on error, else \c FALSE
  */
 gboolean
 gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
 			      ExperimentReader *exp)
 {
-	/** @todo Clear contents, process XML file and fill \e TreeViewStore */
+	/** @todo Clear contents */
+	/** @todo Process XML file and fill \e TreeViewStore */
 
 	return TRUE;
 }
@@ -230,19 +364,20 @@ gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
  * Fills the \e GtkExperimentNavigator widget with the structure specified
  * in an experiment-XML file (see session.dtd).
  * It accepts an XML filename and is otherwise identical to
- * gtk_experiment_navigator_load.
+ * \ref gtk_experiment_navigator_load.
  *
- * @ref gtk_experiment_navigator_load
+ * @sa gtk_experiment_navigator_load
  *
  * @param navi Object instance to display the structure in
  * @param exp  Filename of XML-file to open and use for configuring \e navi
- * @return \e TRUE on error, else \e FALSE
+ * @return \c TRUE on error, else \c FALSE
  */
 gboolean
 gtk_experiment_navigator_load_filename(GtkExperimentNavigator *navi,
 				       const gchar *exp)
 {
-	/** @todo Clear contents, process XML file and fill \e TreeViewStore */
+	/** @todo Clear contents */
+	/** @todo Process XML file and fill \e TreeViewStore */
 
 	return TRUE;
 }

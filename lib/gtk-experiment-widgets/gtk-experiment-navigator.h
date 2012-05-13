@@ -20,6 +20,7 @@ G_BEGIN_DECLS
  * Cast instance pointer to \e GtkExperimentNavigator
  *
  * @param obj Object to cast to \e GtkExperimentNavigator
+ * @return \e obj casted to \e GtkExperimentNavigator
  */
 #define GTK_EXPERIMENT_NAVIGATOR(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_EXPERIMENT_NAVIGATOR, GtkExperimentNavigator))
@@ -32,13 +33,22 @@ G_BEGIN_DECLS
 #define GTK_EXPERIMENT_NAVIGATOR_GET_CLASS(obj) \
 	(G_TYPE_INSTANCE_GET_CLASS((obj), GTK_TYPE_EXPERIMENT_NAVIGATOR, GtkExperimentNavigatorClass))
 
+/** @private */
+typedef struct _GtkExperimentNavigatorPrivate GtkExperimentNavigatorPrivate;
+
 /**
  * \e GtkExperimentNavigator instance structure
  */
 typedef struct _GtkExperimentNavigator {
-	GtkTreeView parent_instance;	/**< Parent instance structure */
+	GtkTreeView parent_instance;		/**< Parent instance structure */
 
-	/** @todo Add necessary instance attributes */
+	/**
+	 * @todo
+	 * Add necessary \b public instance attributes. They must be
+	 * initialized in the instance initializer function.
+	 */
+
+	GtkExperimentNavigatorPrivate *priv;	/**< @private Pointer to \b private instance attributes */
 } GtkExperimentNavigator;
 
 /**
@@ -50,6 +60,10 @@ typedef struct _GtkExperimentNavigatorClass {
 	/**
 	 * Callback function to invoke when emitting the "time-selected"
 	 * signal. Do not set manually.
+	 *
+	 * @param self          \e GtkExperimentNavigator the event was emitted on.
+	 * @param selected_time Time selected by the navigator in milliseconds
+	 * @param user_data     Callback user data
 	 */
 	void (*time_selected)(GtkExperimentNavigator *self,
 			      gint64 selected_time, gpointer user_data);
