@@ -81,7 +81,8 @@ static guint gtk_vlc_player_signals[LAST_SIGNAL] = {0, 0};
 
 /**
  * @private
- * will create gtk_vlc_player_get_type and set gtk_vlc_player_parent_class
+ * Will create \e gtk_vlc_player_get_type and set
+ * \e gtk_vlc_player_parent_class
  */
 G_DEFINE_TYPE(GtkVlcPlayer, gtk_vlc_player, GTK_TYPE_ALIGNMENT);
 
@@ -232,6 +233,9 @@ widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
 	GtkVlcPlayer *player = GTK_VLC_PLAYER(user_data);
 
+	if (player->priv->fullscreen_window == NULL)
+		return TRUE;
+
 	if (event->type != GDK_2BUTTON_PRESS || event->button != 1)
 		return TRUE;
 
@@ -274,13 +278,15 @@ update_time(GtkVlcPlayer *player, gint64 new_time)
 	g_signal_emit(player, gtk_vlc_player_signals[TIME_CHANGED_SIGNAL], 0,
 		      new_time);
 
-	/* ensure that time_adj_on_value_changed() will not be executed */
-	g_signal_handler_block(G_OBJECT(player->priv->time_adjustment),
-			       player->priv->time_adj_on_value_changed_id);
-	gtk_adjustment_set_value(GTK_ADJUSTMENT(player->priv->time_adjustment),
-				 (gdouble)new_time);
-	g_signal_handler_unblock(G_OBJECT(player->priv->time_adjustment),
-				 player->priv->time_adj_on_value_changed_id);
+	if (player->priv->time_adjustment != NULL) {
+		/* ensure that time_adj_on_value_changed() will not be executed */
+		g_signal_handler_block(G_OBJECT(player->priv->time_adjustment),
+				       player->priv->time_adj_on_value_changed_id);
+		gtk_adjustment_set_value(GTK_ADJUSTMENT(player->priv->time_adjustment),
+					 (gdouble)new_time);
+		g_signal_handler_unblock(G_OBJECT(player->priv->time_adjustment),
+					 player->priv->time_adj_on_value_changed_id);
+	}
 }
 
 static inline void
@@ -289,8 +295,9 @@ update_length(GtkVlcPlayer *player, gint64 new_length)
 	g_signal_emit(player, gtk_vlc_player_signals[LENGTH_CHANGED_SIGNAL], 0,
 		      new_length);
 
-	gtk_adjustment_set_upper(GTK_ADJUSTMENT(player->priv->time_adjustment),
-				 (gdouble)new_length);
+	if (player->priv->time_adjustment != NULL)
+		gtk_adjustment_set_upper(GTK_ADJUSTMENT(player->priv->time_adjustment),
+					 (gdouble)new_length);
 }
 
 static void
@@ -333,7 +340,7 @@ vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media)
  */
 
 /**
- * Construct new \e GtkVlcPlayer widget instance.
+ * @brief Construct new \e GtkVlcPlayer widget instance.
  *
  * @return New \e GtkVlcPlayer widget instance
  */
@@ -344,15 +351,16 @@ gtk_vlc_player_new(void)
 }
 
 /**
- * Load media with specified filename into player widget. It does not
- * start playing until playback is started or toggled.
+ * @brief Load media with specified filename into player widget
+ *
+ * It does not start playing until playback is started or toggled.
  * "time-changed" and "length-changed" signals will be emitted immediately
  * after successfully loading the media. The time-adjustment will also be
  * reconfigured appropriately.
  *
  * @param player \e GtkVlcPlayer instance to load file into.
  * @param file   \e Filename to load
- * @return \e TRUE on error, else \e FALSE
+ * @return \c TRUE on error, else \c FALSE
  */
 gboolean
 gtk_vlc_player_load_filename(GtkVlcPlayer *player, const gchar *file)
@@ -370,14 +378,15 @@ gtk_vlc_player_load_filename(GtkVlcPlayer *player, const gchar *file)
 }
 
 /**
- * Load media with specified URI into player widget. It is otherwise
- * identical to gtk_vlc_player_load_filename.
+ * @brief Load media with specified URI into player widget
  *
- * @ref gtk_vlc_player_load_filename
+ * It is otherwise identical to \ref gtk_vlc_player_load_filename.
+ *
+ * @sa gtk_vlc_player_load_filename
  *
  * @param player \e GtkVlcPlayer instance to load media into.
  * @param uri    \e URI to load
- * @return \e TRUE on error, else \e FALSE
+ * @return \c TRUE on error, else \c FALSE
  */
 gboolean
 gtk_vlc_player_load_uri(GtkVlcPlayer *player, const gchar *uri)
@@ -395,8 +404,9 @@ gtk_vlc_player_load_uri(GtkVlcPlayer *player, const gchar *uri)
 }
 
 /**
- * Play back media if playback is currently paused. If it is already playing,
- * do nothing.
+ * @brief Play back media if playback is currently paused
+ *
+ * If it is already playing, do nothing.
  * In playback mode, there will be constant "time-changed" signal emissions
  * and the time-adjustment's value will be set accordingly.
  *
@@ -409,8 +419,9 @@ gtk_vlc_player_play(GtkVlcPlayer *player)
 }
 
 /**
- * Pause media playback if it is currently playing. If it is already paused,
- * do nothing.
+ * @brief Pause media playback if it is currently playing
+ *
+ * If it is already paused, do nothing.
  *
  * @param player \e GtkVlcPlayer instance
  */
@@ -421,15 +432,17 @@ gtk_vlc_player_pause(GtkVlcPlayer *player)
 }
 
 /**
- * Toggle media playback. If it is currently playing, pause playback. If it is
- * currently paused, start playback.
+ * @brief Toggle media playback
  *
- * @ref gtk_vlc_player_play
- * @ref gtk_vlc_player_pause
+ * If it is currently playing, pause playback. If it is currently paused,
+ * start playback.
+ *
+ * @sa gtk_vlc_player_play
+ * @sa gtk_vlc_player_pause
  *
  * @param player \e GtkVlcPlayer instance
- * @return \e TRUE if media is playing \b after the operation,
- *         \e FALSE if it is paused.
+ * @return \c TRUE if media is playing \b after the operation,
+ *         \c FALSE if it is paused.
  */
 gboolean
 gtk_vlc_player_toggle(GtkVlcPlayer *player)
@@ -443,8 +456,10 @@ gtk_vlc_player_toggle(GtkVlcPlayer *player)
 }
 
 /**
- * Stop media playback. A "time-changed" signal will be emitted and the
- * time-adjustment will be reset appropriately.
+ * @brief Stop media playback
+ *
+ * A "time-changed" signal will be emitted and the time-adjustment will be
+ * reset appropriately.
  *
  * @param player \e GtkVlcPlayer instance
  */
@@ -458,7 +473,7 @@ gtk_vlc_player_stop(GtkVlcPlayer *player)
 }
 
 /**
- * Set point of time in playback.
+ * @brief Set point of time in playback
  *
  * @param player \e GtkVlcPlayer instance
  * @param time   New position in media (milliseconds)
@@ -471,11 +486,11 @@ gtk_vlc_player_seek(GtkVlcPlayer *player, gint64 time)
 }
 
 /**
- * Set audio volume of playback.
+ * @brief Set audio volume of playback
  *
  * @param player \e GtkVlcPlayer instance
  * @param volume New volume of playback. It must be between 0.0 (0%) and 2.0 (200%)
- *        of the original audio volume.
+ *               of the original audio volume.
  */
 void
 gtk_vlc_player_set_volume(GtkVlcPlayer *player, gdouble volume)
@@ -484,15 +499,16 @@ gtk_vlc_player_set_volume(GtkVlcPlayer *player, gdouble volume)
 }
 
 /**
- * Get time-adjustment currently used by \e GtkVlcPlayer. The time-adjustment
- * is an alternative to signal-callbacks and using the API for synchronizing the
- * \e GtkVlcPlayer widget's current playback position with another widget
- * (e.g. a \e GtkScale).
+ * @brief Get time-adjustment currently used by \e GtkVlcPlayer
+ * The time-adjustment is an alternative to signal-callbacks and using the API
+ * for synchronizing the \e GtkVlcPlayer widget's current playback position with
+ * another widget (e.g. a \e GtkScale).
  * The adjustment's value is in milliseconds.
- * The widget will initialize one on construction, so there will always be an
- * adjustment to get.
+ * The widget will initialize one on construction, so there \e should always be
+ * an adjustment to get.
  *
- * @ref gtk_vlc_player_seek
+ * @sa gtk_vlc_player_seek
+ * @sa GtkVlcPlayerClass::time_changed GtkVlcPlayerClass::length_changed
  *
  * @param player \e GtkVlcPlayer instance
  * @return Currently used time-adjustment
@@ -500,15 +516,19 @@ gtk_vlc_player_set_volume(GtkVlcPlayer *player, gdouble volume)
 GtkAdjustment *
 gtk_vlc_player_get_time_adjustment(GtkVlcPlayer *player)
 {
-	return GTK_ADJUSTMENT(player->priv->time_adjustment);
+	return player->priv->time_adjustment != NULL
+			? GTK_ADJUSTMENT(player->priv->time_adjustment)
+			: NULL;
 }
 
 /**
- * Change time-adjustment used by \e GtkVlcPlayer. The old adjustment will be
+ * @brief Change time-adjustment used by \e GtkVlcPlayer
+ *
+ * The old adjustment will be
  * unreferenced (and possibly destroyed) and a reference to the new
  * adjustment will be fetched.
  *
- * @ref gtk_vlc_player_get_time_adjustment
+ * @sa gtk_vlc_player_get_time_adjustment
  *
  * @param player \e GtkVlcPlayer instance
  * @param adj    New \e GtkAdjustment to use as time-adjustment.
@@ -516,6 +536,9 @@ gtk_vlc_player_get_time_adjustment(GtkVlcPlayer *player)
 void
 gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 {
+	if (player->priv->time_adjustment == NULL)
+		return;
+
 	g_signal_handler_disconnect(G_OBJECT(player->priv->time_adjustment),
 				    player->priv->time_adj_on_value_changed_id);
 
@@ -531,10 +554,11 @@ gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 }
 
 /**
- * Get volume-adjustment currently used by \e GtkVlcPlayer. The volume-adjustment
- * is an alternative to signal-callbacks and using the API for synchronizing the
- * \e GtkVlcPlayer widget's current playback volume with another widget
- * (e.g. a \e GtkVolumeButton).
+ * @brief Get volume-adjustment currently used by \e GtkVlcPlayer
+ *
+ * The volume-adjustment is an alternative to signal-callbacks and using the
+ * API for synchronizing the \e GtkVlcPlayer widget's current playback volume
+ * with another widget (e.g. a \e GtkVolumeButton).
  * The adjustment's value is a percentage of gain to apply to the original
  * signal (0.0 is 0%, 2.0 is 200%).
  * The widget will initialize a volume-adjustment on construction, so there will
@@ -542,7 +566,7 @@ gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
  * In contrast to the time-adjustment, the volume-adjustment's value will never
  * be changed by the \e GtkVlcPlayer widget.
  *
- * @ref gtk_vlc_player_set_volume
+ * @sa gtk_vlc_player_set_volume
  *
  * @param player \e GtkVlcPlayer instance
  * @return Currently used volume-adjustment
@@ -550,15 +574,18 @@ gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 GtkAdjustment *
 gtk_vlc_player_get_volume_adjustment(GtkVlcPlayer *player)
 {
-	return GTK_ADJUSTMENT(player->priv->volume_adjustment);
+	return player->priv->volume_adjustment != NULL
+			? GTK_ADJUSTMENT(player->priv->volume_adjustment)
+			: NULL;
 }
 
 /**
- * Change volume-adjustment used by \e GtkVlcPlayer. The old adjustment will be
- * unreferenced (and possibly destroyed) and a reference to the new
- * adjustment will be fetched.
+ * @brief Change volume-adjustment used by \e GtkVlcPlayer
  *
- * @ref gtk_vlc_player_get_volume_adjustment
+ * The old adjustment will be unreferenced (and possibly destroyed) and a
+ * reference to the new adjustment will be fetched.
+ *
+ * @sa gtk_vlc_player_get_volume_adjustment
  *
  * @param player \e GtkVlcPlayer instance
  * @param adj    New \e GtkAdjustment to use as volume-adjustment.
@@ -566,6 +593,9 @@ gtk_vlc_player_get_volume_adjustment(GtkVlcPlayer *player)
 void
 gtk_vlc_player_set_volume_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 {
+	if (player->priv->volume_adjustment == NULL)
+		return;
+
 	g_signal_handler_disconnect(G_OBJECT(player->priv->volume_adjustment),
 				    player->priv->vol_adj_on_value_changed_id);
 

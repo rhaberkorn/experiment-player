@@ -18,6 +18,7 @@ G_BEGIN_DECLS
  * Cast instance pointer to \e GtkVlcPlayer
  *
  * @param obj Object to cast to \e GtkVlcPlayer
+ * @return \e obj casted to \e GtkVlcPlayer
  */
 #define GTK_VLC_PLAYER(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST((obj), GTK_TYPE_VLC_PLAYER, GtkVlcPlayer))
@@ -51,12 +52,20 @@ typedef struct _GtkVlcPlayerClass {
 	/**
 	 * Callback function to invoke when emitting the "time-changed"
 	 * signal. Do not set manually.
+	 *
+	 * @param self      \e GtkVlcPlayer widget that emitted the signal
+	 * @param new_time  New (current) position of playback in milliseconds
+	 * @param user_data Callback user data
 	 */
 	void (*time_changed)	(GtkVlcPlayer *self, gint64 new_time, gpointer user_data);
 
 	/**
 	 * Callback function to invoke when emitting the "length-changed"
 	 * signal. Do not set manually.
+	 *
+	 * @param self       \e GtkVlcPlayer widget that emitted the signal
+	 * @param new_length New (current) length of media loaded into player (milliseconds)
+	 * @param user_data  Callback user data
 	 */
 	void (*length_changed)	(GtkVlcPlayer *self, gint64 new_length, gpointer user_data);
 } GtkVlcPlayerClass;
