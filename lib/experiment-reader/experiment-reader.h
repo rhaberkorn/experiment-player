@@ -17,6 +17,7 @@ G_BEGIN_DECLS
  * Cast instance pointer to \e ExperimentReader
  *
  * @param obj Object to cast to \e ExperimentReader
+ * @return \e obj casted to \e ExperimentReader
  */
 #define EXPERIMENT_READER(obj) \
 	(G_TYPE_CHECK_INSTANCE_CAST((obj), EXPERIMENT_TYPE_READER, ExperimentReader))
@@ -55,12 +56,15 @@ GType experiment_reader_get_type(void);
  * Callbacks
  */
 /**
- * Type of function to use for \b topic callbacks.
+ * Type of function to use for \e topic callbacks.
  *
+ * @param reader     \e ExperimentReader the information refers to
  * @param topic_id   Symbolic identifier of experiment \b topic
  * @param start_time Beginning of first \b contribution in \e topic (milliseconds)
+ * @param data       Callback user data
  */
-typedef void (*ExperimentReaderTopicCallback)(const gchar *topic_id,
+typedef void (*ExperimentReaderTopicCallback)(ExperimentReader *reader,
+					      const gchar *topic_id,
 					      gint64 start_time,
 					      gpointer data);
 

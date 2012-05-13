@@ -25,7 +25,7 @@ static void experiment_reader_init(ExperimentReader *klass);
 static void experiment_reader_finalize(GObject *gobject);
 
 static gint64 get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref);
-static gboolean generic_foreach_topic(xmlDoc *doc, xmlNodeSet *nodes,
+static gboolean generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 				      ExperimentReaderTopicCallback callback,
 				      gpointer data);
 
@@ -40,7 +40,8 @@ struct _ExperimentReaderPrivate {
 
 /**
  * @private
- * will create experiment_reader_get_type and set experiment_reader_parent_class
+ * Will create \e experiment_reader_get_type and set
+ * \e experiment_reader_parent_class
  */
 G_DEFINE_TYPE(ExperimentReader, experiment_reader, G_TYPE_OBJECT);
 
@@ -88,6 +89,7 @@ get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref)
 	xpathCtx = xmlXPathNewContext(doc);
 	assert(xpathCtx != NULL);
 
+	/** @todo precompile XPath expression */
 	xmlStrPrintf(expr, sizeof(expr),
 		     (const xmlChar *)"/session/timeline/"
 				      "timepoint[@timepoint-id = '%s']/"
@@ -105,7 +107,7 @@ get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref)
 }
 
 static gboolean
-generic_foreach_topic(xmlDoc *doc, xmlNodeSet *nodes,
+generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 		      ExperimentReaderTopicCallback callback, gpointer data)
 {
 	if (nodes == NULL)
@@ -123,11 +125,12 @@ generic_foreach_topic(xmlDoc *doc, xmlNodeSet *nodes,
 			xmlChar *contrib_start_ref;
 
 			contrib_start_ref = xmlGetProp(contrib, (const xmlChar *)"start-reference");
-			start_time = get_timepoint_by_ref(doc, contrib_start_ref);
+			start_time = get_timepoint_by_ref(reader->priv->doc,
+							  contrib_start_ref);
 			xmlFree(contrib_start_ref);
 		}
 
-		callback((const gchar *)topic_id, start_time, data);
+		callback(reader, (const gchar *)topic_id, start_time, data);
 
 		xmlFree(topic_id);
 	}
@@ -140,7 +143,7 @@ generic_foreach_topic(xmlDoc *doc, xmlNodeSet *nodes,
  */
 
 /**
- * Constructs a new ExperimentReader object.
+ * @brief Constructs a new ExperimentReader object
  *
  * @param filename Filename of XML file to open
  * @return A new \e ExperimentReader object. Free with \e g_object_unref.
@@ -163,7 +166,7 @@ experiment_reader_new(const gchar *filename)
 }
 
 /**
- * Calls \e callback with \e userdata for each \b topic in the \b greetings
+ * Calls \e callback with \e userdata for each \b topic in the \b greeting
  * section of the experiment.
  *
  * @param reader   \e ExperimentReader instance
@@ -182,7 +185,7 @@ experiment_reader_foreach_greeting_topic(ExperimentReader *reader,
 	xpathObj = xmlXPathEvalExpression((const xmlChar *)"/session/greeting/topic",
 					  xpathCtx);
 
-	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
+	generic_foreach_topic(reader, xpathObj->nodesetval,
 			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
@@ -212,7 +215,7 @@ experiment_reader_foreach_exp_initial_narrative_topic(reader, callback, userdata
 							   "initial-narrative/topic",
 					  xpathCtx);
 
-	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
+	generic_foreach_topic(reader, xpathObj->nodesetval,
 			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
@@ -225,7 +228,7 @@ experiment_reader_foreach_exp_initial_narrative_topic(reader, callback, userdata
  * the experiment.
  *
  * @param reader   \e ExperimentReader instance
- * @param phase    \b Phase section (integer between 1 and 6)
+ * @param phase    \b Phase section (integer from 1 to 6)
  * @param callback Function to invoke
  * @param userdata User data to pass to \e callback
  */
@@ -250,7 +253,7 @@ experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, u
 		     phase);
 	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
 
-	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
+	generic_foreach_topic(reader, xpathObj->nodesetval,
 			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
@@ -277,7 +280,7 @@ experiment_reader_foreach_farewell_topic(ExperimentReader *reader,
 	xpathObj = xmlXPathEvalExpression((const xmlChar *)"/session/farewell/topic",
 					  xpathCtx);
 
-	generic_foreach_topic(reader->priv->doc, xpathObj->nodesetval,
+	generic_foreach_topic(reader, xpathObj->nodesetval,
 			      callback, userdata);
 
 	xmlXPathFreeObject(xpathObj);
