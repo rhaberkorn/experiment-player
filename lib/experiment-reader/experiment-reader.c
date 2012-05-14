@@ -25,6 +25,7 @@ static void experiment_reader_init(ExperimentReader *klass);
 static void experiment_reader_finalize(GObject *gobject);
 
 static gint64 get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref);
+static xmlNode *get_first_element(xmlNode *children, const gchar *name);
 static gboolean generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 				      ExperimentReaderTopicCallback callback,
 				      gpointer data);
@@ -106,6 +107,16 @@ get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref)
 	return (gint64)(value*1000.);
 }
 
+static xmlNode *
+get_first_element(xmlNode *children, const gchar *name)
+{
+	for (xmlNode *cur = children; cur != NULL; cur = cur->next)
+		if (!g_strcmp0((const gchar *)cur->name, name))
+			return cur;
+
+	return NULL;
+}
+
 static gboolean
 generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 		      ExperimentReaderTopicCallback callback, gpointer data)
@@ -115,7 +126,7 @@ generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 
 	for (int i = 0; i < nodes->nodeNr; i++) {
 		xmlNode *cur = nodes->nodeTab[i];
-		xmlNode *contrib = cur->children;
+		xmlNode *contrib = get_first_element(cur->children, "contribution");
 		assert(cur != NULL && cur->type == XML_ELEMENT_NODE);
 
 		xmlChar	*topic_id = xmlGetProp(cur, (const xmlChar *)"id");
