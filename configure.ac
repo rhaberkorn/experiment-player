@@ -15,6 +15,14 @@ AC_CONFIG_HEADER(config.h)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
+# Experiment player data directory
+player_datadir=$datarootdir/$PACKAGE_TARNAME
+AC_SUBST(player_datadir)
+
+# GtkVlcPlayer data directory
+gtk_vlc_player_datadir=$datarootdir/gtk-vlc-player
+AC_SUBST(gtk_vlc_player_datadir)
+
 #
 # Checks for programs.
 #
@@ -35,10 +43,10 @@ fi
 # not necessarily required
 AC_CHECK_PROG(GTESTER, gtester, gtester)
 AC_CHECK_PROG(GTESTER_REPORT, gtester-report, gtester-report)
-if [[ x$GTESTER = x -o x$GTESTER_REPORT = x ]]; then
+AM_CONDITIONAL(USE_GTESTER, [test x$GTESTER != x -a x$GTESTER_REPORT != x])
+AM_COND_IF(USE_GTESTER, , [
 	AC_MSG_WARN([gtester not found! Cannot automatically run test suites.])
-fi
-AM_CONDITIONAL(USE_GTESTER, test x$GTESTER != x -a x$GTESTER_REPORT != x)
+])
 
 # not necessarily required (depends on options)
 AC_CHECK_PROG(DOXYGEN, doxygen, doxygen)
@@ -53,7 +61,7 @@ case $host in
 		AC_MSG_WARN([Resource compiler not found... Binary will not have an icon!])
 	fi
 esac
-AM_CONDITIONAL(USE_W32_RES, test x$RC != x)
+AM_CONDITIONAL(USE_W32_RES, [test x$RC != x])
 
 #
 # Checks for libraries.
@@ -67,7 +75,10 @@ PKG_CHECK_EXISTS([gladeui-1.0],
 if [[ x$glade3_catalogsdir = x ]]; then
 	AC_MSG_WARN([Glade-3 catalog directory not found, installing Gtk+ widget catalogs into custom directories!])
 fi
-AC_SUBST(glade3_catalogsdir)
+gtk_experiment_widgets_catalogsdir=${glade3_catalogsdir:-$player_datadir/catalogs}
+AC_SUBST(gtk_experiment_widgets_catalogsdir)
+gtk_vlc_player_catalogsdir=${glade3_catalogsdir:-$gtk_vlc_player_datadir/catalogs}
+AC_SUBST(gtk_vlc_player_catalogsdir)
 
 # FIXME: further restrict libvlc version
 PKG_CHECK_MODULES(LIBVLC, [libvlc >= 1.1.13 vlc-plugin])
@@ -136,10 +147,6 @@ AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 
-# Experiment player data directory
-player_datadir=$datarootdir/$PACKAGE_TARNAME
-AC_SUBST(player_datadir)
-
 #
 # Config options
 #
@@ -166,7 +173,7 @@ AC_ARG_ENABLE(doxygen-doc,
 if [[ $doxygen_doc = yes -a x$DOXYGEN = x ]]; then
         AC_MSG_ERROR([Enabled generating Doxygen documentation, but Doxygen not found! Try --disable-doxygen-doc.])
 fi
-AM_CONDITIONAL(BUILD_DOXYGEN, test $doxygen_doc = yes)
+AM_CONDITIONAL(BUILD_DOXYGEN, [test $doxygen_doc = yes])
 
 AC_ARG_ENABLE(doxygen-extract-private,
 	AS_HELP_STRING([--enable-doxygen-extract-private],
@@ -188,7 +195,7 @@ AC_ARG_ENABLE(html-doc,
 if [[ $html_doc = yes -a x$XSLTPROC = x ]]; then
         AC_MSG_ERROR([Enabled generating HTML documentation, but XSLTProc not found! Try --disable-html-doc.])
 fi
-AM_CONDITIONAL(BUILD_HTML, test $html_doc = yes)
+AM_CONDITIONAL(BUILD_HTML, [test $html_doc = yes])
 
 AC_ARG_ENABLE(console,
 	AS_HELP_STRING([--enable-console],

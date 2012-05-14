@@ -1,7 +1,5 @@
 AM_CFLAGS = -Wall
 
-vlcplayer_datadir = @datarootdir@/gtk-vlc-player
-
 BUILT_SOURCES = cclosure-marshallers.c cclosure-marshallers.h
 
 lib_LTLIBRARIES = libgtk-vlc-player.la
@@ -16,8 +14,7 @@ libgtk_vlc_player_la_LDFLAGS = -no-undefined -shared -bindir @bindir@ \
 
 include_HEADERS = gtk-vlc-player.h
 
-glade3_catalogsdir ?= $(vlcplayer_datadir)/catalogs
-dist_glade3_catalogs_DATA = gtk-vlc-player-catalog.xml
+dist_gtk_vlc_player_catalogs_DATA = gtk-vlc-player-catalog.xml
 
 dist_noinst_DATA = cclosure-marshallers.list
 CLEANFILES = $(BUILT_SOURCES)
