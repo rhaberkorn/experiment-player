@@ -62,6 +62,13 @@ PKG_CHECK_MODULES(LIBGLIB, [gobject-2.0 glib-2.0])
 
 PKG_CHECK_MODULES(LIBGTK, [gtk+-2.0])
 
+PKG_CHECK_EXISTS([gladeui-1.0],
+		 [glade3_catalogsdir=`$PKG_CONFIG --variable=catalogdir gladeui-1.0`])
+if [[ x$glade3_catalogsdir = x ]]; then
+	AC_MSG_WARN([Glade-3 catalog directory not found, installing Gtk+ widget catalogs into custom directories!])
+fi
+AC_SUBST(glade3_catalogsdir)
+
 # FIXME: further restrict libvlc version
 PKG_CHECK_MODULES(LIBVLC, [libvlc >= 1.1.13 vlc-plugin])
 

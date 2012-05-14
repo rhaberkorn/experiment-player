@@ -21,7 +21,8 @@ libgtk_experiment_widgets_la_LIBADD += @top_srcdir@/lib/experiment-reader/libexp
 
 include_HEADERS = gtk-experiment-navigator.h
 
-dist_player_data_DATA = gtk-experiment-widgets-catalog.xml
+glade3_catalogsdir ?= $(player_datadir)/catalogs
+dist_glade3_catalogs_DATA = gtk-experiment-widgets-catalog.xml
 
 dist_noinst_DATA = cclosure-marshallers.list
 CLEANFILES = $(BUILT_SOURCES)
