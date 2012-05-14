@@ -74,4 +74,6 @@ main(int argc, char **argv)
 			test_foreach_greeting_topic_values);
 
 	g_test_run_suite(g_test_get_root());
+
+	return 0;
 }
