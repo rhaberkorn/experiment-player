@@ -1,5 +1,7 @@
 AM_CFLAGS = -Wall
 
+SUBDIRS = . tests
+
 reader_datadir = @datarootdir@/libexperiment-reader
 
 lib_LTLIBRARIES = libexperiment-reader.la

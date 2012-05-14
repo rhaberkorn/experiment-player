@@ -1,0 +1,914 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE session SYSTEM "session.dtd">
+
+<session>
+  <head/>
+  <speakers>
+    <speaker speaker-id="W">
+      <name>Wizard</name>
+    </speaker>
+    <speaker speaker-id="P">
+      <name>Proband</name>
+    </speaker>
+  </speakers>
+
+  <recording path="test-experiment-valid.wav"/>
+
+  <timeline>
+    <timepoint timepoint-id="TLI_0" absolute-time="7.214049251927732"/>
+    <timepoint timepoint-id="TLI_1" absolute-time="8.348253519252669"/>
+    <timepoint timepoint-id="TLI_2" absolute-time="10.228151350137683"/>
+    <timepoint timepoint-id="TLI_3" absolute-time="10.468148330350127"/>
+    <timepoint timepoint-id="TLI_4" absolute-time="11.628133734710278"/>
+    <timepoint timepoint-id="TLI_5" absolute-time="13.648297524768681"/>
+    <timepoint timepoint-id="TLI_6" absolute-time="15.914218445730855"/>
+    <timepoint timepoint-id="TLI_7" absolute-time="18.033208622734193"/>
+    <timepoint timepoint-id="TLI_8" absolute-time="19.697200908969947"/>
+    <timepoint timepoint-id="TLI_9" absolute-time="20.72419614813107"/>
+    <timepoint timepoint-id="TLI_10" absolute-time="23.844181684823106"/>
+    <timepoint timepoint-id="TLI_11" absolute-time="26.84716776388919"/>
+    <timepoint timepoint-id="TLI_12" absolute-time="29.83715390321906"/>
+    <timepoint timepoint-id="TLI_13" absolute-time="32.54114136835216"/>
+    <timepoint timepoint-id="TLI_14" absolute-time="35.64829780703222"/>
+    <timepoint timepoint-id="TLI_15" absolute-time="36.908294160025214"/>
+    <timepoint timepoint-id="TLI_16" absolute-time="40.96829190279636"/>
+    <timepoint timepoint-id="TLI_17" absolute-time="41.52775751951068"/>
+    <timepoint timepoint-id="TLI_18" absolute-time="41.77775437389864"/>
+    <timepoint timepoint-id="TLI_19" absolute-time="42.62774367881771"/>
+    <timepoint timepoint-id="TLI_20" absolute-time="44.367721785357936"/>
+    <timepoint timepoint-id="TLI_21" absolute-time="44.96771423588905"/>
+    <timepoint timepoint-id="TLI_22" absolute-time="48.5076696940226"/>
+    <timepoint timepoint-id="TLI_23" absolute-time="49.587656104978606"/>
+    <timepoint timepoint-id="TLI_24" absolute-time="53.327609046622534"/>
+    <timepoint timepoint-id="TLI_25" absolute-time="57.868294100469406"/>
+    <timepoint timepoint-id="TLI_26" absolute-time="61.519908309894845"/>
+    <timepoint timepoint-id="TLI_27" absolute-time="63.52829612507884"/>
+    <timepoint timepoint-id="TLI_28" absolute-time="64.36703373249568"/>
+    <timepoint timepoint-id="TLI_29" absolute-time="65.2170174085329"/>
+    <timepoint timepoint-id="TLI_30" absolute-time="65.95098649042936"/>
+    <timepoint timepoint-id="TLI_31" absolute-time="67.48497937930296"/>
+    <timepoint timepoint-id="TLI_32" absolute-time="70.3839659404793"/>
+    <timepoint timepoint-id="TLI_33" absolute-time="71.94466128838656"/>
+    <timepoint timepoint-id="TLI_34" absolute-time="75.96828798083035"/>
+    <timepoint timepoint-id="TLI_35" absolute-time="79.84792206844514"/>
+    <timepoint timepoint-id="TLI_36" absolute-time="84.03390266350696"/>
+    <timepoint timepoint-id="TLI_37" absolute-time="87.17988807967143"/>
+    <timepoint timepoint-id="TLI_38" absolute-time="88.14188362015146"/>
+    <timepoint timepoint-id="TLI_39" absolute-time="89.32487813614719"/>
+    <timepoint timepoint-id="TLI_40" absolute-time="90.33887343557211"/>
+    <timepoint timepoint-id="TLI_41" absolute-time="91.66486728866623"/>
+    <timepoint timepoint-id="TLI_42" absolute-time="93.41579885069328"/>
+    <timepoint timepoint-id="TLI_43" absolute-time="94.49329519655608"/>
+    <timepoint timepoint-id="TLI_44" absolute-time="94.66804448950987"/>
+    <timepoint timepoint-id="TLI_45" absolute-time="97.15084185734972"/>
+    <timepoint timepoint-id="TLI_46" absolute-time="98.94303316519402"/>
+    <timepoint timepoint-id="TLI_47" absolute-time="100.68682546560069"/>
+    <timepoint timepoint-id="TLI_48" absolute-time="103.5430209799653"/>
+    <timepoint timepoint-id="TLI_49" absolute-time="106.2637996124377"/>
+    <timepoint timepoint-id="TLI_50" absolute-time="109.09300627822196"/>
+    <timepoint timepoint-id="TLI_51" absolute-time="111.56777502481417"/>
+    <timepoint timepoint-id="TLI_52" absolute-time="113.76799389432104"/>
+    <timepoint timepoint-id="TLI_53" absolute-time="115.11799031822129"/>
+    <timepoint timepoint-id="TLI_54" absolute-time="117.76798329846997"/>
+    <timepoint timepoint-id="TLI_55" absolute-time="118.28048194087654"/>
+    <timepoint timepoint-id="TLI_56" absolute-time="120.16797694095935"/>
+    <timepoint timepoint-id="TLI_57" absolute-time="120.49297608004643"/>
+    <timepoint timepoint-id="TLI_58" absolute-time="122.86796978875986"/>
+    <timepoint timepoint-id="TLI_59" absolute-time="128.01829794257122"/>
+    <timepoint timepoint-id="TLI_60" absolute-time="129.71309701995418"/>
+    <timepoint timepoint-id="TLI_61" absolute-time="131.83468107357612"/>
+    <timepoint timepoint-id="TLI_62" absolute-time="133.4206737213946"/>
+    <timepoint timepoint-id="TLI_63" absolute-time="136.1506610660001"/>
+    <timepoint timepoint-id="TLI_64" absolute-time="139.36164618084567"/>
+    <timepoint timepoint-id="TLI_65" absolute-time="142.1566332241323"/>
+    <timepoint timepoint-id="TLI_66" absolute-time="143.98962472693887"/>
+    <timepoint timepoint-id="TLI_67" absolute-time="145.8429089288403"/>
+    <timepoint timepoint-id="TLI_68" absolute-time="147.36790488917208"/>
+    <timepoint timepoint-id="TLI_69" absolute-time="149.21830281955513"/>
+    <timepoint timepoint-id="TLI_70" absolute-time="152.49714766571643"/>
+    <timepoint timepoint-id="TLI_71" absolute-time="154.64330065593106"/>
+    <timepoint timepoint-id="TLI_72" absolute-time="160.64286972419137"/>
+    <timepoint timepoint-id="TLI_73" absolute-time="161.76786674410826"/>
+    <timepoint timepoint-id="TLI_74" absolute-time="166.36785455887954"/>
+    <timepoint timepoint-id="TLI_75" absolute-time="167.9745135402589"/>
+    <timepoint timepoint-id="TLI_76" absolute-time="169.87250474174652"/>
+    <timepoint timepoint-id="TLI_77" absolute-time="171.2504983537855"/>
+    <timepoint timepoint-id="TLI_78" absolute-time="173.01783694327716"/>
+    <timepoint timepoint-id="TLI_79" absolute-time="177.56830096345422"/>
+    <timepoint timepoint-id="TLI_80" absolute-time="180.6624547228065"/>
+    <timepoint timepoint-id="TLI_81" absolute-time="182.9172980245914"/>
+    <timepoint timepoint-id="TLI_82" absolute-time="184.31680603608694"/>
+    <timepoint timepoint-id="TLI_83" absolute-time="185.09280495705175"/>
+    <timepoint timepoint-id="TLI_84" absolute-time="192.44278548717543"/>
+    <timepoint timepoint-id="TLI_85" absolute-time="195.19277820252785"/>
+    <timepoint timepoint-id="TLI_86" absolute-time="195.6677769442705"/>
+    <timepoint timepoint-id="TLI_87" absolute-time="197.75737547593158"/>
+    <timepoint timepoint-id="TLI_88" absolute-time="201.21776224252716"/>
+    <timepoint timepoint-id="TLI_89" absolute-time="201.9177603882532"/>
+    <timepoint timepoint-id="TLI_90" absolute-time="205.5427507857632"/>
+    <timepoint timepoint-id="TLI_91" absolute-time="206.44274840169672"/>
+    <timepoint timepoint-id="TLI_92" absolute-time="208.78132437224343"/>
+    <timepoint timepoint-id="TLI_93" absolute-time="210.87431466977435"/>
+    <timepoint timepoint-id="TLI_94" absolute-time="212.76773164700722"/>
+    <timepoint timepoint-id="TLI_95" absolute-time="215.67129243243838"/>
+    <timepoint timepoint-id="TLI_96" absolute-time="216.51830764934473"/>
+    <timepoint timepoint-id="TLI_97" absolute-time="218.54330228519513"/>
+    <timepoint timepoint-id="TLI_98" absolute-time="218.9177153558862"/>
+    <timepoint timepoint-id="TLI_99" absolute-time="220.9667089516016"/>
+    <timepoint timepoint-id="TLI_100" absolute-time="223.7177026408649"/>
+    <timepoint timepoint-id="TLI_101" absolute-time="224.4927005879188"/>
+    <timepoint timepoint-id="TLI_102" absolute-time="225.31769840252448"/>
+    <timepoint timepoint-id="TLI_103" absolute-time="227.71769204501385"/>
+    <timepoint timepoint-id="TLI_104" absolute-time="230.91768356833302"/>
+    <timepoint timepoint-id="TLI_105" absolute-time="235.46829931972786"/>
+    <timepoint timepoint-id="TLI_106" absolute-time="238.62918600659725"/>
+    <timepoint timepoint-id="TLI_107" absolute-time="239.9811797391638"/>
+    <timepoint timepoint-id="TLI_108" absolute-time="242.0741700366947"/>
+    <timepoint timepoint-id="TLI_109" absolute-time="243.95916129844613"/>
+    <timepoint timepoint-id="TLI_110" absolute-time="245.54515394626458"/>
+    <timepoint timepoint-id="TLI_111" absolute-time="247.69329830992396"/>
+    <timepoint timepoint-id="TLI_112" absolute-time="250.9676304566296"/>
+    <timepoint timepoint-id="TLI_113" absolute-time="252.89262535737623"/>
+    <timepoint timepoint-id="TLI_114" absolute-time="253.47511718535685"/>
+    <timepoint timepoint-id="TLI_115" absolute-time="255.36661782728243"/>
+    <timepoint timepoint-id="TLI_116" absolute-time="257.89509669567053"/>
+    <timepoint timepoint-id="TLI_117" absolute-time="258.701092959316"/>
+    <timepoint timepoint-id="TLI_118" absolute-time="259.14260880135896"/>
+    <timepoint timepoint-id="TLI_119" absolute-time="260.2926057550518"/>
+    <timepoint timepoint-id="TLI_120" absolute-time="261.99260125181513"/>
+    <timepoint timepoint-id="TLI_121" absolute-time="263.59259701347474"/>
+    <timepoint timepoint-id="TLI_122" absolute-time="264.2425952916489"/>
+    <timepoint timepoint-id="TLI_123" absolute-time="265.5925917155492"/>
+    <timepoint timepoint-id="TLI_124" absolute-time="265.86759098708444"/>
+    <timepoint timepoint-id="TLI_125" absolute-time="268.2675846295738"/>
+    <timepoint timepoint-id="TLI_126" absolute-time="274.0675692655898"/>
+    <timepoint timepoint-id="TLI_127" absolute-time="274.94256694774737"/>
+    <timepoint timepoint-id="TLI_128" absolute-time="284.8925405905678"/>
+    <timepoint timepoint-id="TLI_129" absolute-time="287.00196176506"/>
+    <timepoint timepoint-id="TLI_130" absolute-time="289.5239500738861"/>
+    <timepoint timepoint-id="TLI_131" absolute-time="291.0665241007746"/>
+    <timepoint timepoint-id="TLI_132" absolute-time="291.8675221140525"/>
+    <timepoint timepoint-id="TLI_133" absolute-time="295.8682927661319"/>
+    <timepoint timepoint-id="TLI_134" absolute-time="298.4159088534584"/>
+    <timepoint timepoint-id="TLI_135" absolute-time="301.6918936669851"/>
+    <timepoint timepoint-id="TLI_136" absolute-time="304.86829333946486"/>
+    <timepoint timepoint-id="TLI_137" absolute-time="305.71748542591826"/>
+    <timepoint timepoint-id="TLI_138" absolute-time="309.0674765518929"/>
+    <timepoint timepoint-id="TLI_139" absolute-time="311.0424713201915"/>
+    <timepoint timepoint-id="TLI_140" absolute-time="311.8174692672453"/>
+    <timepoint timepoint-id="TLI_141" absolute-time="312.09246853878057"/>
+    <timepoint timepoint-id="TLI_142" absolute-time="315.44582990790246"/>
+    <timepoint timepoint-id="TLI_143" absolute-time="317.3414544992779"/>
+    <timepoint timepoint-id="TLI_144" absolute-time="318.29245211521146"/>
+    <timepoint timepoint-id="TLI_145" absolute-time="321.89329706886946"/>
+    <timepoint timepoint-id="TLI_146" absolute-time="324.4547881451007"/>
+    <timepoint timepoint-id="TLI_147" absolute-time="325.8067818776673"/>
+    <timepoint timepoint-id="TLI_148" absolute-time="328.66830353614455"/>
+    <timepoint timepoint-id="TLI_149" absolute-time="329.0924235064136"/>
+    <timepoint timepoint-id="TLI_150" absolute-time="330.46741986408983"/>
+    <timepoint timepoint-id="TLI_151" absolute-time="331.74241648666225"/>
+    <timepoint timepoint-id="TLI_152" absolute-time="332.5174144337161"/>
+    <timepoint timepoint-id="TLI_153" absolute-time="335.6433094736271"/>
+    <timepoint timepoint-id="TLI_154" absolute-time="338.10472486812836"/>
+    <timepoint timepoint-id="TLI_155" absolute-time="340.8347122127339"/>
+    <timepoint timepoint-id="TLI_156" absolute-time="344.1182870236677"/>
+    <timepoint timepoint-id="TLI_157" absolute-time="354.66735575919085"/>
+    <timepoint timepoint-id="TLI_158" absolute-time="357.3056358585206"/>
+    <timepoint timepoint-id="TLI_159" absolute-time="359.2556268189531"/>
+    <timepoint timepoint-id="TLI_160" absolute-time="360.34234072632717"/>
+    <timepoint timepoint-id="TLI_161" absolute-time="363.89330788242245"/>
+    <timepoint timepoint-id="TLI_162" absolute-time="365.1185996399869"/>
+    <timepoint timepoint-id="TLI_163" absolute-time="367.84858698459243"/>
+    <timepoint timepoint-id="TLI_164" absolute-time="370.8932893396831"/>
+    <timepoint timepoint-id="TLI_165" absolute-time="374.2673038395206"/>
+    <timepoint timepoint-id="TLI_166" absolute-time="374.9673019852467"/>
+    <timepoint timepoint-id="TLI_167" absolute-time="378.1932944162527"/>
+    <timepoint timepoint-id="TLI_168" absolute-time="379.7235058378855"/>
+    <timepoint timepoint-id="TLI_169" absolute-time="380.122505296356"/>
+    <timepoint timepoint-id="TLI_170" absolute-time="383.4047975382218"/>
+    <timepoint timepoint-id="TLI_171" absolute-time="385.13850683376074"/>
+    <timepoint timepoint-id="TLI_172" absolute-time="389.1682897578842"/>
+    <timepoint timepoint-id="TLI_173" absolute-time="390.2433113242471"/>
+    <timepoint timepoint-id="TLI_174" absolute-time="391.76780684060105"/>
+    <timepoint timepoint-id="TLI_175" absolute-time="393.302468988105"/>
+    <timepoint timepoint-id="TLI_176" absolute-time="395.12246055117527"/>
+    <timepoint timepoint-id="TLI_177" absolute-time="397.501449522903"/>
+    <timepoint timepoint-id="TLI_178" absolute-time="399.5814398806977"/>
+    <timepoint timepoint-id="TLI_179" absolute-time="401.66143023849236"/>
+    <timepoint timepoint-id="TLI_180" absolute-time="404.33941782415303"/>
+    <timepoint timepoint-id="TLI_181" absolute-time="406.4682993197279"/>
+    <timepoint timepoint-id="TLI_182" absolute-time="407.8682890502762"/>
+    <timepoint timepoint-id="TLI_183" absolute-time="409.4680760879715"/>
+    <timepoint timepoint-id="TLI_184" absolute-time="411.98338238904853"/>
+    <timepoint timepoint-id="TLI_185" absolute-time="413.99837304816214"/>
+    <timepoint timepoint-id="TLI_186" absolute-time="416.7673602119763"/>
+    <timepoint timepoint-id="TLI_187" absolute-time="419.61434701420774"/>
+    <timepoint timepoint-id="TLI_188" absolute-time="422.3833341780219"/>
+    <timepoint timepoint-id="TLI_189" absolute-time="425.45428655112926"/>
+    <timepoint timepoint-id="TLI_190" absolute-time="428.28530681826436"/>
+    <timepoint timepoint-id="TLI_191" absolute-time="430.9242945847164"/>
+    <timepoint timepoint-id="TLI_192" absolute-time="434.4933161776338"/>
+    <timepoint timepoint-id="TLI_193" absolute-time="435.4682993197279"/>
+    <timepoint timepoint-id="TLI_194" absolute-time="438.49228019387397"/>
+    <timepoint timepoint-id="TLI_195" absolute-time="439.01830419107733"/>
+    <timepoint timepoint-id="TLI_196" absolute-time="441.2932981646871"/>
+    <timepoint timepoint-id="TLI_197" absolute-time="443.10523811755155"/>
+    <timepoint timepoint-id="TLI_198" absolute-time="445.39322751112576"/>
+    <timepoint timepoint-id="TLI_199" absolute-time="448.50021310808154"/>
+    <timepoint timepoint-id="TLI_200" absolute-time="451.0092014771713"/>
+    <timepoint timepoint-id="TLI_201" absolute-time="453.1021917747023"/>
+    <timepoint timepoint-id="TLI_202" absolute-time="456.0661780345597"/>
+    <timepoint timepoint-id="TLI_203" absolute-time="458.7441656202204"/>
+    <timepoint timepoint-id="TLI_204" absolute-time="460.6432957352532"/>
+    <timepoint timepoint-id="TLI_205" absolute-time="461.34329388097916"/>
+    <timepoint timepoint-id="TLI_206" absolute-time="464.99328421226517"/>
+    <timepoint timepoint-id="TLI_207" absolute-time="465.6932823579912"/>
+    <timepoint timepoint-id="TLI_208" absolute-time="469.0791177105128"/>
+    <timepoint timepoint-id="TLI_209" absolute-time="471.3183162855713"/>
+    <timepoint timepoint-id="TLI_210" absolute-time="471.99204496963443"/>
+    <timepoint timepoint-id="TLI_211" absolute-time="473.4210975824092"/>
+    <timepoint timepoint-id="TLI_212" absolute-time="478.1530756463921"/>
+    <timepoint timepoint-id="TLI_213" absolute-time="481.2470613036116"/>
+    <timepoint timepoint-id="TLI_214" absolute-time="483.5932837695534"/>
+    <timepoint timepoint-id="TLI_215" absolute-time="484.76828065702216"/>
+    <timepoint timepoint-id="TLI_216" absolute-time="487.9160303882909"/>
+    <timepoint timepoint-id="TLI_217" absolute-time="490.8670167084121"/>
+    <timepoint timepoint-id="TLI_218" absolute-time="491.75101261047485"/>
+    <timepoint timepoint-id="TLI_219" absolute-time="494.5933034589586"/>
+    <timepoint timepoint-id="TLI_220" absolute-time="499.01697338141565"/>
+    <timepoint timepoint-id="TLI_221" absolute-time="499.50447209004625"/>
+    <timepoint timepoint-id="TLI_222" absolute-time="501.066967951042"/>
+    <timepoint timepoint-id="TLI_223" absolute-time="501.391967090129"/>
+    <timepoint timepoint-id="TLI_224" absolute-time="503.06696265311643"/>
+    <timepoint timepoint-id="TLI_225" absolute-time="504.9419576863113"/>
+    <timepoint timepoint-id="TLI_226" absolute-time="505.99195490490035"/>
+    <timepoint timepoint-id="TLI_227" absolute-time="506.56832056562513"/>
+    <timepoint timepoint-id="TLI_228" absolute-time="509.34331321475344"/>
+    <timepoint timepoint-id="TLI_229" absolute-time="510.8419420574309"/>
+    <timepoint timepoint-id="TLI_230" absolute-time="512.1419386137794"/>
+    <timepoint timepoint-id="TLI_231" absolute-time="512.3419380839869"/>
+    <timepoint timepoint-id="TLI_232" absolute-time="513.0419362297127"/>
+    <timepoint timepoint-id="TLI_233" absolute-time="513.1919358323685"/>
+    <timepoint timepoint-id="TLI_234" absolute-time="514.04193358075"/>
+    <timepoint timepoint-id="TLI_235" absolute-time="516.7932934799809"/>
+    <timepoint timepoint-id="TLI_236" absolute-time="519.0898858757389"/>
+    <timepoint timepoint-id="TLI_237" absolute-time="520.468299319728"/>
+    <timepoint timepoint-id="TLI_238" absolute-time="523.4919085480519"/>
+    <timepoint timepoint-id="TLI_239" absolute-time="526.0669017269728"/>
+    <timepoint timepoint-id="TLI_240" absolute-time="531.2183040966885"/>
+    <timepoint timepoint-id="TLI_241" absolute-time="534.0668805352706"/>
+    <timepoint timepoint-id="TLI_242" absolute-time="536.3418745088803"/>
+    <timepoint timepoint-id="TLI_243" absolute-time="538.0047981919341"/>
+    <timepoint timepoint-id="TLI_244" absolute-time="540.2168642441496"/>
+    <timepoint timepoint-id="TLI_245" absolute-time="544.4682993197279"/>
+    <timepoint timepoint-id="TLI_246" absolute-time="547.1183108061763"/>
+    <timepoint timepoint-id="TLI_247" absolute-time="547.7418443107049"/>
+    <timepoint timepoint-id="TLI_248" absolute-time="548.0418435160159"/>
+    <timepoint timepoint-id="TLI_249" absolute-time="548.3418427213271"/>
+    <timepoint timepoint-id="TLI_250" absolute-time="549.3668400061403"/>
+    <timepoint timepoint-id="TLI_251" absolute-time="549.6668392114515"/>
+    <timepoint timepoint-id="TLI_252" absolute-time="550.1168380194182"/>
+    <timepoint timepoint-id="TLI_253" absolute-time="550.4168372247293"/>
+    <timepoint timepoint-id="TLI_254" absolute-time="550.9908355691277"/>
+    <timepoint timepoint-id="TLI_255" absolute-time="552.1168327214928"/>
+    <timepoint timepoint-id="TLI_256" absolute-time="552.3668320592519"/>
+    <timepoint timepoint-id="TLI_257" absolute-time="553.6668286156004"/>
+    <timepoint timepoint-id="TLI_258" absolute-time="555.9432874290798"/>
+    <timepoint timepoint-id="TLI_259" absolute-time="558.3182811377932"/>
+    <timepoint timepoint-id="TLI_260" absolute-time="559.1182790186231"/>
+    <timepoint timepoint-id="TLI_261" absolute-time="560.7026929713687"/>
+    <timepoint timepoint-id="TLI_262" absolute-time="562.1716861615612"/>
+    <timepoint timepoint-id="TLI_263" absolute-time="563.6926791106985"/>
+    <timepoint timepoint-id="TLI_264" absolute-time="564.6416747114424"/>
+    <timepoint timepoint-id="TLI_265" absolute-time="566.6436654308197"/>
+    <timepoint timepoint-id="TLI_266" absolute-time="567.8183048006426"/>
+    <timepoint timepoint-id="TLI_267" absolute-time="568.4433031450409"/>
+    <timepoint timepoint-id="TLI_268" absolute-time="571.968293807447"/>
+    <timepoint timepoint-id="TLI_269" absolute-time="572.6417783515319"/>
+    <timepoint timepoint-id="TLI_270" absolute-time="573.7917753052247"/>
+    <timepoint timepoint-id="TLI_271" absolute-time="576.5682816222185"/>
+    <timepoint timepoint-id="TLI_272" absolute-time="578.8432755958281"/>
+    <timepoint timepoint-id="TLI_273" absolute-time="579.0917612657221"/>
+    <timepoint timepoint-id="TLI_274" absolute-time="580.216758285639"/>
+    <timepoint timepoint-id="TLI_275" absolute-time="583.0683132319562"/>
+    <timepoint timepoint-id="TLI_276" absolute-time="585.9183056824122"/>
+    <timepoint timepoint-id="TLI_277" absolute-time="586.0917427229828"/>
+    <timepoint timepoint-id="TLI_278" absolute-time="587.1917398091236"/>
+    <timepoint timepoint-id="TLI_279" absolute-time="588.6932983315405"/>
+    <timepoint timepoint-id="TLI_280" absolute-time="590.5115547865138"/>
+    <timepoint timepoint-id="TLI_281" absolute-time="592.3432886628264"/>
+    <timepoint timepoint-id="TLI_282" absolute-time="593.591722855762"/>
+    <timepoint timepoint-id="TLI_283" absolute-time="595.4417179551808"/>
+    <timepoint timepoint-id="TLI_284" absolute-time="597.8182741597553"/>
+    <timepoint timepoint-id="TLI_285" absolute-time="599.9183174249291"/>
+    <timepoint timepoint-id="TLI_286" absolute-time="600.3417049752634"/>
+    <timepoint timepoint-id="TLI_287" absolute-time="602.0417004720266"/>
+    <timepoint timepoint-id="TLI_288" absolute-time="604.1933061006133"/>
+    <timepoint timepoint-id="TLI_289" absolute-time="606.6932994782064"/>
+    <timepoint timepoint-id="TLI_290" absolute-time="606.8666876907813"/>
+    <timepoint timepoint-id="TLI_291" absolute-time="607.7916852404907"/>
+    <timepoint timepoint-id="TLI_292" absolute-time="609.9682908028534"/>
+    <timepoint timepoint-id="TLI_293" absolute-time="611.7182861671686"/>
+    <timepoint timepoint-id="TLI_294" absolute-time="612.041673982399"/>
+    <timepoint timepoint-id="TLI_295" absolute-time="613.3666704725233"/>
+    <timepoint timepoint-id="TLI_296" absolute-time="615.2682767633507"/>
+    <timepoint timepoint-id="TLI_297" absolute-time="617.1906837803276"/>
+    <timepoint timepoint-id="TLI_298" absolute-time="618.2666574926058"/>
+    <timepoint timepoint-id="TLI_299" absolute-time="620.0433129425492"/>
+    <timepoint timepoint-id="TLI_300" absolute-time="622.4524067183986"/>
+    <timepoint timepoint-id="TLI_301" absolute-time="625.4943926166733"/>
+    <timepoint timepoint-id="TLI_302" absolute-time="628.3432909561582"/>
+    <timepoint timepoint-id="TLI_303" absolute-time="628.6416300096171"/>
+    <timepoint timepoint-id="TLI_304" absolute-time="631.2666230560899"/>
+    <timepoint timepoint-id="TLI_305" absolute-time="633.4682993197279"/>
+    <timepoint timepoint-id="TLI_306" absolute-time="636.0183194533646"/>
+    <timepoint timepoint-id="TLI_307" absolute-time="636.266609811276"/>
+    <timepoint timepoint-id="TLI_308" absolute-time="637.9916052418153"/>
+    <timepoint timepoint-id="TLI_309" absolute-time="639.9183091224098"/>
+    <timepoint timepoint-id="TLI_310" absolute-time="642.1673266023304"/>
+    <timepoint timepoint-id="TLI_311" absolute-time="642.4923257414176"/>
+    <timepoint timepoint-id="TLI_312" absolute-time="643.6182993212476"/>
+    <timepoint timepoint-id="TLI_313" absolute-time="645.7682936259775"/>
+    <timepoint timepoint-id="TLI_314" absolute-time="647.5552903490333"/>
+    <timepoint timepoint-id="TLI_315" absolute-time="649.0682848844006"/>
+    <timepoint timepoint-id="TLI_316" absolute-time="652.8415659047181"/>
+    <timepoint timepoint-id="TLI_317" absolute-time="654.9415603418963"/>
+    <timepoint timepoint-id="TLI_318" absolute-time="657.4682993197279"/>
+    <timepoint timepoint-id="TLI_319" absolute-time="659.4682993197279"/>
+    <timepoint timepoint-id="TLI_320" absolute-time="659.6165479579953"/>
+    <timepoint timepoint-id="TLI_321" absolute-time="660.6165453090325"/>
+    <timepoint timepoint-id="TLI_322" absolute-time="662.5682979513989"/>
+    <timepoint timepoint-id="TLI_323" absolute-time="664.3642124279617"/>
+    <timepoint timepoint-id="TLI_324" absolute-time="665.9432890111495"/>
+    <timepoint timepoint-id="TLI_325" absolute-time="666.7665290179117"/>
+    <timepoint timepoint-id="TLI_326" absolute-time="667.7665263689489"/>
+    <timepoint timepoint-id="TLI_327" absolute-time="670.2182776868337"/>
+    <timepoint timepoint-id="TLI_328" absolute-time="672.2320907116789"/>
+    <timepoint timepoint-id="TLI_329" absolute-time="672.9674891542556"/>
+    <timepoint timepoint-id="TLI_330" absolute-time="673.891510144052"/>
+    <timepoint timepoint-id="TLI_331" absolute-time="676.4682993197279"/>
+    <timepoint timepoint-id="TLI_332" absolute-time="678.4682993197279"/>
+    <timepoint timepoint-id="TLI_333" absolute-time="678.6414975614789"/>
+    <timepoint timepoint-id="TLI_334" absolute-time="679.5664951111881"/>
+    <timepoint timepoint-id="TLI_335" absolute-time="681.8881311923818"/>
+    <timepoint timepoint-id="TLI_336" absolute-time="684.3971195614716"/>
+    <timepoint timepoint-id="TLI_337" absolute-time="687.2701062431755"/>
+    <timepoint timepoint-id="TLI_338" absolute-time="689.7270948533206"/>
+    <timepoint timepoint-id="TLI_339" absolute-time="692.8600803297488"/>
+    <timepoint timepoint-id="TLI_340" absolute-time="695.9540659869684"/>
+    <timepoint timepoint-id="TLI_341" absolute-time="698.4630543560583"/>
+    <timepoint timepoint-id="TLI_342" absolute-time="699.689382004508"/>
+    <timepoint timepoint-id="TLI_343" absolute-time="700.8680432072583"/>
+    <timepoint timepoint-id="TLI_344" absolute-time="702.1420373014076"/>
+    <timepoint timepoint-id="TLI_345" absolute-time="703.838529436984"/>
+    <timepoint timepoint-id="TLI_346" absolute-time="704.8330248268045"/>
+    <timepoint timepoint-id="TLI_347" absolute-time="706.3410178362057"/>
+    <timepoint timepoint-id="TLI_348" absolute-time="707.1600140395874"/>
+    <timepoint timepoint-id="TLI_349" absolute-time="708.0830097608588"/>
+    <timepoint timepoint-id="TLI_350" absolute-time="709.5520029510512"/>
+    <timepoint timepoint-id="TLI_351" absolute-time="710.7479974067832"/>
+    <timepoint timepoint-id="TLI_352" absolute-time="711.8932603903737"/>
+    <timepoint timepoint-id="TLI_353" absolute-time="712.9839870414124"/>
+    <timepoint timepoint-id="TLI_354" absolute-time="714.3537139777944"/>
+    <timepoint timepoint-id="TLI_355" absolute-time="716.2209720357304"/>
+    <timepoint timepoint-id="TLI_356" absolute-time="718.4172993197278"/>
+    <timepoint timepoint-id="TLI_357" absolute-time="718.7839416538685"/>
+    <timepoint timepoint-id="TLI_358" absolute-time="721.0957304801879"/>
+    <timepoint timepoint-id="TLI_359" absolute-time="723.7016336752315"/>
+    <timepoint timepoint-id="TLI_360" absolute-time="726.2349463173365"/>
+    <timepoint timepoint-id="TLI_361" absolute-time="727.2623467800488"/>
+    <timepoint timepoint-id="TLI_362" absolute-time="728.6623353454227"/>
+    <timepoint timepoint-id="TLI_363" absolute-time="731.2683036441011"/>
+    <timepoint timepoint-id="TLI_364" absolute-time="733.7016171029651"/>
+    <timepoint timepoint-id="TLI_365" absolute-time="734.2622896069179"/>
+    <timepoint timepoint-id="TLI_366" absolute-time="735.1446153171671"/>
+    <timepoint timepoint-id="TLI_367" absolute-time="736.5956038825409"/>
+    <timepoint timepoint-id="TLI_368" absolute-time="739.4016356513364"/>
+    <timepoint timepoint-id="TLI_369" absolute-time="741.9016152323611"/>
+    <timepoint timepoint-id="TLI_370" absolute-time="742.2955573272773"/>
+    <timepoint timepoint-id="TLI_371" absolute-time="743.3288822207676"/>
+    <timepoint timepoint-id="TLI_372" absolute-time="745.0016550164667"/>
+    <timepoint timepoint-id="TLI_373" absolute-time="747.3688276437059"/>
+    <timepoint timepoint-id="TLI_374" absolute-time="750.4746228784879"/>
+    <timepoint timepoint-id="TLI_375" absolute-time="754.0016466117905"/>
+    <timepoint timepoint-id="TLI_376" absolute-time="754.195460132955"/>
+    <timepoint timepoint-id="TLI_377" absolute-time="756.1954437977746"/>
+    <timepoint timepoint-id="TLI_378" absolute-time="758.4682993197279"/>
+    <timepoint timepoint-id="TLI_379" absolute-time="760.4284464724095"/>
+    <timepoint timepoint-id="TLI_380" absolute-time="761.3571783595758"/>
+    <timepoint timepoint-id="TLI_381" absolute-time="763.2682879238208"/>
+    <timepoint timepoint-id="TLI_382" absolute-time="766.6238407633667"/>
+    <timepoint timepoint-id="TLI_383" absolute-time="767.1121216181486"/>
+    <timepoint timepoint-id="TLI_384" absolute-time="768.9676756718051"/>
+    <timepoint timepoint-id="TLI_385" absolute-time="771.4682993197279"/>
+    <timepoint timepoint-id="TLI_386" absolute-time="773.6287059108638"/>
+    <timepoint timepoint-id="TLI_387" absolute-time="775.4616974136703"/>
+    <timepoint timepoint-id="TLI_388" absolute-time="776.6672598250482"/>
+    <timepoint timepoint-id="TLI_389" absolute-time="778.7116823477246"/>
+    <timepoint timepoint-id="TLI_390" absolute-time="780.8436724644642"/>
+    <timepoint timepoint-id="TLI_391" absolute-time="782.0136670407238"/>
+    <timepoint timepoint-id="TLI_392" absolute-time="784.9516534211087"/>
+    <timepoint timepoint-id="TLI_393" absolute-time="787.7076406451866"/>
+    <timepoint timepoint-id="TLI_394" absolute-time="790.2426288937488"/>
+    <timepoint timepoint-id="TLI_395" absolute-time="791.7636218428862"/>
+    <timepoint timepoint-id="TLI_396" absolute-time="794.2726102119761"/>
+    <timepoint timepoint-id="TLI_397" absolute-time="796.4682993197279"/>
+    <timepoint timepoint-id="TLI_398" absolute-time="796.6779524646015"/>
+    <timepoint timepoint-id="TLI_399" absolute-time="797.7039509537797"/>
+    <timepoint timepoint-id="TLI_400" absolute-time="800.4028981409589"/>
+    <timepoint timepoint-id="TLI_401" absolute-time="802.6683174556807"/>
+    <timepoint timepoint-id="TLI_402" absolute-time="804.8155613380479"/>
+    <timepoint timepoint-id="TLI_403" absolute-time="806.2183080518628"/>
+    <timepoint timepoint-id="TLI_404" absolute-time="806.6911583617965"/>
+    <timepoint timepoint-id="TLI_405" absolute-time="807.5161561764023"/>
+    <timepoint timepoint-id="TLI_406" absolute-time="809.4932993765098"/>
+    <timepoint timepoint-id="TLI_407" absolute-time="812.6423144723639"/>
+    <timepoint timepoint-id="TLI_408" absolute-time="813.768288052194"/>
+    <timepoint timepoint-id="TLI_409" absolute-time="815.0182847409905"/>
+    <timepoint timepoint-id="TLI_410" absolute-time="818.5682753371725"/>
+    <timepoint timepoint-id="TLI_411" absolute-time="820.291122335903"/>
+    <timepoint timepoint-id="TLI_412" absolute-time="821.0661202829568"/>
+    <timepoint timepoint-id="TLI_413" absolute-time="822.3911167730811"/>
+    <timepoint timepoint-id="TLI_414" absolute-time="825.0432581851387"/>
+    <timepoint timepoint-id="TLI_415" absolute-time="827.3432520925244"/>
+    <timepoint timepoint-id="TLI_416" absolute-time="827.541103130923"/>
+    <timepoint timepoint-id="TLI_417" absolute-time="828.3411010117528"/>
+    <timepoint timepoint-id="TLI_418" absolute-time="831.3933390202164"/>
+    <timepoint timepoint-id="TLI_419" absolute-time="832.7654317709141"/>
+    <timepoint timepoint-id="TLI_420" absolute-time="834.1552792183886"/>
+    <timepoint timepoint-id="TLI_421" absolute-time="834.8312760846719"/>
+    <timepoint timepoint-id="TLI_422" absolute-time="834.5984232737206"/>
+    <timepoint timepoint-id="TLI_423" absolute-time="835.5734187539368"/>
+    <timepoint timepoint-id="TLI_424" absolute-time="837.8874080269836"/>
+    <timepoint timepoint-id="TLI_425" absolute-time="839.0660726016271"/>
+    <timepoint timepoint-id="TLI_426" absolute-time="840.591068561959"/>
+    <timepoint timepoint-id="TLI_427" absolute-time="841.3160666414609"/>
+    <timepoint timepoint-id="TLI_428" absolute-time="843.8410599528298"/>
+    <timepoint timepoint-id="TLI_429" absolute-time="846.3432994182232"/>
+    <timepoint timepoint-id="TLI_430" absolute-time="848.2932942527458"/>
+    <timepoint timepoint-id="TLI_431" absolute-time="849.9410437941569"/>
+    <timepoint timepoint-id="TLI_432" absolute-time="850.7910415425387"/>
+    <timepoint timepoint-id="TLI_433" absolute-time="852.8682821337411"/>
+    <timepoint timepoint-id="TLI_434" absolute-time="854.5923010043672"/>
+    <timepoint timepoint-id="TLI_435" absolute-time="855.042276239799"/>
+    <timepoint timepoint-id="TLI_436" absolute-time="856.2432731934917"/>
+    <timepoint timepoint-id="TLI_437" absolute-time="858.8432663061886"/>
+    <timepoint timepoint-id="TLI_438" absolute-time="860.9682606771427"/>
+    <timepoint timepoint-id="TLI_439" absolute-time="862.6660100861058"/>
+    <timepoint timepoint-id="TLI_440" absolute-time="864.1160062451099"/>
+    <timepoint timepoint-id="TLI_441" absolute-time="866.6433433002703"/>
+    <timepoint timepoint-id="TLI_442" absolute-time="869.1933365454153"/>
+    <timepoint timepoint-id="TLI_443" absolute-time="870.1409902851093"/>
+    <timepoint timepoint-id="TLI_444" absolute-time="871.4159869076816"/>
+    <timepoint timepoint-id="TLI_445" absolute-time="874.1183234992737"/>
+    <timepoint timepoint-id="TLI_446" absolute-time="876.2923411778664"/>
+    <timepoint timepoint-id="TLI_447" absolute-time="877.3433149563688"/>
+    <timepoint timepoint-id="TLI_448" absolute-time="879.7183086650822"/>
+    <timepoint timepoint-id="TLI_449" absolute-time="882.6202006593056"/>
+    <timepoint timepoint-id="TLI_450" absolute-time="885.4182935659945"/>
+    <timepoint timepoint-id="TLI_451" absolute-time="885.765948895066"/>
+    <timepoint timepoint-id="TLI_452" absolute-time="887.0401801696194"/>
+    <timepoint timepoint-id="TLI_453" absolute-time="889.9659377694223"/>
+    <timepoint timepoint-id="TLI_454" absolute-time="890.4682993197279"/>
+    <timepoint timepoint-id="TLI_455" absolute-time="893.6526549524397"/>
+    <timepoint timepoint-id="TLI_456" absolute-time="896.0409216769735"/>
+    <timepoint timepoint-id="TLI_457" absolute-time="896.418264427404"/>
+    <timepoint timepoint-id="TLI_458" absolute-time="899.4811224971787"/>
+    <timepoint timepoint-id="TLI_459" absolute-time="901.8991112881151"/>
+    <timepoint timepoint-id="TLI_460" absolute-time="904.9408981012049"/>
+    <timepoint timepoint-id="TLI_461" absolute-time="905.2433387062989"/>
+    <timepoint timepoint-id="TLI_462" absolute-time="907.2940862786452"/>
+    <timepoint timepoint-id="TLI_463" absolute-time="908.9060788059361"/>
+    <timepoint timepoint-id="TLI_464" absolute-time="910.9600692842583"/>
+    <timepoint timepoint-id="TLI_465" absolute-time="912.143063800254"/>
+    <timepoint timepoint-id="TLI_466" absolute-time="913.6183165212358"/>
+    <timepoint timepoint-id="TLI_467" absolute-time="914.3683145345137"/>
+    <timepoint timepoint-id="TLI_468" absolute-time="915.1460498793201"/>
+    <timepoint timepoint-id="TLI_469" absolute-time="917.7683055280403"/>
+    <timepoint timepoint-id="TLI_470" absolute-time="918.4682993197279"/>
+    <timepoint timepoint-id="TLI_471" absolute-time="921.4682993197279"/>
+    <timepoint timepoint-id="TLI_472" absolute-time="922.7182924156747"/>
+    <timepoint timepoint-id="TLI_473" absolute-time="924.3890070317702"/>
+    <timepoint timepoint-id="TLI_474" absolute-time="926.5079972087736"/>
+    <timepoint timepoint-id="TLI_475" absolute-time="929.2432751311925"/>
+    <timepoint timepoint-id="TLI_476" absolute-time="929.6182741378316"/>
+    <timepoint timepoint-id="TLI_477" absolute-time="932.6682660584951"/>
+    <timepoint timepoint-id="TLI_478" absolute-time="933.043265065134"/>
+    <timepoint timepoint-id="TLI_479" absolute-time="936.2158152548944"/>
+    <timepoint timepoint-id="TLI_480" absolute-time="936.8908134668446"/>
+    <timepoint timepoint-id="TLI_481" absolute-time="937.5908116125705"/>
+    <timepoint timepoint-id="TLI_482" absolute-time="939.6933451055229"/>
+    <timepoint timepoint-id="TLI_483" absolute-time="940.9769301351829"/>
+    <timepoint timepoint-id="TLI_484" absolute-time="943.9433338474312"/>
+    <timepoint timepoint-id="TLI_485" absolute-time="944.4183325891739"/>
+    <timepoint timepoint-id="TLI_486" absolute-time="947.531159164819"/>
+    <timepoint timepoint-id="TLI_487" absolute-time="949.8657790965527"/>
+    <timepoint timepoint-id="TLI_488" absolute-time="950.5683162980529"/>
+    <timepoint timepoint-id="TLI_489" absolute-time="953.7168710766754"/>
+    <timepoint timepoint-id="TLI_490" absolute-time="956.147859807348"/>
+    <timepoint timepoint-id="TLI_491" absolute-time="959.1932934507491"/>
+    <timepoint timepoint-id="TLI_492" absolute-time="959.540753467838"/>
+    <timepoint timepoint-id="TLI_493" absolute-time="961.6078344965589"/>
+    <timepoint timepoint-id="TLI_494" absolute-time="963.2068270841137"/>
+    <timepoint timepoint-id="TLI_495" absolute-time="965.2478176226997"/>
+    <timepoint timepoint-id="TLI_496" absolute-time="966.4568120181679"/>
+    <timepoint timepoint-id="TLI_497" absolute-time="967.9432702723249"/>
+    <timepoint timepoint-id="TLI_498" absolute-time="968.7432681531546"/>
+    <timepoint timepoint-id="TLI_499" absolute-time="972.1432591466812"/>
+    <timepoint timepoint-id="TLI_500" absolute-time="972.8657181704091"/>
+    <timepoint timepoint-id="TLI_501" absolute-time="975.8183470677344"/>
+    <timepoint timepoint-id="TLI_502" absolute-time="976.4682993197279"/>
+    <timepoint timepoint-id="TLI_503" absolute-time="978.1697577204992"/>
+    <timepoint timepoint-id="TLI_504" absolute-time="980.2757479577663"/>
+    <timepoint timepoint-id="TLI_505" absolute-time="983.0683278627544"/>
+    <timepoint timepoint-id="TLI_506" absolute-time="983.4433268693933"/>
+    <timepoint timepoint-id="TLI_507" absolute-time="986.4183189887291"/>
+    <timepoint timepoint-id="TLI_508" absolute-time="986.7406814160507"/>
+    <timepoint timepoint-id="TLI_509" absolute-time="989.6923101809278"/>
+    <timepoint timepoint-id="TLI_510" absolute-time="990.3183086577743"/>
+    <timepoint timepoint-id="TLI_511" absolute-time="991.7183049492264"/>
+    <timepoint timepoint-id="TLI_512" absolute-time="993.691685765542"/>
+    <timepoint timepoint-id="TLI_513" absolute-time="995.818294088479"/>
+    <timepoint timepoint-id="TLI_514" absolute-time="996.2932928302217"/>
+    <timepoint timepoint-id="TLI_515" absolute-time="997.6696673248244"/>
+    <timepoint timepoint-id="TLI_516" absolute-time="999.9182832277318"/>
+    <timepoint timepoint-id="TLI_517" absolute-time="1000.4682993197279"/>
+    <timepoint timepoint-id="TLI_518" absolute-time="1003.2336415319252"/>
+    <timepoint timepoint-id="TLI_519" absolute-time="1004.780634360535"/>
+    <timepoint timepoint-id="TLI_520" absolute-time="1007.042287793959"/>
+    <timepoint timepoint-id="TLI_521" absolute-time="1007.4932631618387"/>
+    <timepoint timepoint-id="TLI_522" absolute-time="1007.7692625658223"/>
+    <timepoint timepoint-id="TLI_523" absolute-time="1008.2373697593724"/>
+    <timepoint timepoint-id="TLI_524" absolute-time="1008.5343142551429"/>
+    <timepoint timepoint-id="TLI_525" absolute-time="1013.0423695561735"/>
+    <timepoint timepoint-id="TLI_526" absolute-time="1013.6906100265041"/>
+    <timepoint timepoint-id="TLI_527" absolute-time="1015.5450652452579"/>
+    <timepoint timepoint-id="TLI_528" absolute-time="1016.011763227739"/>
+    <timepoint timepoint-id="TLI_529" absolute-time="1018.2747455144173"/>
+    <timepoint timepoint-id="TLI_530" absolute-time="1019.3022818550045"/>
+    <timepoint timepoint-id="TLI_531" absolute-time="1022.5933208184922"/>
+    <timepoint timepoint-id="TLI_532" absolute-time="1023.043319626459"/>
+    <timepoint timepoint-id="TLI_533" absolute-time="1022.5784686240823"/>
+    <timepoint timepoint-id="TLI_534" absolute-time="1024.2252180330454"/>
+    <timepoint timepoint-id="TLI_535" absolute-time="1026.3865342021272"/>
+    <timepoint timepoint-id="TLI_536" absolute-time="1028.7183045935953"/>
+    <timepoint timepoint-id="TLI_537" absolute-time="1029.843301613512"/>
+    <timepoint timepoint-id="TLI_538" absolute-time="1032.2625069628973"/>
+    <timepoint timepoint-id="TLI_539" absolute-time="1034.58949617568"/>
+    <timepoint timepoint-id="TLI_540" absolute-time="1036.3461778542262"/>
+    <timepoint timepoint-id="TLI_541" absolute-time="1038.1384797236672"/>
+    <timepoint timepoint-id="TLI_542" absolute-time="1040.6604680324933"/>
+    <timepoint timepoint-id="TLI_543" absolute-time="1043.5854544731421"/>
+    <timepoint timepoint-id="TLI_544" absolute-time="1046.458441154846"/>
+    <timepoint timepoint-id="TLI_545" absolute-time="1048.2914326576529"/>
+    <timepoint timepoint-id="TLI_546" absolute-time="1050.2154237386128"/>
+    <timepoint timepoint-id="TLI_547" absolute-time="1053.582408130293"/>
+    <timepoint timepoint-id="TLI_548" absolute-time="1055.643330926264"/>
+    <timepoint timepoint-id="TLI_549" absolute-time="1056.0904977104829"/>
+    <timepoint timepoint-id="TLI_550" absolute-time="1058.8654903596114"/>
+    <timepoint timepoint-id="TLI_551" absolute-time="1062.4682993197277"/>
+    <timepoint timepoint-id="TLI_552" absolute-time="1064.4682993197277"/>
+    <timepoint timepoint-id="TLI_553" absolute-time="1065.9654715519757"/>
+    <timepoint timepoint-id="TLI_554" absolute-time="1069.6763335237295"/>
+    <timepoint timepoint-id="TLI_555" absolute-time="1071.5154568502323"/>
+    <timepoint timepoint-id="TLI_556" absolute-time="1072.1904550621823"/>
+    <timepoint timepoint-id="TLI_557" absolute-time="1074.8154481086551"/>
+    <timepoint timepoint-id="TLI_558" absolute-time="1076.4904436716424"/>
+    <timepoint timepoint-id="TLI_559" absolute-time="1079.4404358572024"/>
+    <timepoint timepoint-id="TLI_560" absolute-time="1080.1404340029285"/>
+    <timepoint timepoint-id="TLI_561" absolute-time="1081.5154303606046"/>
+    <timepoint timepoint-id="TLI_562" absolute-time="1081.9404292347954"/>
+    <timepoint timepoint-id="TLI_563" absolute-time="1083.240425791144"/>
+    <timepoint timepoint-id="TLI_564" absolute-time="1084.9404212879072"/>
+    <timepoint timepoint-id="TLI_565" absolute-time="1086.3154176455835"/>
+    <timepoint timepoint-id="TLI_566" absolute-time="1087.1904153277408"/>
+    <timepoint timepoint-id="TLI_567" absolute-time="1088.8654108907283"/>
+    <timepoint timepoint-id="TLI_568" absolute-time="1089.7404085728858"/>
+    <timepoint timepoint-id="TLI_569" absolute-time="1090.9154054603546"/>
+    <timepoint timepoint-id="TLI_570" absolute-time="1094.7933248753632"/>
+    <timepoint timepoint-id="TLI_571" absolute-time="1096.322907979507"/>
+    <timepoint timepoint-id="TLI_572" absolute-time="1098.6456082487625"/>
+    <timepoint timepoint-id="TLI_573" absolute-time="1099.277196303095"/>
+    <timepoint timepoint-id="TLI_574" absolute-time="1100.9683085180181"/>
+    <timepoint timepoint-id="TLI_575" absolute-time="1102.8903737390256"/>
+    <timepoint timepoint-id="TLI_576" absolute-time="1105.5691671354239"/>
+    <timepoint timepoint-id="TLI_577" absolute-time="1107.4403616862448"/>
+    <timepoint timepoint-id="TLI_578" absolute-time="1109.215356984336"/>
+    <timepoint timepoint-id="TLI_579" absolute-time="1109.5153561896473"/>
+    <timepoint timepoint-id="TLI_580" absolute-time="1110.0682844124572"/>
+    <timepoint timepoint-id="TLI_581" absolute-time="1110.7041433312297"/>
+    <timepoint timepoint-id="TLI_582" absolute-time="1111.757138449863"/>
+    <timepoint timepoint-id="TLI_583" absolute-time="1113.655129651351"/>
+    <timepoint timepoint-id="TLI_584" absolute-time="1115.442293614369"/>
+    <timepoint timepoint-id="TLI_585" absolute-time="1117.590334799273"/>
+    <timepoint timepoint-id="TLI_586" absolute-time="1117.9903337396877"/>
+    <timepoint timepoint-id="TLI_587" absolute-time="1118.615332084086"/>
+    <timepoint timepoint-id="TLI_588" absolute-time="1119.893258386398"/>
+    <timepoint timepoint-id="TLI_589" absolute-time="1121.039095421522"/>
+    <timepoint timepoint-id="TLI_590" absolute-time="1123.6390833687651"/>
+    <timepoint timepoint-id="TLI_591" absolute-time="1125.2250760165837"/>
+    <timepoint timepoint-id="TLI_592" absolute-time="1127.4454657235294"/>
+    <timepoint timepoint-id="TLI_593" absolute-time="1129.9830539600391"/>
+    <timepoint timepoint-id="TLI_594" absolute-time="1132.6220417264913"/>
+    <timepoint timepoint-id="TLI_595" absolute-time="1133.6750368451249"/>
+    <timepoint timepoint-id="TLI_596" absolute-time="1136.7183114735906"/>
+    <timepoint timepoint-id="TLI_597" absolute-time="1138.0091604230213"/>
+    <timepoint timepoint-id="TLI_598" absolute-time="1138.0678703716653"/>
+    <timepoint timepoint-id="TLI_599" absolute-time="1138.4708685034882"/>
+    <timepoint timepoint-id="TLI_600" absolute-time="1138.7568671776849"/>
+    <timepoint timepoint-id="TLI_601" absolute-time="1139.4210102085324"/>
+    <timepoint timepoint-id="TLI_602" absolute-time="1141.8682978314325"/>
+    <timepoint timepoint-id="TLI_603" absolute-time="1142.6902683103076"/>
+    <timepoint timepoint-id="TLI_604" absolute-time="1143.190266985826"/>
+    <timepoint timepoint-id="TLI_605" absolute-time="1145.618287897822"/>
+    <timepoint timepoint-id="TLI_606" absolute-time="1147.4182831296891"/>
+    <timepoint timepoint-id="TLI_607" absolute-time="1147.6402551979415"/>
+    <timepoint timepoint-id="TLI_608" absolute-time="1148.690252416531"/>
+    <timepoint timepoint-id="TLI_609" absolute-time="1149.99327630861"/>
+    <timepoint timepoint-id="TLI_610" absolute-time="1151.7449530784663"/>
+    <timepoint timepoint-id="TLI_611" absolute-time="1153.543266904792"/>
+    <timepoint timepoint-id="TLI_612" absolute-time="1153.8652387081486"/>
+    <timepoint timepoint-id="TLI_613" absolute-time="1155.0652355293932"/>
+    <timepoint timepoint-id="TLI_614" absolute-time="1157.0682575671983"/>
+    <timepoint timepoint-id="TLI_615" absolute-time="1158.9079198731215"/>
+    <timepoint timepoint-id="TLI_616" absolute-time="1160.727911436192"/>
+    <timepoint timepoint-id="TLI_617" absolute-time="1163.3278993834354"/>
+    <timepoint timepoint-id="TLI_618" absolute-time="1165.2433335679193"/>
+    <timepoint timepoint-id="TLI_619" absolute-time="1165.5402077815083"/>
+    <timepoint timepoint-id="TLI_620" absolute-time="1167.6652021524621"/>
+    <timepoint timepoint-id="TLI_621" absolute-time="1169.7433216475868"/>
+    <timepoint timepoint-id="TLI_622" absolute-time="1171.5433168794536"/>
+    <timepoint timepoint-id="TLI_623" absolute-time="1171.9401908281466"/>
+    <timepoint timepoint-id="TLI_624" absolute-time="1173.565186523582"/>
+    <timepoint timepoint-id="TLI_625" absolute-time="1175.4682993197277"/>
+    <timepoint timepoint-id="TLI_626" absolute-time="1176.8683027737268"/>
+    <timepoint timepoint-id="TLI_627" absolute-time="1177.0651772522124"/>
+    <timepoint timepoint-id="TLI_628" absolute-time="1178.8651724840793"/>
+    <timepoint timepoint-id="TLI_629" absolute-time="1180.5932929063406"/>
+    <timepoint timepoint-id="TLI_630" absolute-time="1182.3432882706559"/>
+    <timepoint timepoint-id="TLI_631" absolute-time="1182.5651626829172"/>
+    <timepoint timepoint-id="TLI_632" absolute-time="1183.665159769058"/>
+    <timepoint timepoint-id="TLI_633" absolute-time="1186.1432782045972"/>
+    <timepoint timepoint-id="TLI_634" absolute-time="1188.4682993197277"/>
+    <timepoint timepoint-id="TLI_635" absolute-time="1188.6151466566926"/>
+    <timepoint timepoint-id="TLI_636" absolute-time="1189.7151437428336"/>
+    <timepoint timepoint-id="TLI_637" absolute-time="1191.9432628406132"/>
+    <timepoint timepoint-id="TLI_638" absolute-time="1194.218256814223"/>
+    <timepoint timepoint-id="TLI_639" absolute-time="1194.3901313589324"/>
+    <timepoint timepoint-id="TLI_640" absolute-time="1195.4901284450734"/>
+    <timepoint timepoint-id="TLI_641" absolute-time="1198.1433440730355"/>
+    <timepoint timepoint-id="TLI_642" absolute-time="1199.7407305845786"/>
+    <timepoint timepoint-id="TLI_643" absolute-time="1202.7957164225895"/>
+    <timepoint timepoint-id="TLI_644" absolute-time="1204.1347102154198"/>
+    <timepoint timepoint-id="TLI_645" absolute-time="1205.343704610888"/>
+    <timepoint timepoint-id="TLI_646" absolute-time="1207.5503824604257"/>
+    <timepoint timepoint-id="TLI_647" absolute-time="1206.2242476418653"/>
+    <timepoint timepoint-id="TLI_648" absolute-time="1209.2436865317532"/>
+    <timepoint timepoint-id="TLI_649" absolute-time="1211.037678215351"/>
+    <timepoint timepoint-id="TLI_650" absolute-time="1213.1826682718267"/>
+    <timepoint timepoint-id="TLI_651" absolute-time="1214.3266629686136"/>
+    <timepoint timepoint-id="TLI_652" absolute-time="1216.8432945374318"/>
+    <timepoint timepoint-id="TLI_653" absolute-time="1217.1650710288054"/>
+    <timepoint timepoint-id="TLI_654" absolute-time="1217.5400700354444"/>
+    <timepoint timepoint-id="TLI_655" absolute-time="1218.5150674527058"/>
+    <timepoint timepoint-id="TLI_656" absolute-time="1219.9400636779337"/>
+    <timepoint timepoint-id="TLI_657" absolute-time="1222.068280696601"/>
+    <timepoint timepoint-id="TLI_658" absolute-time="1223.7256193978985"/>
+    <timepoint timepoint-id="TLI_659" absolute-time="1225.6182712927834"/>
+    <timepoint timepoint-id="TLI_660" absolute-time="1228.3150414928707"/>
+    <timepoint timepoint-id="TLI_661" absolute-time="1230.4150359300488"/>
+    <timepoint timepoint-id="TLI_662" absolute-time="1232.9432518891313"/>
+    <timepoint timepoint-id="TLI_663" absolute-time="1234.7173447107655"/>
+    <timepoint timepoint-id="TLI_664" absolute-time="1234.9923675548355"/>
+    <timepoint timepoint-id="TLI_665" absolute-time="1236.6683396777362"/>
+    <timepoint timepoint-id="TLI_666" absolute-time="1238.0900155992597"/>
+    <timepoint timepoint-id="TLI_667" absolute-time="1238.365014870795"/>
+    <timepoint timepoint-id="TLI_668" absolute-time="1239.7933313997275"/>
+    <timepoint timepoint-id="TLI_669" absolute-time="1242.5933239826318"/>
+    <timepoint timepoint-id="TLI_670" absolute-time="1243.390001559757"/>
+    <timepoint timepoint-id="TLI_671" absolute-time="1244.4149988445702"/>
+    <timepoint timepoint-id="TLI_672" absolute-time="1246.6683131881086"/>
+    <timepoint timepoint-id="TLI_673" absolute-time="1249.0235021245765"/>
+    <timepoint timepoint-id="TLI_674" absolute-time="1251.918299281054"/>
+    <timepoint timepoint-id="TLI_675" absolute-time="1254.5432923275266"/>
+    <timepoint timepoint-id="TLI_676" absolute-time="1256.4899668583446"/>
+    <timepoint timepoint-id="TLI_677" absolute-time="1257.2649648053987"/>
+    <timepoint timepoint-id="TLI_678" absolute-time="1259.5932789502647"/>
+    <timepoint timepoint-id="TLI_679" absolute-time="1262.4182714669448"/>
+    <timepoint timepoint-id="TLI_680" absolute-time="1267.0899387793395"/>
+    <timepoint timepoint-id="TLI_681" absolute-time="1268.5399349383435"/>
+    <timepoint timepoint-id="TLI_682" absolute-time="1271.218345812064"/>
+    <timepoint timepoint-id="TLI_683" absolute-time="1272.8523916610618"/>
+    <timepoint timepoint-id="TLI_684" absolute-time="1274.711383043341"/>
+    <timepoint timepoint-id="TLI_685" absolute-time="1277.3243709303206"/>
+    <timepoint timepoint-id="TLI_686" absolute-time="1279.2433245541379"/>
+    <timepoint timepoint-id="TLI_687" absolute-time="1280.1149042765994"/>
+    <timepoint timepoint-id="TLI_688" absolute-time="1280.5649030845661"/>
+    <timepoint timepoint-id="TLI_689" absolute-time="1282.789897190624"/>
+    <timepoint timepoint-id="TLI_690" absolute-time="1285.0933090577055"/>
+    <timepoint timepoint-id="TLI_691" absolute-time="1287.168303561108"/>
+    <timepoint timepoint-id="TLI_692" absolute-time="1291.0648752704572"/>
+    <timepoint timepoint-id="TLI_693" absolute-time="1292.3148719592537"/>
+    <timepoint timepoint-id="TLI_694" absolute-time="1295.6152861391777"/>
+    <timepoint timepoint-id="TLI_695" absolute-time="1297.2532785459407"/>
+    <timepoint timepoint-id="TLI_696" absolute-time="1299.060270169275"/>
+    <timepoint timepoint-id="TLI_697" absolute-time="1301.6732580562546"/>
+    <timepoint timepoint-id="TLI_698" absolute-time="1303.6182599856704"/>
+    <timepoint timepoint-id="TLI_699" absolute-time="1304.1648405690448"/>
+    <timepoint timepoint-id="TLI_700" absolute-time="1304.539839575684"/>
+    <timepoint timepoint-id="TLI_701" absolute-time="1306.7648336817417"/>
+    <timepoint timepoint-id="TLI_702" absolute-time="1308.9183436021588"/>
+    <timepoint timepoint-id="TLI_703" absolute-time="1310.7183388340259"/>
+    <timepoint timepoint-id="TLI_704" absolute-time="1311.2148218938573"/>
+    <timepoint timepoint-id="TLI_705" absolute-time="1312.2898190462224"/>
+    <timepoint timepoint-id="TLI_706" absolute-time="1314.5433287017433"/>
+    <timepoint timepoint-id="TLI_707" absolute-time="1316.2461905005537"/>
+    <timepoint timepoint-id="TLI_708" absolute-time="1318.0271822444151"/>
+    <timepoint timepoint-id="TLI_709" absolute-time="1320.6661700108673"/>
+    <timepoint timepoint-id="TLI_710" absolute-time="1322.568307443817"/>
+    <timepoint timepoint-id="TLI_711" absolute-time="1323.4933049935266"/>
+    <timepoint timepoint-id="TLI_712" absolute-time="1326.048145061661"/>
+    <timepoint timepoint-id="TLI_713" absolute-time="1327.7641371068416"/>
+    <timepoint timepoint-id="TLI_714" absolute-time="1328.7261326473217"/>
+    <timepoint timepoint-id="TLI_715" absolute-time="1330.7411233064354"/>
+    <timepoint timepoint-id="TLI_716" absolute-time="1331.8932827422393"/>
+    <timepoint timepoint-id="TLI_717" absolute-time="1332.6432807555173"/>
+    <timepoint timepoint-id="TLI_718" absolute-time="1335.642100586989"/>
+    <timepoint timepoint-id="TLI_719" absolute-time="1338.523402165555"/>
+    <timepoint timepoint-id="TLI_720" absolute-time="1341.143258239334"/>
+    <timepoint timepoint-id="TLI_721" absolute-time="1342.0397402395802"/>
+    <timepoint timepoint-id="TLI_722" absolute-time="1343.1647372594969"/>
+    <timepoint timepoint-id="TLI_723" absolute-time="1345.4183445710096"/>
+    <timepoint timepoint-id="TLI_724" absolute-time="1348.7683356969842"/>
+    <timepoint timepoint-id="TLI_725" absolute-time="1349.3397209021518"/>
+    <timepoint timepoint-id="TLI_726" absolute-time="1350.389718120741"/>
+    <timepoint timepoint-id="TLI_727" absolute-time="1352.9933245051163"/>
+    <timepoint timepoint-id="TLI_728" absolute-time="1355.1683187436224"/>
+    <timepoint timepoint-id="TLI_729" absolute-time="1355.3897048759272"/>
+    <timepoint timepoint-id="TLI_730" absolute-time="1356.589701697172"/>
+    <timepoint timepoint-id="TLI_731" absolute-time="1360.5433045054474"/>
+    <timepoint timepoint-id="TLI_732" absolute-time="1363.513971381438"/>
+    <timepoint timepoint-id="TLI_733" absolute-time="1366.9459554717992"/>
+    <timepoint timepoint-id="TLI_734" absolute-time="1369.8319420932391"/>
+    <timepoint timepoint-id="TLI_735" absolute-time="1372.4682993197277"/>
+    <timepoint timepoint-id="TLI_736" absolute-time="1373.8682692080188"/>
+    <timepoint timepoint-id="TLI_737" absolute-time="1375.7599146129542"/>
+    <timepoint timepoint-id="TLI_738" absolute-time="1376.83890961106"/>
+    <timepoint timepoint-id="TLI_739" absolute-time="1378.0479040065281"/>
+    <timepoint timepoint-id="TLI_740" absolute-time="1380.6682511950717"/>
+    <timepoint timepoint-id="TLI_741" absolute-time="1383.1896312347626"/>
+    <timepoint timepoint-id="TLI_742" absolute-time="1386.3146229567537"/>
+    <timepoint timepoint-id="TLI_743" absolute-time="1386.9396213011519"/>
+    <timepoint timepoint-id="TLI_744" absolute-time="1389.6646140827283"/>
+    <timepoint timepoint-id="TLI_745" absolute-time="1389.9646132880396"/>
+    <timepoint timepoint-id="TLI_746" absolute-time="1392.6396062020642"/>
+    <timepoint timepoint-id="TLI_747" absolute-time="1393.5896036855495"/>
+    <timepoint timepoint-id="TLI_748" absolute-time="1394.9738255430825"/>
+    <timepoint timepoint-id="TLI_749" absolute-time="1396.4895960035576"/>
+    <timepoint timepoint-id="TLI_750" absolute-time="1399.7145874606526"/>
+    <timepoint timepoint-id="TLI_751" absolute-time="1401.6645822951753"/>
+    <timepoint timepoint-id="TLI_752" absolute-time="1405.3282536045688"/>
+    <timepoint timepoint-id="TLI_753" absolute-time="1406.504772089107"/>
+    <timepoint timepoint-id="TLI_754" absolute-time="1408.74836682063"/>
+    <timepoint timepoint-id="TLI_755" absolute-time="1409.7705414590089"/>
+    <timepoint timepoint-id="TLI_756" absolute-time="1410.263660254289"/>
+    <timepoint timepoint-id="TLI_757" absolute-time="1411.5305193139002"/>
+    <timepoint timepoint-id="TLI_758" absolute-time="1414.6682923325372"/>
+    <timepoint timepoint-id="TLI_759" absolute-time="1416.6282676709388"/>
+    <timepoint timepoint-id="TLI_760" absolute-time="1419.4104201642085"/>
+    <timepoint timepoint-id="TLI_761" absolute-time="1420.4504070784626"/>
+    <timepoint timepoint-id="TLI_762" absolute-time="1421.6103924828228"/>
+    <timepoint timepoint-id="TLI_763" absolute-time="1424.3536893469325"/>
+    <timepoint timepoint-id="TLI_764" absolute-time="1425.8903386299446"/>
+    <timepoint timepoint-id="TLI_765" absolute-time="1426.150335358508"/>
+    <timepoint timepoint-id="TLI_766" absolute-time="1428.11031069691"/>
+    <timepoint timepoint-id="TLI_767" absolute-time="1430.1502850287156"/>
+    <timepoint timepoint-id="TLI_768" absolute-time="1430.5829358348408"/>
+    <timepoint timepoint-id="TLI_769" absolute-time="1432.9192495462119"/>
+    <timepoint timepoint-id="TLI_770" absolute-time="1433.8302387253066"/>
+    <timepoint timepoint-id="TLI_771" absolute-time="1436.9283247433093"/>
+    <timepoint timepoint-id="TLI_772" absolute-time="1438.4846238402004"/>
+    <timepoint timepoint-id="TLI_773" absolute-time="1440.5082796981449"/>
+    <timepoint timepoint-id="TLI_774" absolute-time="1441.190146118488"/>
+    <timepoint timepoint-id="TLI_775" absolute-time="1441.750139072317"/>
+    <timepoint timepoint-id="TLI_776" absolute-time="1444.9682235804264"/>
+    <timepoint timepoint-id="TLI_777" absolute-time="1446.752585512434"/>
+    <timepoint timepoint-id="TLI_778" absolute-time="1448.9235754483825"/>
+    <timepoint timepoint-id="TLI_779" absolute-time="1451.9882914996742"/>
+    <timepoint timepoint-id="TLI_780" absolute-time="1453.2299946258124"/>
+    <timepoint timepoint-id="TLI_781" absolute-time="1454.9758326351493"/>
+  </timeline>
+
+  <greeting>
+    <topic id="bz_2">
+      <contribution speaker-reference="W" start-reference="TLI_5" end-reference="TLI_14" parse-level="2">
+        guten tag und herzlich willkommen
+        <pause duration="micro"/>
+        <time timepoint-reference="TLI_6"/>
+        sie sprechen hier mit dem prototypen
+        <time timepoint-reference="TLI_7"/>
+        eines computerprogramms
+        <pause duration="micro"/>
+        <time timepoint-reference="TLI_8"/>
+        dieses soll nutzer
+        <time timepoint-reference="TLI_9"/>
+        in der bewältigung von alltagsaufgaben unterstützen
+        <pause duration="micro"/>
+        <time timepoint-reference="TLI_10"/>
+        das besondere an diesem neuen computerprogramm ist
+        <pause duration="micro"/>
+        <time timepoint-reference="TLI_11"/>
+        dass es sich individuell an seinen nutzer anpasst
+        <pause duration="micro"/>
+        <time timepoint-reference="TLI_12"/>
+        zu diesem zweck werden im verlauf dieser sitzung
+        <time timepoint-reference="TLI_13"/>
+        einige aufgaben und testsituationen durchlaufen
+      </contribution>
+      <contribution speaker-reference="W" start-reference="TLI_14" end-reference="TLI_15" parse-level="2">
+        <pause duration="1.26"/>
+      </contribution>
+    </topic>
+  </greeting>
+
+  <experiment>
+    <initial-narrative>
+      <topic id="i_1">
+        <contribution speaker-reference="W" start-reference="TLI_15" end-reference="TLI_16" parse-level="2">
+          bitte nennen und buchstabieren sie zunächst ihren vor und zunamen
+        </contribution>
+        <contribution start-reference="TLI_16" end-reference="TLI_17" parse-level="2">
+          <pause duration="medium"/>
+        </contribution>
+        <contribution speaker-reference="P" start-reference="TLI_17" end-reference="TLI_24" parse-level="2">
+          <pause duration="0.85"/>
+          <time timepoint-reference="TLI_19"/>
+          john smith
+          <time timepoint-reference="TLI_20"/>
+          <pause duration="medium"/>
+          <time timepoint-reference="TLI_21"/>
+          jot
+          <pause duration="micro"/>
+          oh
+          <pause duration="micro"/>
+          ha
+          <pause duration="micro"/>
+          en
+          <pause duration="micro"/>
+          es
+          <pause duration="micro"/>
+          em
+          <time timepoint-reference="TLI_22"/>
+          <pause duration="1.08"/>
+          <time timepoint-reference="TLI_23"/>
+          ie
+          <pause duration="short"/>
+          te
+          <pause duration="micro"/>
+          ha
+        </contribution>
+        <contribution start-reference="TLI_24" end-reference="TLI_25" parse-level="2">
+          <pause duration="4.54"/>
+        </contribution>
+      </topic>
+    </initial-narrative>
+    <last-minute>
+      <phase id="1">
+        <!-- FIXME -->
+      </phase>
+      <phase id="2">
+        <!-- FIXME -->
+      </phase>
+      <phase id="3">
+        <!-- FIXME -->
+      </phase>
+      <phase id="4"/>
+      <phase id="5">
+        <!-- FIXME -->
+      </phase>
+      <phase id="6">
+        <!-- FIXME -->
+      </phase>
+    </last-minute>
+  </experiment>
+
+  <farewell>
+    <topic id="v_1">
+      <contribution speaker-reference="W" start-reference="TLI_776" end-reference="TLI_779" parse-level="2">
+        mit abschluss dieser aufgabe
+        <time timepoint-reference="TLI_777"/>
+        wurde das ende der sitzung erreicht
+        <pause duration="micro"/>
+        <time timepoint-reference="TLI_778"/>
+        vielen dank für ihre mitarbeit und auf wiedersehen
+      </contribution>
+      <contribution start-reference="TLI_779" end-reference="TLI_780" parse-level="2">
+        <pause duration="1.24"/>
+      </contribution>
+      <contribution speaker-reference="P" start-reference="TLI_780" end-reference="TLI_781" parse-level="2">
+        tschüss
+      </contribution>
+    </topic>
+  </farewell>
+</session>

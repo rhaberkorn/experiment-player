@@ -27,12 +27,20 @@ if [[ $ac_cv_prog_cc_c99 = no ]]; then
 fi
 AM_PROG_CC_C_O
 
-# might not be used if built from source distro
 AC_CHECK_PROG(GLIB_GENMARSHAL, glib-genmarshal, glib-genmarshal)
 if [[ x$GLIB_GENMARSHAL = x ]]; then
 	AC_MSG_ERROR([glib-genmarshal not found!])
 fi
 
+# not necessarily required
+AC_CHECK_PROG(GTESTER, gtester, gtester)
+AC_CHECK_PROG(GTESTER_REPORT, gtester-report, gtester-report)
+if [[ x$GTESTER = x -o x$GTESTER_REPORT = x ]]; then
+	AC_MSG_WARN([gtester not found! Cannot automatically run test suites.])
+fi
+AM_CONDITIONAL(USE_GTESTER, test x$GTESTER != x -a x$GTESTER_REPORT != x)
+
+# not necessarily required (depends on options)
 AC_CHECK_PROG(DOXYGEN, doxygen, doxygen)
 AC_CHECK_PROG(XSLTPROC, xsltproc, xsltproc)
 XSLT_FLAGS="--xinclude"
@@ -189,5 +197,10 @@ AC_DEFINE(DEFAULT_QUICKOPEN_DIR, ["."], [Default directory for listing experimen
 AC_DEFINE(EXPERIMENT_MOVIE_FILTER, ["*.mp4;*.avi"], [Filters for (quick) opening movies])
 AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT, ["xml"], [File extension of experiment transcripts])
 
-AC_CONFIG_FILES([Makefile lib/Makefile lib/gtk-vlc-player/Makefile lib/experiment-reader/Makefile lib/gtk-experiment-widgets/Makefile src/Makefile doc/Makefile doc/Doxyfile])
+AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile])
+AC_CONFIG_FILES([lib/gtk-vlc-player/Makefile])
+AC_CONFIG_FILES([lib/experiment-reader/Makefile lib/experiment-reader/tests/Makefile])
+AC_CONFIG_FILES([lib/gtk-experiment-widgets/Makefile])
+AC_CONFIG_FILES([doc/Makefile doc/Doxyfile])
+
 AC_OUTPUT
