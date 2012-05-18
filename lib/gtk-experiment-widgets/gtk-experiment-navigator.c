@@ -357,7 +357,7 @@ gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
 	/** @todo Clear contents */
 	/** @todo Process XML file and fill \e TreeViewStore */
 
-	return TRUE;
+	return FALSE;
 }
 
 /**
