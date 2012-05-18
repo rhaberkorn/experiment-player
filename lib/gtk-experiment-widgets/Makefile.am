@@ -4,7 +4,9 @@ BUILT_SOURCES = cclosure-marshallers.c cclosure-marshallers.h
 
 lib_LTLIBRARIES = libgtk-experiment-widgets.la
 libgtk_experiment_widgets_la_SOURCES = gtk-experiment-navigator.c \
-				       gtk-experiment-navigator.h
+				       gtk-experiment-navigator.h \
+				       gtk-experiment-transcript.c \
+				       gtk-experiment-transcript.h
 nodist_libgtk_experiment_widgets_la_SOURCES = $(BUILT_SOURCES)
 
 libgtk_experiment_widgets_la_CFLAGS = $(AM_CFLAGS)

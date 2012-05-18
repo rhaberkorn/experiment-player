@@ -10,10 +10,14 @@
 		<glade-widget-class name="GtkExperimentNavigator"
 				    generic-name="gtk-experiment-navigator"
 				    title="Experiment Navigator"/>
+		<glade-widget-class name="GtkExperimentTranscript"
+				    generic-name="gtk-experiment-transcript"
+				    title="Experiment Transcript"/>
 	</glade-widget-classes>
 
 	<glade-widget-group name="gtk-experiment-widgets"
 			    title="Experiment Widgets">
 		<glade-widget-class-ref name="GtkExperimentNavigator"/>
+		<glade-widget-class-ref name="GtkExperimentTranscript"/>
 	</glade-widget-group>
 </glade-catalog>

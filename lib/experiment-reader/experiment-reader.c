@@ -305,7 +305,8 @@ experiment_reader_get_contribution_by_time(GList *contribs,
 	for (GList *cur = contribs; cur != NULL; cur = cur->next) {
 		ExperimentReaderContrib *contrib = (ExperimentReaderContrib *)cur->data;
 
-		if (contrib->start_time >= timept)
+		if (contrib->start_time >= timept ||
+		    cur->next == NULL)
 			return cur;
 	}
 

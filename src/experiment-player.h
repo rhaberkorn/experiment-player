@@ -14,6 +14,11 @@ extern GtkWidget *player_widget,
 		 *playpause_button,
 		 *volume_button;
 
+extern GtkWidget *transcript_hbox,
+		 *transcript_wizard_widget,
+		 *transcript_proband_widget,
+		 *transcript_scroll_widget;
+
 extern GtkWidget *navigator_scrolledwindow,
 		 *navigator_widget;
 

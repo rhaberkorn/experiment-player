@@ -19,6 +19,7 @@
 
 #include <gtk-vlc-player.h>
 #include <gtk-experiment-navigator.h>
+#include <gtk-experiment-transcript.h>
 #include <experiment-reader.h>
 
 #include "experiment-player.h"
@@ -30,6 +31,11 @@ GtkWidget *player_widget,
 	  *scale_widget,
 	  *playpause_button,
 	  *volume_button;
+
+GtkWidget *transcript_hbox,
+	  *transcript_wizard_widget,
+	  *transcript_proband_widget,
+	  *transcript_scroll_widget;
 
 GtkWidget *navigator_scrolledwindow,
 	  *navigator_widget;
@@ -172,7 +178,6 @@ load_media_file(const gchar *file)
 	current_filename = g_strdup(file);
 
 	gtk_widget_set_sensitive(controls_hbox, TRUE);
-	gtk_widget_set_sensitive(navigator_scrolledwindow, TRUE);
 
 	button_image_set_from_stock(GTK_BUTTON(playpause_button),
 				    "gtk-media-play");
@@ -190,6 +195,20 @@ load_transcript_file(const gchar *file)
 	if (reader == NULL)
 		return TRUE;
 
+	res = gtk_experiment_transcript_load(GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget),
+					     reader);
+	if (res) {
+		g_object_unref(G_OBJECT(reader));
+		return TRUE;
+	}
+
+	res = gtk_experiment_transcript_load(GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget),
+					     reader);
+	if (res) {
+		g_object_unref(G_OBJECT(reader));
+		return TRUE;
+	}
+
 	res = gtk_experiment_navigator_load(GTK_EXPERIMENT_NAVIGATOR(navigator_widget),
 					    reader);
 	if (res) {
@@ -198,6 +217,10 @@ load_transcript_file(const gchar *file)
 	}
 
 	g_object_unref(reader);
+
+	gtk_widget_set_sensitive(transcript_hbox, TRUE);
+	gtk_widget_set_sensitive(navigator_scrolledwindow, TRUE);
+
 	return FALSE;
 }
 
@@ -256,16 +279,32 @@ main(int argc, char *argv[])
 	BUILDER_INIT(builder, quickopen_menu);
 	BUILDER_INIT(builder, quickopen_menu_empty_item);
 
+	BUILDER_INIT(builder, transcript_hbox);
+	BUILDER_INIT(builder, transcript_wizard_widget);
+	BUILDER_INIT(builder, transcript_proband_widget);
+	BUILDER_INIT(builder, transcript_scroll_widget);
+
 	BUILDER_INIT(builder, navigator_scrolledwindow);
 	BUILDER_INIT(builder, navigator_widget);
 
 	g_object_unref(G_OBJECT(builder));
 
-	/* connect timeline and volume button with player widget */
+	/** @todo most of this could be done in Glade with proper catalog files */
+	/* connect timeline, volume button and other widgets with player widget */
 	adj = gtk_vlc_player_get_time_adjustment(GTK_VLC_PLAYER(player_widget));
 	gtk_range_set_adjustment(GTK_RANGE(scale_widget), adj);
+	gtk_experiment_transcript_set_time_adjustment(GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget),
+						      adj);
+	gtk_experiment_transcript_set_time_adjustment(GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget),
+						      adj);
+	gtk_range_set_adjustment(GTK_RANGE(transcript_scroll_widget), adj);
+
 	adj = gtk_vlc_player_get_volume_adjustment(GTK_VLC_PLAYER(player_widget));
 	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
+
+	/* configure transcript widgets */
+	GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget)->speaker = g_strdup("Wizard");
+	GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget)->speaker = g_strdup("Proband");
 
 	quickopen_directory = g_strdup(DEFAULT_QUICKOPEN_DIR);
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
