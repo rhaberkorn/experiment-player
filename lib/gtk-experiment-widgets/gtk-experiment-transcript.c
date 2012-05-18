@@ -235,6 +235,9 @@ gtk_experiment_transcript_realize(GtkWidget *widget)
 	gdk_window_set_user_data(widget->window, widget);
 
 	gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+
+	/* FIXME */
+	gtk_experiment_transcript_configure(widget, NULL);
 }
 
 static void 
