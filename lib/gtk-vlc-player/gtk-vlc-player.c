@@ -34,6 +34,7 @@ static void widget_on_realize(GtkWidget *widget, gpointer data);
 static gboolean widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer data);
 
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
+static void time_adj_on_changed(GtkAdjustment *adj, gpointer user_data);
 static void vol_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
 static inline void update_time(GtkVlcPlayer *player, gint64 new_time);
@@ -60,6 +61,7 @@ static void vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media);
 struct _GtkVlcPlayerPrivate {
 	GtkObject		*time_adjustment;
 	gulong			time_adj_on_value_changed_id;
+	gulong			time_adj_on_changed_id;
 
 	GtkObject		*volume_adjustment;
 	gulong			vol_adj_on_value_changed_id;
@@ -147,16 +149,23 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 	 */
 
 	klass->priv->time_adjustment = gtk_adjustment_new(0., 0., 0.,
-							  GTK_VLC_PLAYER_ADJ_STEP,
-							  GTK_VLC_PLAYER_ADJ_PAGE, 0.);
+							  GTK_VLC_PLAYER_TIME_ADJ_STEP,
+							  GTK_VLC_PLAYER_TIME_ADJ_PAGE,
+							  0.);
 	g_object_ref_sink(klass->priv->time_adjustment);
 	klass->priv->time_adj_on_value_changed_id =
 		g_signal_connect(G_OBJECT(klass->priv->time_adjustment),
 				 "value-changed",
 				 G_CALLBACK(time_adj_on_value_changed), klass);
+	klass->priv->time_adj_on_changed_id =
+		g_signal_connect(G_OBJECT(klass->priv->time_adjustment),
+				 "changed",
+				 G_CALLBACK(time_adj_on_changed), klass);
 
 	klass->priv->volume_adjustment = gtk_adjustment_new(1., 0., 1.,
-							    0.02, 0., 0.);
+							    GTK_VLC_PLAYER_VOL_ADJ_STEP,
+							    GTK_VLC_PLAYER_VOL_ADJ_PAGE,
+							    0.);
 	g_object_ref_sink(klass->priv->volume_adjustment);
 	klass->priv->vol_adj_on_value_changed_id =
 		g_signal_connect(G_OBJECT(klass->priv->volume_adjustment),
@@ -188,8 +197,20 @@ gtk_vlc_player_dispose(GObject *gobject)
 	 * destroy might be called more than once, but we have only one
 	 * reference for each object
 	 */
-	GOBJECT_UNREF_SAFE(player->priv->time_adjustment);
-	GOBJECT_UNREF_SAFE(player->priv->volume_adjustment);
+	if (player->priv->time_adjustment != NULL) {
+		g_signal_handler_disconnect(G_OBJECT(player->priv->time_adjustment),
+					    player->priv->time_adj_on_changed_id);
+		g_signal_handler_disconnect(G_OBJECT(player->priv->time_adjustment),
+					    player->priv->time_adj_on_value_changed_id);
+		g_object_unref(player->priv->time_adjustment);
+		player->priv->time_adjustment = NULL;
+	}
+	if (player->priv->volume_adjustment != NULL) {
+		g_signal_handler_disconnect(G_OBJECT(player->priv->volume_adjustment),
+					    player->priv->vol_adj_on_value_changed_id);
+		g_object_unref(player->priv->volume_adjustment);
+		player->priv->volume_adjustment = NULL;
+	}
 	GOBJECT_UNREF_SAFE(player->priv->fullscreen_window);
 
 	/* Chain up to the parent class */
@@ -266,6 +287,20 @@ time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
 }
 
 static void
+time_adj_on_changed(GtkAdjustment *adj, gpointer user_data)
+{
+	GtkVlcPlayer *player = GTK_VLC_PLAYER(user_data);
+
+	/* avoid signal handler recursion */
+	g_signal_handler_block(G_OBJECT(adj),
+			       player->priv->time_adj_on_changed_id);
+	gtk_adjustment_set_upper(adj, (gdouble)gtk_vlc_player_get_length(player) +
+				      gtk_adjustment_get_page_size(adj));
+	g_signal_handler_unblock(G_OBJECT(adj),
+				 player->priv->time_adj_on_changed_id);
+}
+
+static void
 vol_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
 {
 	gtk_vlc_player_set_volume(GTK_VLC_PLAYER(user_data),
@@ -295,9 +330,17 @@ update_length(GtkVlcPlayer *player, gint64 new_length)
 	g_signal_emit(player, gtk_vlc_player_signals[LENGTH_CHANGED_SIGNAL], 0,
 		      new_length);
 
-	if (player->priv->time_adjustment != NULL)
-		gtk_adjustment_set_upper(GTK_ADJUSTMENT(player->priv->time_adjustment),
-					 (gdouble)new_length);
+	if (player->priv->time_adjustment != NULL) {
+		GtkAdjustment *adj = GTK_ADJUSTMENT(player->priv->time_adjustment);
+
+		/* ensure that time_adj_on_changed() will not be executed */
+		g_signal_handler_block(G_OBJECT(adj),
+				       player->priv->time_adj_on_changed_id);
+		gtk_adjustment_set_upper(adj, (gdouble)new_length +
+					      gtk_adjustment_get_page_size(adj));
+		g_signal_handler_unblock(G_OBJECT(adj),
+					 player->priv->time_adj_on_changed_id);
+	}
 }
 
 static void
@@ -499,6 +542,18 @@ gtk_vlc_player_set_volume(GtkVlcPlayer *player, gdouble volume)
 }
 
 /**
+ * @brief Get media length
+ *
+ * @param player \e GtkVlcPlayer instance
+ * @return Length of media (in milliseconds)
+ */
+gint64
+gtk_vlc_player_get_length(GtkVlcPlayer *player)
+{
+	return (gint64)libvlc_media_player_get_length(player->priv->media_player);
+}
+
+/**
  * @brief Get time-adjustment currently used by \e GtkVlcPlayer
  * The time-adjustment is an alternative to signal-callbacks and using the API
  * for synchronizing the \e GtkVlcPlayer widget's current playback position with
@@ -540,17 +595,33 @@ gtk_vlc_player_set_time_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 		return;
 
 	g_signal_handler_disconnect(G_OBJECT(player->priv->time_adjustment),
+				    player->priv->time_adj_on_changed_id);
+	g_signal_handler_disconnect(G_OBJECT(player->priv->time_adjustment),
 				    player->priv->time_adj_on_value_changed_id);
 
 	g_object_unref(player->priv->time_adjustment);
 	player->priv->time_adjustment = GTK_OBJECT(adj);
 	g_object_ref_sink(player->priv->time_adjustment);
-	/** @todo Configure new time-adjustment */
+
+	/*
+	 * NOTE: not setting value and upper properly, as well as setting the
+	 * page-size might cause problems if adjustment is set after loading/playing
+	 * a media or setting it on other widgets
+	 */
+	gtk_adjustment_configure(GTK_ADJUSTMENT(player->priv->time_adjustment),
+				 0., 0., 0.,
+				 GTK_VLC_PLAYER_TIME_ADJ_STEP,
+				 GTK_VLC_PLAYER_TIME_ADJ_PAGE,
+				 0.);
 
 	player->priv->time_adj_on_value_changed_id =
 		g_signal_connect(G_OBJECT(player->priv->time_adjustment),
 				 "value-changed",
 				 G_CALLBACK(time_adj_on_value_changed), player);
+	player->priv->time_adj_on_changed_id =
+		g_signal_connect(G_OBJECT(player->priv->time_adjustment),
+				 "changed",
+				 G_CALLBACK(time_adj_on_changed), player);
 }
 
 /**
@@ -602,7 +673,12 @@ gtk_vlc_player_set_volume_adjustment(GtkVlcPlayer *player, GtkAdjustment *adj)
 	g_object_unref(player->priv->volume_adjustment);
 	player->priv->volume_adjustment = GTK_OBJECT(adj);
 	g_object_ref_sink(player->priv->volume_adjustment);
-	/** @todo Configure new volume-adjustment */
+
+	gtk_adjustment_configure(GTK_ADJUSTMENT(player->priv->volume_adjustment),
+				 1., 0., 1.,
+				 GTK_VLC_PLAYER_VOL_ADJ_STEP,
+				 GTK_VLC_PLAYER_VOL_ADJ_PAGE,
+				 0.);
 
 	player->priv->vol_adj_on_value_changed_id =
 		g_signal_connect(G_OBJECT(player->priv->volume_adjustment),

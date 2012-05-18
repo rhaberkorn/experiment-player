@@ -75,6 +75,7 @@ PKG_CHECK_EXISTS([gladeui-1.0],
 if [[ x$glade3_catalogsdir = x ]]; then
 	AC_MSG_WARN([Glade-3 catalog directory not found, installing Gtk+ widget catalogs into custom directories!])
 fi
+# TODO: with-option to overwrite the catalogsdir
 gtk_experiment_widgets_catalogsdir=${glade3_catalogsdir:-$player_datadir/catalogs}
 AC_SUBST(gtk_experiment_widgets_catalogsdir)
 gtk_vlc_player_catalogsdir=${glade3_catalogsdir:-$gtk_vlc_player_datadir/catalogs}
@@ -211,12 +212,15 @@ AC_SUBST(GTKAPP_CFLAGS)
 AC_SUBST(GTKAPP_LDFLAGS)
 
 # Some constants
-AC_DEFINE(GTK_VLC_PLAYER_ADJ_STEP, [1000.],	[VLC Player time adjustment step increment])
-AC_DEFINE(GTK_VLC_PLAYER_ADJ_PAGE, [30000.],	[VLC Player time adjustment page increment])
+AC_DEFINE(GTK_VLC_PLAYER_TIME_ADJ_STEP,	[1000.],	[VLC Player time adjustment step increment])
+AC_DEFINE(GTK_VLC_PLAYER_TIME_ADJ_PAGE,	[30000.],	[VLC Player time adjustment page increment])
 
-AC_DEFINE(DEFAULT_QUICKOPEN_DIR, ["."], [Default directory for listing experiments])
-AC_DEFINE(EXPERIMENT_MOVIE_FILTER, ["*.mp4;*.avi"], [Filters for (quick) opening movies])
-AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT, ["xml"], [File extension of experiment transcripts])
+AC_DEFINE(GTK_VLC_PLAYER_VOL_ADJ_STEP,	[0.02],		[VLC Player volume adjustment step increment])
+AC_DEFINE(GTK_VLC_PLAYER_VOL_ADJ_PAGE,	[0.],		[VLC Player volume adjustment page increment])
+
+AC_DEFINE(DEFAULT_QUICKOPEN_DIR,	["."],		[Default directory for listing experiments])
+AC_DEFINE(EXPERIMENT_MOVIE_FILTER,	["*.mp4;*.avi"], [Filters for (quick) opening movies])
+AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT,	["xml"],	[File extension of experiment transcripts])
 
 AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile])
 AC_CONFIG_FILES([lib/gtk-vlc-player/Makefile])
