@@ -8,6 +8,7 @@
 #include "config.h"
 #endif
 
+#include <string.h>
 #include <assert.h>
 
 #include <glib.h>
@@ -29,6 +30,9 @@ static xmlNode *get_first_element(xmlNode *children, const gchar *name);
 static gboolean generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 				      ExperimentReaderTopicCallback callback,
 				      gpointer data);
+
+static gint experiment_reader_contrib_cmp(const ExperimentReaderContrib *a,
+					  const ExperimentReaderContrib *b);
 
 /** @private */
 #define EXPERIMENT_READER_GET_PRIVATE(obj) \
@@ -111,7 +115,8 @@ static xmlNode *
 get_first_element(xmlNode *children, const gchar *name)
 {
 	for (xmlNode *cur = children; cur != NULL; cur = cur->next)
-		if (!g_strcmp0((const gchar *)cur->name, name))
+		if (cur->type == XML_ELEMENT_NODE &&
+		    !g_strcmp0((const gchar *)cur->name, name))
 			return cur;
 
 	return NULL;
@@ -149,6 +154,17 @@ generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 	return FALSE;
 }
 
+static gint
+experiment_reader_contrib_cmp(const ExperimentReaderContrib *a,
+			      const ExperimentReaderContrib *b)
+{
+	if (a->start_time < b->start_time)
+		return -1;
+	if (a->start_time > b->start_time)
+		return 1;
+	return 0;
+}
+
 /*
  * API
  */
@@ -174,6 +190,135 @@ experiment_reader_new(const gchar *filename)
 	/** @todo validate against session.dtd */
 
 	return reader;
+}
+
+GList *
+experiment_reader_get_contributions_by_speaker(ExperimentReader *reader,
+					       const gchar *speaker)
+{
+	GList		*list = NULL;
+
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+
+	xmlChar expr[255];
+
+	xpathCtx = xmlXPathNewContext(reader->priv->doc);
+
+	/* Evaluate xpath expression */
+	xmlStrPrintf(expr, sizeof(expr),
+		     (const xmlChar *)
+		     "//contribution[@speaker-reference = "
+		     "/session/speakers/speaker[name = '%s']/@speaker-id]",
+		     speaker);
+	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
+
+	for (int i = 0; i < xpathObj->nodesetval->nodeNr; i++) {
+		xmlNode *contrib = xpathObj->nodesetval->nodeTab[i];
+		xmlChar *ref;
+		gint64 start_time;
+
+		gchar *text = NULL;
+
+		ref = xmlGetProp(contrib, (const xmlChar *)"start-reference");
+		start_time = get_timepoint_by_ref(reader->priv->doc, ref);
+		xmlFree(ref);
+
+		for (xmlNode *cur = contrib->children; cur != NULL; cur = cur->next) {
+			xmlChar *content;
+			gchar *new;
+
+			switch (cur->type) {
+			case XML_TEXT_NODE:
+				content = xmlNodeGetContent(cur);
+
+				new = g_strconcat(text != NULL ? text : "",
+						  g_strstrip((gchar *)content),
+						  " ", NULL);
+				g_free(text);
+				text = new;
+
+				xmlFree(content);
+				break;
+
+			case XML_ELEMENT_NODE:
+				if (!xmlStrcmp(cur->name, (const xmlChar *)"pause")) {
+					xmlChar *duration = xmlGetProp(cur, (const xmlChar *)"duration");
+
+					if (duration != NULL) {
+						if (!xmlStrcmp(duration, (const xmlChar *)"micro") ||
+						    !xmlStrcmp(duration, (const xmlChar *)"short"))
+							new = g_strconcat(text != NULL ? text : "", " ...", NULL);
+						else
+							new = g_strconcat(text != NULL ? text : "", "\n", NULL);
+						g_free(text);
+						text = new;
+
+						xmlFree(duration);
+					}
+				} else if (!xmlStrcmp(cur->name, (const xmlChar *)"time")) {
+					if (text != NULL) {
+						ExperimentReaderContrib *contrib = g_malloc(sizeof(ExperimentReaderContrib) + strlen(text) + 1);
+
+						contrib->start_time = start_time;
+						g_stpcpy(contrib->text, text);
+
+						list = g_list_insert_sorted(list, contrib, (GCompareFunc)experiment_reader_contrib_cmp);
+
+						g_free(text);
+						text = NULL;
+					}
+
+					ref = xmlGetProp(cur, (const xmlChar *)"timepoint-reference");
+					start_time = get_timepoint_by_ref(reader->priv->doc, ref);
+					xmlFree(ref);
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		if (text != NULL) {
+			ExperimentReaderContrib *contrib = g_malloc(sizeof(ExperimentReaderContrib) + strlen(text) + 1);
+
+			contrib->start_time = start_time;
+			g_stpcpy(contrib->text, text);
+
+			list = g_list_insert_sorted(list, contrib, (GCompareFunc)experiment_reader_contrib_cmp);
+
+			g_free(text);
+		}
+	}
+
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+
+	return list;
+}
+
+GList *
+experiment_reader_get_contribution_by_time(GList *contribs,
+					   gint64 timept)
+{
+	for (GList *cur = contribs; cur != NULL; cur = cur->next) {
+		ExperimentReaderContrib *contrib = (ExperimentReaderContrib *)cur->data;
+
+		if (contrib->start_time >= timept)
+			return cur;
+	}
+
+	return NULL;
+}
+
+void
+experiment_reader_free_contributions(GList *contribs)
+{
+	for (GList *cur = contribs; cur != NULL; cur = cur->next)
+		g_free(cur->data);
+
+	g_list_free(contribs);
 }
 
 /**

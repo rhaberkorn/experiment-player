@@ -63,15 +63,30 @@ GType experiment_reader_get_type(void);
  * @param start_time Beginning of first \b contribution in \e topic (milliseconds)
  * @param data       Callback user data
  */
+/** @todo Perhaps we should use CClosures */
 typedef void (*ExperimentReaderTopicCallback)(ExperimentReader *reader,
 					      const gchar *topic_id,
 					      gint64 start_time,
 					      gpointer data);
 
+typedef struct {
+	gint64	start_time;
+	gchar	text[];
+} ExperimentReaderContrib;
+
 /*
  * API
  */
 ExperimentReader *experiment_reader_new(const gchar *filename);
+
+GList *experiment_reader_get_contributions_by_speaker(
+	ExperimentReader		*reader,
+	const gchar			*speaker);
+GList *experiment_reader_get_contribution_by_time(
+	GList				*contribs,
+	gint64				timept);
+void experiment_reader_free_contributions(
+	GList				*contribs);
 
 void experiment_reader_foreach_greeting_topic(
 	ExperimentReader		*reader,
