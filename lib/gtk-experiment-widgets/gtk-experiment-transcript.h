@@ -43,6 +43,7 @@ typedef struct _GtkExperimentTranscript {
 	GtkWidget parent_instance;		/**< Parent instance structure */
 
 	gchar *speaker;				/**< Name of speaker whose contributions are displayed (\b read-only) */
+	gboolean reverse;			/**< Reverse mode (\b read-write) */
 
 	GtkExperimentTranscriptPrivate *priv;	/**< @private Pointer to \b private instance attributes */
 } GtkExperimentTranscript;

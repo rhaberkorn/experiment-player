@@ -40,6 +40,12 @@ static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
 static void text_layer_redraw(GtkExperimentTranscript *trans);
 
+static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
+static void choose_font_activated(GtkWidget *widget, gpointer data);
+static void choose_fg_color_activated(GtkWidget *widget, gpointer data);
+static void choose_bg_color_activated(GtkWidget *widget, gpointer data);
+static void reverse_activated(GtkWidget *widget, gpointer data);
+
 #define DEFAULT_WIDTH		100
 #define DEFAULT_HEIGHT		200
 
@@ -84,6 +90,8 @@ struct _GtkExperimentTranscriptPrivate {
 	PangoLayout	*layer_text_layout;
 
 	GList		*contribs;
+
+	GtkWidget	*menu;		/**< Drop-down menu, doesn't have to be unreferenced manually */
 };
 
 /**
@@ -109,6 +117,8 @@ gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass)
 	widget_class->size_request = gtk_experiment_transcript_size_request;
 	widget_class->size_allocate = gtk_experiment_transcript_size_allocate;
 
+	widget_class->button_press_event = button_pressed;
+
 	g_type_class_add_private(klass, sizeof(GtkExperimentTranscriptPrivate));
 }
 
@@ -120,9 +130,12 @@ gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass)
 static void
 gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 {
+	GtkWidget *item;
+
 	klass->priv = GTK_EXPERIMENT_TRANSCRIPT_GET_PRIVATE(klass);
 
 	klass->speaker = NULL;
+	klass->reverse = FALSE;
 
 	klass->priv->time_adjustment = gtk_adjustment_new(0., 0., 0.,
 							  0., 0., 0.);
@@ -139,6 +152,38 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	pango_layout_set_ellipsize(klass->priv->layer_text_layout, PANGO_ELLIPSIZE_END);
 
 	klass->priv->contribs = NULL;
+
+	klass->priv->menu = gtk_menu_new();
+	gtk_menu_attach_to_widget(GTK_MENU(klass->priv->menu),
+				  GTK_WIDGET(klass), NULL);
+
+	item = gtk_menu_item_new_with_mnemonic("_Choose Font...");
+	g_signal_connect(item, "activate",
+			 G_CALLBACK(choose_font_activated), klass);
+	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
+	gtk_widget_show(item);
+
+	item = gtk_menu_item_new_with_mnemonic("Choose _Foreground Color...");
+	g_signal_connect(item, "activate",
+			 G_CALLBACK(choose_fg_color_activated), klass);
+	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
+	gtk_widget_show(item);
+
+	item = gtk_menu_item_new_with_mnemonic("Choose _Background Color...");
+	g_signal_connect(item, "activate",
+			 G_CALLBACK(choose_bg_color_activated), klass);
+	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
+	gtk_widget_show(item);
+
+	item = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
+	gtk_widget_show(item);
+
+	item = gtk_check_menu_item_new_with_mnemonic("_Reverse");
+	g_signal_connect(item, "activate",
+			 G_CALLBACK(reverse_activated), klass);
+	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
+	gtk_widget_show(item);
 }
 
 /**
@@ -222,7 +267,7 @@ gtk_experiment_transcript_realize(GtkWidget *widget)
 	attributes.wclass = GDK_INPUT_OUTPUT;
 	attributes.window_type = GDK_WINDOW_CHILD;
 	attributes.event_mask = gtk_widget_get_events(widget)
-			      | GDK_EXPOSURE_MASK;
+			      | GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK;
 	attributes.visual = gtk_widget_get_visual(widget);
 	attributes.colormap = gtk_widget_get_colormap(widget);
 
@@ -321,7 +366,7 @@ text_layer_redraw(GtkExperimentTranscript *trans)
 	gint last_contrib_y;
 
 	gdk_draw_rectangle(GDK_DRAWABLE(trans->priv->layer_text),
-			   widget->style->white_gc,
+			   widget->style->bg_gc[gtk_widget_get_state(widget)],
 			   TRUE,
 			   0, 0,
 			   widget->allocation.width,
@@ -333,6 +378,8 @@ text_layer_redraw(GtkExperimentTranscript *trans)
 
 	if (trans->priv->contribs == NULL)
 		return;
+
+	/** @todo reverse mode */
 
 	if (trans->priv->time_adjustment != NULL)
 		current_time = (gint64)gtk_adjustment_get_value(GTK_ADJUSTMENT(trans->priv->time_adjustment));
@@ -352,7 +399,6 @@ text_layer_redraw(GtkExperimentTranscript *trans)
 			continue;
 
 		/** @todo add attributes according to regexp masks and search mask */
-		/* does that reset default attributes for the widget? */
 		pango_layout_set_attributes(trans->priv->layer_text_layout, NULL);
 
 		pango_layout_set_text(trans->priv->layer_text_layout,
@@ -366,10 +412,114 @@ text_layer_redraw(GtkExperimentTranscript *trans)
 			break;
 
 		gdk_draw_layout(GDK_DRAWABLE(trans->priv->layer_text),
-				widget->style->black_gc,
+				widget->style->text_gc[gtk_widget_get_state(widget)],
 				0, y, trans->priv->layer_text_layout);
 		last_contrib_y = y;
 	}
+}
+
+static gboolean
+button_pressed(GtkWidget *widget, GdkEventButton *event)
+{
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(widget);
+
+	/* Ignore double-clicks and triple-clicks */
+	if (event->button != 3 || event->type != GDK_BUTTON_PRESS)
+		return FALSE;
+
+	gtk_menu_popup(GTK_MENU(trans->priv->menu), NULL, NULL, NULL, NULL,
+                       event->button, event->time);
+	return TRUE;
+}
+
+static void
+choose_font_activated(GtkWidget *widget __attribute__((unused)),
+		      gpointer data)
+{
+	GtkWidget *dialog;
+	gchar *font_name;
+
+	dialog = gtk_font_selection_dialog_new("Choose Font...");
+
+	font_name = pango_font_description_to_string(GTK_WIDGET(data)->style->font_desc);
+	gtk_font_selection_dialog_set_font_name(GTK_FONT_SELECTION_DIALOG(dialog),
+						font_name);
+	g_free(font_name);
+
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+		PangoFontDescription *font_desc;
+
+		font_name = gtk_font_selection_dialog_get_font_name(GTK_FONT_SELECTION_DIALOG(dialog));
+		font_desc = pango_font_description_from_string(font_name);
+
+		gtk_widget_modify_font(GTK_WIDGET(data), font_desc);
+
+		pango_font_description_free(font_desc);
+		g_free(font_name);
+
+		text_layer_redraw(GTK_EXPERIMENT_TRANSCRIPT(data));
+	}
+
+	gtk_widget_destroy(dialog);
+}
+
+static void
+choose_fg_color_activated(GtkWidget *widget __attribute__((unused)),
+			  gpointer data)
+{
+	GtkWidget *dialog, *colorsel;
+
+	dialog = gtk_color_selection_dialog_new("Choose Foreground Color...");
+	colorsel = gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(dialog));
+
+	gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(colorsel),
+					      &GTK_WIDGET(data)->style->text[GTK_STATE_NORMAL]);
+
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+		GdkColor color;
+
+		gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(colorsel),
+						      &color);
+		gtk_widget_modify_text(GTK_WIDGET(data), GTK_STATE_NORMAL, &color);
+
+		text_layer_redraw(GTK_EXPERIMENT_TRANSCRIPT(data));
+	}
+
+	gtk_widget_destroy(dialog);
+}
+
+static void
+choose_bg_color_activated(GtkWidget *widget __attribute__((unused)),
+			  gpointer data)
+{
+	GtkWidget *dialog, *colorsel;
+
+	dialog = gtk_color_selection_dialog_new("Choose Background Color...");
+	colorsel = gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(dialog));
+
+	gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(colorsel),
+					      &GTK_WIDGET(data)->style->bg[GTK_STATE_NORMAL]);
+
+	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+		GdkColor color;
+
+		gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(colorsel),
+						      &color);
+		gtk_widget_modify_bg(GTK_WIDGET(data), GTK_STATE_NORMAL, &color);
+
+		text_layer_redraw(GTK_EXPERIMENT_TRANSCRIPT(data));
+	}
+
+	gtk_widget_destroy(dialog);
+}
+
+static void
+reverse_activated(GtkWidget *widget, gpointer data)
+{
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(data);
+
+	trans->reverse =
+		gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
 }
 
 /*
