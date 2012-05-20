@@ -32,7 +32,7 @@ GtkWidget *player_widget,
 	  *playpause_button,
 	  *volume_button;
 
-GtkWidget *transcript_hbox,
+GtkWidget *transcript_table,
 	  *transcript_wizard_widget,
 	  *transcript_proband_widget,
 	  *transcript_scroll_widget;
@@ -146,6 +146,15 @@ help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 }
 
 void
+generic_transcript_entry_changed_cb(gpointer user_data, GtkEditable *editable)
+{
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(user_data);
+	const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
+
+	gtk_experiment_transcript_set_interactive_format(trans, text, TRUE);
+}
+
+void
 navigator_widget_time_selected_cb(GtkWidget *widget, gint64 selected_time,
 				  gpointer user_data __attribute__((unused)))
 {
@@ -218,7 +227,7 @@ load_transcript_file(const gchar *file)
 
 	g_object_unref(reader);
 
-	gtk_widget_set_sensitive(transcript_hbox, TRUE);
+	gtk_widget_set_sensitive(transcript_table, TRUE);
 	gtk_widget_set_sensitive(navigator_scrolledwindow, TRUE);
 
 	return FALSE;
@@ -279,7 +288,7 @@ main(int argc, char *argv[])
 	BUILDER_INIT(builder, quickopen_menu);
 	BUILDER_INIT(builder, quickopen_menu_empty_item);
 
-	BUILDER_INIT(builder, transcript_hbox);
+	BUILDER_INIT(builder, transcript_table);
 	BUILDER_INIT(builder, transcript_wizard_widget);
 	BUILDER_INIT(builder, transcript_proband_widget);
 	BUILDER_INIT(builder, transcript_scroll_widget);

@@ -9,7 +9,6 @@
 #endif
 
 #include <assert.h>
-#include <inttypes.h>
 
 #include <glib.h>
 #include <glib/gprintf.h>
@@ -17,8 +16,7 @@
 #include <gtk/gtk.h>
 #include <experiment-reader.h>
 
-#include "cclosure-marshallers.h"
-#include "gtk-experiment-transcript.h"
+#include "gtk-experiment-transcript-private.h"
 
 static void gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass);
 static void gtk_experiment_transcript_init(GtkExperimentTranscript *klass);
@@ -38,61 +36,11 @@ static void gtk_experiment_transcript_finalize(GObject *gobject);
 
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
-static void text_layer_redraw(GtkExperimentTranscript *trans);
-
 static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
 static void choose_font_activated(GtkWidget *widget, gpointer data);
 static void choose_fg_color_activated(GtkWidget *widget, gpointer data);
 static void choose_bg_color_activated(GtkWidget *widget, gpointer data);
 static void reverse_activated(GtkWidget *widget, gpointer data);
-
-#define DEFAULT_WIDTH		100
-#define DEFAULT_HEIGHT		200
-
-#define LAYER_TEXT_INVISIBLE	100
-
-/** @todo scale should be configurable */
-#define PX_PER_SECOND		15
-#define TIME_TO_PX(TIME)	((TIME)/(1000/PX_PER_SECOND))
-#define PX_TO_TIME(PX)		(((PX)*1000)/PX_PER_SECOND)
-
-/**
- * @private
- * Unreference object given by variable, but only once.
- * Use it in \ref gtk_experiment_transcript_dispose to unreference object
- * references in public or private instance attributes.
- *
- * @sa gtk_experiment_transcript_dispose
- *
- * @param VAR Variable to unreference
- */
-#define GOBJECT_UNREF_SAFE(VAR) do {	\
-	if ((VAR) != NULL) {		\
-		g_object_unref(VAR);	\
-		VAR = NULL;		\
-	}				\
-} while (0)
-
-/** @private */
-#define GTK_EXPERIMENT_TRANSCRIPT_GET_PRIVATE(obj) \
-	(G_TYPE_INSTANCE_GET_PRIVATE((obj), GTK_TYPE_EXPERIMENT_TRANSCRIPT, GtkExperimentTranscriptPrivate))
-
-/**
- * @private
- * Private instance attribute structure.
- * You can access these attributes using \c klass->priv->attribute.
- */
-struct _GtkExperimentTranscriptPrivate {
-	GtkObject	*time_adjustment;
-	gulong		time_adj_on_value_changed_id;
-
-	GdkPixmap	*layer_text;
-	PangoLayout	*layer_text_layout;
-
-	GList		*contribs;
-
-	GtkWidget	*menu;		/**< Drop-down menu, doesn't have to be unreferenced manually */
-};
 
 /**
  * @private
@@ -152,6 +100,9 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	pango_layout_set_ellipsize(klass->priv->layer_text_layout, PANGO_ELLIPSIZE_END);
 
 	klass->priv->contribs = NULL;
+	klass->priv->formats = NULL;
+	klass->priv->interactive_format.regexp = NULL;
+	klass->priv->interactive_format.attribs = NULL;
 
 	klass->priv->menu = gtk_menu_new();
 	gtk_menu_attach_to_widget(GTK_MENU(klass->priv->menu),
@@ -247,6 +198,8 @@ gtk_experiment_transcript_finalize(GObject *gobject)
 
 	g_free(trans->speaker);
 	experiment_reader_free_contributions(trans->priv->contribs);
+	gtk_experiment_transcript_free_formats(trans->priv->formats);
+	gtk_experiment_transcript_free_format(&trans->priv->interactive_format);
 
 	/* Chain up to the parent class */
 	G_OBJECT_CLASS(gtk_experiment_transcript_parent_class)->finalize(gobject);
@@ -326,7 +279,7 @@ gtk_experiment_transcript_configure(GtkWidget *widget,
 	pango_layout_set_width(trans->priv->layer_text_layout,
 			       widget->allocation.width*PANGO_SCALE);
 
-	text_layer_redraw(trans);
+	gtk_experiment_transcript_text_layer_redraw(trans);
 
 	return TRUE;
 }
@@ -349,16 +302,19 @@ gtk_experiment_transcript_expose(GtkWidget *widget, GdkEventExpose *event)
 static void
 time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
 {
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(user_data);
+
 	/**
 	 * @todo
 	 * heuristic to improve performance in the common case of advancing
 	 * time in small steps
 	 */
-	text_layer_redraw(GTK_EXPERIMENT_TRANSCRIPT(user_data));
+	gtk_experiment_transcript_text_layer_redraw(trans);
 }
 
-static void
-text_layer_redraw(GtkExperimentTranscript *trans)
+/** @private */
+void
+gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 {
 	GtkWidget *widget = GTK_WIDGET(trans);
 
@@ -395,11 +351,26 @@ text_layer_redraw(GtkExperimentTranscript *trans)
 			 TIME_TO_PX(current_time - contrib->start_time);
 		int logical_height;
 
+		PangoAttrList *attrib_list;
+
 		if (y > widget->allocation.height + LAYER_TEXT_INVISIBLE)
 			continue;
 
-		/** @todo add attributes according to regexp masks and search mask */
-		pango_layout_set_attributes(trans->priv->layer_text_layout, NULL);
+		attrib_list = pango_attr_list_new();
+
+		for (GSList *cur = trans->priv->formats; cur != NULL; cur = cur->next) {
+			GtkExperimentTranscriptFormat *fmt =
+				(GtkExperimentTranscriptFormat *)cur->data;
+
+			gtk_experiment_transcript_apply_format(fmt, contrib->text,
+							       attrib_list);
+		}
+		gtk_experiment_transcript_apply_format(&trans->priv->interactive_format,
+						       contrib->text, attrib_list);
+
+		pango_layout_set_attributes(trans->priv->layer_text_layout,
+					    attrib_list);
+		pango_attr_list_unref(attrib_list);
 
 		pango_layout_set_text(trans->priv->layer_text_layout,
 				      contrib->text, -1);
@@ -436,12 +407,14 @@ static void
 choose_font_activated(GtkWidget *widget __attribute__((unused)),
 		      gpointer data)
 {
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(data);
+
 	GtkWidget *dialog;
 	gchar *font_name;
 
 	dialog = gtk_font_selection_dialog_new("Choose Font...");
 
-	font_name = pango_font_description_to_string(GTK_WIDGET(data)->style->font_desc);
+	font_name = pango_font_description_to_string(GTK_WIDGET(trans)->style->font_desc);
 	gtk_font_selection_dialog_set_font_name(GTK_FONT_SELECTION_DIALOG(dialog),
 						font_name);
 	g_free(font_name);
@@ -452,12 +425,12 @@ choose_font_activated(GtkWidget *widget __attribute__((unused)),
 		font_name = gtk_font_selection_dialog_get_font_name(GTK_FONT_SELECTION_DIALOG(dialog));
 		font_desc = pango_font_description_from_string(font_name);
 
-		gtk_widget_modify_font(GTK_WIDGET(data), font_desc);
+		gtk_widget_modify_font(GTK_WIDGET(trans), font_desc);
 
 		pango_font_description_free(font_desc);
 		g_free(font_name);
 
-		text_layer_redraw(GTK_EXPERIMENT_TRANSCRIPT(data));
+		gtk_experiment_transcript_text_layer_redraw(trans);
 	}
 
 	gtk_widget_destroy(dialog);
@@ -467,22 +440,25 @@ static void
 choose_fg_color_activated(GtkWidget *widget __attribute__((unused)),
 			  gpointer data)
 {
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(data);
+
 	GtkWidget *dialog, *colorsel;
 
 	dialog = gtk_color_selection_dialog_new("Choose Foreground Color...");
 	colorsel = gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(dialog));
 
 	gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(colorsel),
-					      &GTK_WIDGET(data)->style->text[GTK_STATE_NORMAL]);
+					      &GTK_WIDGET(trans)->style->text[GTK_STATE_NORMAL]);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
 		GdkColor color;
 
 		gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(colorsel),
 						      &color);
-		gtk_widget_modify_text(GTK_WIDGET(data), GTK_STATE_NORMAL, &color);
+		gtk_widget_modify_text(GTK_WIDGET(trans),
+				       GTK_STATE_NORMAL, &color);
 
-		text_layer_redraw(GTK_EXPERIMENT_TRANSCRIPT(data));
+		gtk_experiment_transcript_text_layer_redraw(trans);
 	}
 
 	gtk_widget_destroy(dialog);
@@ -492,22 +468,25 @@ static void
 choose_bg_color_activated(GtkWidget *widget __attribute__((unused)),
 			  gpointer data)
 {
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(data);
+
 	GtkWidget *dialog, *colorsel;
 
 	dialog = gtk_color_selection_dialog_new("Choose Background Color...");
 	colorsel = gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(dialog));
 
 	gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(colorsel),
-					      &GTK_WIDGET(data)->style->bg[GTK_STATE_NORMAL]);
+					      &GTK_WIDGET(trans)->style->bg[GTK_STATE_NORMAL]);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
 		GdkColor color;
 
 		gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(colorsel),
 						      &color);
-		gtk_widget_modify_bg(GTK_WIDGET(data), GTK_STATE_NORMAL, &color);
+		gtk_widget_modify_bg(GTK_WIDGET(trans),
+				     GTK_STATE_NORMAL, &color);
 
-		text_layer_redraw(GTK_EXPERIMENT_TRANSCRIPT(data));
+		gtk_experiment_transcript_text_layer_redraw(trans);
 	}
 
 	gtk_widget_destroy(dialog);
@@ -555,7 +534,7 @@ gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 	trans->priv->contribs =
 		experiment_reader_get_contributions_by_speaker(exp, trans->speaker);
 
-	text_layer_redraw(trans);
+	gtk_experiment_transcript_text_layer_redraw(trans);
 
 	return trans->priv->contribs == NULL;
 }

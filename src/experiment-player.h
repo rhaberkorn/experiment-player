@@ -14,7 +14,7 @@ extern GtkWidget *player_widget,
 		 *playpause_button,
 		 *volume_button;
 
-extern GtkWidget *transcript_hbox,
+extern GtkWidget *transcript_table,
 		 *transcript_wizard_widget,
 		 *transcript_proband_widget,
 		 *transcript_scroll_widget;

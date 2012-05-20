@@ -111,7 +111,7 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 			     G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
 			     G_STRUCT_OFFSET(GtkExperimentNavigatorClass, time_selected),
 			     NULL, NULL,
-			     gtk_experiment_navigator_marshal_VOID__INT64,
+			     gtk_experiment_widgets_marshal_VOID__INT64,
 			     G_TYPE_NONE, 1, G_TYPE_INT64);
 
 	g_type_class_add_private(klass, sizeof(GtkExperimentNavigatorPrivate));
