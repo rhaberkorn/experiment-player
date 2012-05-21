@@ -55,6 +55,7 @@ quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget,
 	gtk_widget_destroy(dialog);
 }
 
+/** @todo refresh item unnecessary, rebuild menu when it is opened */
 void
 quickopen_menu_refresh_item_activate_cb(GtkWidget *widget,
 					gpointer data __attribute__((unused)))
