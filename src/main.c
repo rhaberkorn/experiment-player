@@ -14,6 +14,7 @@
 #endif
 
 #include <glib.h>
+#include <glib/gprintf.h>
 
 #include <gtk/gtk.h>
 
@@ -143,15 +144,6 @@ help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 		show_message_dialog_gerror(err);
 		g_error_free(err);
 	}
-}
-
-void
-generic_transcript_entry_changed_cb(gpointer user_data, GtkEditable *editable)
-{
-	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(user_data);
-	const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
-
-	gtk_experiment_transcript_set_interactive_format(trans, text, TRUE);
 }
 
 void
@@ -293,6 +285,9 @@ main(int argc, char *argv[])
 	BUILDER_INIT(builder, transcript_proband_widget);
 	BUILDER_INIT(builder, transcript_scroll_widget);
 
+	BUILDER_INIT(builder, transcript_wizard_combo);
+	BUILDER_INIT(builder, transcript_proband_combo);
+
 	BUILDER_INIT(builder, navigator_scrolledwindow);
 	BUILDER_INIT(builder, navigator_widget);
 
@@ -314,6 +309,7 @@ main(int argc, char *argv[])
 	/* configure transcript widgets */
 	GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget)->speaker = g_strdup("Wizard");
 	GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget)->speaker = g_strdup("Proband");
+	format_selection_init(DEFAULT_FORMAT_DIR);
 
 	quickopen_directory = g_strdup(DEFAULT_QUICKOPEN_DIR);
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));

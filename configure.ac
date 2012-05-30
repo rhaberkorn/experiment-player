@@ -222,6 +222,9 @@ AC_DEFINE(DEFAULT_QUICKOPEN_DIR,	["."],		[Default directory for listing experime
 AC_DEFINE(EXPERIMENT_MOVIE_FILTER,	["*.mp4;*.avi"], [Filters for (quick) opening movies])
 AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT,	["xml"],	[File extension of experiment transcripts])
 
+AC_DEFINE(DEFAULT_FORMAT_DIR,		["."],		[Default directory for selecting formats])
+AC_DEFINE(EXPERIMENT_FORMAT_FILTER,	["*.fmt"],	[Format file filter])
+
 AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile])
 AC_CONFIG_FILES([lib/gtk-vlc-player/Makefile])
 AC_CONFIG_FILES([lib/experiment-reader/Makefile lib/experiment-reader/tests/Makefile])
