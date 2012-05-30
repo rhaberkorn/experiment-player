@@ -139,11 +139,14 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 	FILE *file;
 	gchar buf[255];
 
-	if ((file = g_fopen(filename, "r")) == NULL)
-		return TRUE;
-
 	gtk_experiment_transcript_free_formats(trans->priv->formats);
 	trans->priv->formats = NULL;
+
+	if (filename == NULL || !*filename)
+		goto redraw;
+
+	if ((file = g_fopen(filename, "r")) == NULL)
+		return TRUE;
 
 	while (fgets((char *)buf, sizeof(buf)-1, file) != NULL) {
 		GtkExperimentTranscriptFormat *fmt;
@@ -171,6 +174,7 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 
 	fclose(file);
 
+redraw:
 	gtk_experiment_transcript_text_layer_redraw(trans);
 	return FALSE;
 }
