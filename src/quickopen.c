@@ -66,6 +66,7 @@ quickopen_menu_refresh_item_activate_cb(GtkWidget *widget,
 static inline gboolean
 quickopen_filter(const gchar *name)
 {
+	guint name_length = strlen(name);
 	gchar *name_reversed = g_strreverse(g_strdup(name));
 	gchar **filters, **filter;
 
@@ -76,7 +77,8 @@ quickopen_filter(const gchar *name)
 	for (filter = filters; *filter != NULL; filter++) {
 		GPatternSpec *pattern = g_pattern_spec_new(*filter);
 
-		res = g_pattern_match(pattern, strlen(name), name, name_reversed);
+		res = g_pattern_match(pattern, name_length,
+				      name, name_reversed);
 		g_pattern_spec_free(pattern);
 		if (res)
 			break;
