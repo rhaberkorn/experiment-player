@@ -1,7 +1,7 @@
 AM_CFLAGS = -Wall
 
 bin_PROGRAMS = experiment-player
-experiment_player_SOURCES = main.c quickopen.c format-selection.c \
+experiment_player_SOURCES = main.c quick-open.c format-selection.c \
 			    experiment-player.h
 
 experiment_player_CFLAGS = $(AM_CFLAGS)
