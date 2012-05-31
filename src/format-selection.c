@@ -75,12 +75,10 @@ generic_transcript_combo_changed_cb(gpointer user_data, GtkComboBox *combo)
 
 	GtkTreeModel *model = gtk_combo_box_get_model(combo);
 	GtkTreeIter iter;
-	gchar *filename;
+	gchar *filename = NULL;
 
-	if (!gtk_combo_box_get_active_iter(combo, &iter))
-		return;
-
-	gtk_tree_model_get(model, &iter, COL_FILENAME, &filename, -1);
+	if (gtk_combo_box_get_active_iter(combo, &iter))
+		gtk_tree_model_get(model, &iter, COL_FILENAME, &filename, -1);
 
 	/*
 	 * filename may be empty (null-entry) in which case any active format
@@ -89,7 +87,9 @@ generic_transcript_combo_changed_cb(gpointer user_data, GtkComboBox *combo)
 	gtk_experiment_transcript_load_formats(trans, filename);
 	g_free(filename);
 
+#if 0
 	refresh_formats_store(GTK_LIST_STORE(model));
+#endif
 }
 
 void
@@ -107,12 +107,25 @@ refresh_formats_store(GtkListStore *store)
 {
 	static GPatternSpec *pattern = NULL;
 
+	GtkTreeModel *model = GTK_TREE_MODEL(store);
+	gchar *wizard_filename = NULL;
+	gchar *proband_filename = NULL;
+
 	GDir *dir;
 	const gchar *name;
 	GtkTreeIter iter;
 
 	if (pattern == NULL)
 		pattern = g_pattern_spec_new(EXPERIMENT_FORMAT_FILTER);
+
+	if (gtk_combo_box_get_active_iter(GTK_COMBO_BOX(transcript_wizard_combo),
+					  &iter))
+		gtk_tree_model_get(model, &iter,
+				   COL_FILENAME, &wizard_filename, -1);
+	if (gtk_combo_box_get_active_iter(GTK_COMBO_BOX(transcript_proband_combo),
+					  &iter))
+		gtk_tree_model_get(model, &iter,
+				   COL_FILENAME, &proband_filename, -1);
 
 	gtk_list_store_clear(store);
 	/* add null-entry */
@@ -139,11 +152,21 @@ refresh_formats_store(GtkListStore *store)
 				   COL_FILENAME,	fullname,
 				   -1);
 
+		if (!g_strcmp0(fullname, wizard_filename))
+			gtk_combo_box_set_active_iter(GTK_COMBO_BOX(transcript_wizard_combo),
+						      &iter);
+		if (!g_strcmp0(fullname, proband_filename))
+			gtk_combo_box_set_active_iter(GTK_COMBO_BOX(transcript_proband_combo),
+						      &iter);
+
 		g_free(fullname);
 		g_free(itemname);
 	}
 
 	g_dir_close(dir);
+
+	g_free(proband_filename);
+	g_free(wizard_filename);
 }
 
 void
