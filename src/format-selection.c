@@ -175,6 +175,9 @@ format_selection_init(const gchar *dir)
 
 	formats_store = gtk_list_store_new(NUM_COLS,
 					   G_TYPE_STRING, G_TYPE_STRING);
+	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(formats_store),
+					     COL_NAME, GTK_SORT_ASCENDING);
+
 	gtk_combo_box_set_model(GTK_COMBO_BOX(transcript_wizard_combo),
 				GTK_TREE_MODEL(formats_store));
 	gtk_combo_box_set_model(GTK_COMBO_BOX(transcript_proband_combo),
