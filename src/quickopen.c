@@ -136,19 +136,17 @@ refresh_quickopen_menu(GtkMenu *menu)
 		if (!quickopen_filter(name))
 			continue;
 
-		gchar *item_name, *p;
+		gchar *itemname;
 		GtkWidget *item;
 
 		fullnames = g_realloc(fullnames, (fullnames_n+2) * sizeof(gchar *));
 		fullnames[fullnames_n] = g_build_filename(quickopen_directory,
 							  name, NULL);
 
-		item_name = g_strdup(name);
-		if ((p = g_strrstr(item_name, ".")) != NULL)
-			*p = '\0';
-		item = gtk_check_menu_item_new_with_label(item_name);
+		itemname = path_strip_extension(name);
+		item = gtk_check_menu_item_new_with_label(itemname);
 		g_ptr_array_add(items, item);
-		g_free(item_name);
+		g_free(itemname);
 
 		gtk_check_menu_item_set_draw_as_radio(GTK_CHECK_MENU_ITEM(item),
 						      TRUE);

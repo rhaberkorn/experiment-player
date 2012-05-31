@@ -1,6 +1,9 @@
 #ifndef __EXPERIMENT_PLAYER_H
 #define __EXPERIMENT_PLAYER_H
 
+#include <glib.h>
+#include <glib/gprintf.h>
+
 #include <gtk/gtk.h>
 
 gboolean load_media_file(const gchar *file);
@@ -39,5 +42,17 @@ extern GtkWidget *transcript_wizard_combo,
 #define BUILDER_INIT(BUILDER, VAR) do {					\
 	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\
 } while (0)
+
+static inline gchar *
+path_strip_extension(const gchar *filename)
+{
+	gchar *ret = g_strdup(filename);
+	gchar *p;
+
+	if ((p = g_strrstr(ret, ".")) != NULL)
+		*p = '\0';
+
+	return ret;
+}
 
 #endif

@@ -134,16 +134,12 @@ refresh_formats_store(GtkListStore *store)
 	dir = g_dir_open(formats_directory, 0, NULL);
 
 	while ((name = g_dir_read_name(dir)) != NULL) {
-		gchar *itemname, *p;
-		gchar *fullname;
+		gchar *itemname, *fullname;
 
 		if (!g_pattern_match_string(pattern, name))
 			continue;
 
-		itemname = g_strdup(name);
-		if ((p = g_strrstr(itemname, ".")) != NULL)
-			*p = '\0';
-
+		itemname = path_strip_extension(name);
 		fullname = g_build_filename(formats_directory, name, NULL);
 
 		gtk_list_store_append(store, &iter);
