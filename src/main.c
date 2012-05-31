@@ -287,6 +287,8 @@ main(int argc, char *argv[])
 
 	BUILDER_INIT(builder, transcript_wizard_combo);
 	BUILDER_INIT(builder, transcript_proband_combo);
+	BUILDER_INIT(builder, transcript_wizard_entry_check);
+	BUILDER_INIT(builder, transcript_proband_entry_check);
 
 	BUILDER_INIT(builder, navigator_scrolledwindow);
 	BUILDER_INIT(builder, navigator_widget);

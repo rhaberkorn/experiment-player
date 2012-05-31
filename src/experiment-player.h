@@ -37,7 +37,9 @@ extern gchar *quickopen_directory;
 void format_selection_init(const gchar *dir);
 
 extern GtkWidget *transcript_wizard_combo,
-		 *transcript_proband_combo;
+		 *transcript_proband_combo,
+		 *transcript_wizard_entry_check,
+		 *transcript_proband_entry_check;
 
 #define BUILDER_INIT(BUILDER, VAR) do {					\
 	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\

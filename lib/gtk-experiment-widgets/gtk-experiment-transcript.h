@@ -71,7 +71,7 @@ gboolean gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 gboolean gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 						const gchar *filename);
 gboolean gtk_experiment_transcript_set_interactive_format(GtkExperimentTranscript *trans,
-							  const gchar *format,
+							  const gchar *format_str,
 							  gboolean with_markup);
 
 GtkAdjustment *gtk_experiment_transcript_get_time_adjustment(GtkExperimentTranscript *trans);

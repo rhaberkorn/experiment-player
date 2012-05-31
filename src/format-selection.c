@@ -17,7 +17,9 @@
 static void refresh_formats_store(GtkListStore *store);
 
 GtkWidget *transcript_wizard_combo,
-	  *transcript_proband_combo;
+	  *transcript_proband_combo,
+	  *transcript_wizard_entry_check,
+	  *transcript_proband_entry_check;
 
 static gchar *formats_directory;
 
@@ -93,14 +95,45 @@ generic_transcript_combo_changed_cb(gpointer user_data, GtkComboBox *combo)
 #endif
 }
 
+
+
 void
 generic_transcript_entry_changed_cb(gpointer user_data, GtkEditable *editable)
 {
 	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(user_data);
 	const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
 
-	/** @todo enable/disable markup */
-	gtk_experiment_transcript_set_interactive_format(trans, text, TRUE);
+	GtkToggleButton *toggle;
+	gboolean isMarkup;
+
+	gboolean res;
+
+	toggle = trans == GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget)
+			? GTK_TOGGLE_BUTTON(transcript_wizard_entry_check)
+			: GTK_TOGGLE_BUTTON(transcript_proband_entry_check);
+	isMarkup = gtk_toggle_button_get_active(toggle);
+
+	res = gtk_experiment_transcript_set_interactive_format(trans, text,
+							       isMarkup);
+
+	gtk_entry_set_icon_from_stock(GTK_ENTRY(editable),
+				      GTK_ENTRY_ICON_PRIMARY,
+				      res ? "gtk-dialog-error" : "gtk-apply");
+	gtk_entry_set_icon_sensitive(GTK_ENTRY(editable),
+				     GTK_ENTRY_ICON_PRIMARY,
+				     text != NULL && *text);
+}
+
+void
+generic_transcript_entry_check_toggled_cb(gpointer user_data,
+					  GtkToggleButton *widget __attribute__((unused)))
+{
+	gint position = 0;
+
+	/*
+	 * Hack to update the transcript's interactive format
+	 */
+	gtk_editable_insert_text(GTK_EDITABLE(user_data), "", 0, &position);
 }
 
 static void

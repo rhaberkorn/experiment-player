@@ -20,6 +20,9 @@
 
 #include "gtk-experiment-transcript-private.h"
 
+#define FORMAT_REGEX_COMPILE_FLAGS	(G_REGEX_CASELESS)
+#define FORMAT_REGEX_MATCH_FLAGS	(0)
+
 static gboolean
 gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 				       const gchar *str)
@@ -27,6 +30,7 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 	PangoAttrIterator *iter;
 
 	gchar *pattern, pattern_captures[255], *p;
+	gint capture_count = 0;
 
 	if (!pango_parse_markup(str, -1, 0, &fmt->attribs, &pattern,
 				NULL, NULL))
@@ -44,16 +48,22 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 			strncpy(p, pattern + start, end - start);
 			p += end - start;
 			*p++ = ')';
+
+			capture_count++;
 		}
 	} while (pango_attr_iterator_next(iter));
 	pango_attr_iterator_destroy(iter);
 	*p = '\0';
 	g_free(pattern);
 
-	fmt->regexp = g_regex_new(pattern_captures, G_REGEX_CASELESS, 0, NULL);
-	if (fmt->regexp == NULL) {
-		pango_attr_list_unref(fmt->attribs);
+	fmt->regexp = g_regex_new(pattern_captures,
+				  FORMAT_REGEX_COMPILE_FLAGS, 0, NULL);
+	if (fmt->regexp == NULL ||
+	    g_regex_get_capture_count(fmt->regexp) != capture_count) {
+		gtk_experiment_transcript_free_format(fmt);
+		fmt->regexp = NULL;
 		fmt->attribs = NULL;
+
 		return TRUE;
 	}
 
@@ -71,7 +81,7 @@ gtk_experiment_transcript_apply_format(GtkExperimentTranscriptFormat *fmt,
 	if (fmt->regexp == NULL || fmt->attribs == NULL)
 		return;
 
-	g_regex_match(fmt->regexp, text, 0, &match_info);
+	g_regex_match(fmt->regexp, text, FORMAT_REGEX_MATCH_FLAGS, &match_info);
 
 	while (g_match_info_matches(match_info)) {
 		PangoAttrIterator *iter;
@@ -132,21 +142,25 @@ gtk_experiment_transcript_free_formats(GSList *formats)
  * API
  */
 
+/** @todo report errors using GError */
 gboolean
 gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 				       const gchar *filename)
 {
 	FILE *file;
 	gchar buf[255];
+	gboolean res = TRUE;
 
 	gtk_experiment_transcript_free_formats(trans->priv->formats);
 	trans->priv->formats = NULL;
 
-	if (filename == NULL || !*filename)
+	if (filename == NULL || !*filename) {
+		res = FALSE;
 		goto redraw;
+	}
 
 	if ((file = g_fopen(filename, "r")) == NULL)
-		return TRUE;
+		goto redraw;
 
 	while (fgets((char *)buf, sizeof(buf)-1, file) != NULL) {
 		GtkExperimentTranscriptFormat *fmt;
@@ -165,7 +179,10 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 		if (gtk_experiment_transcript_parse_format(fmt, buf)) {
 			g_free(fmt);
 			fclose(file);
-			return TRUE;
+			gtk_experiment_transcript_free_formats(trans->priv->formats);
+			trans->priv->formats = NULL;
+
+			goto redraw;
 		}
 
 		trans->priv->formats = g_slist_prepend(trans->priv->formats, fmt);
@@ -173,33 +190,91 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 	trans->priv->formats = g_slist_reverse(trans->priv->formats);
 
 	fclose(file);
+	res = FALSE;
 
 redraw:
 	gtk_experiment_transcript_text_layer_redraw(trans);
-	return FALSE;
+	return res;
 }
 
 gboolean
 gtk_experiment_transcript_set_interactive_format(GtkExperimentTranscript *trans,
-						 const gchar *format,
+						 const gchar *format_str,
 						 gboolean with_markup)
 {
+	static PangoAttrList *default_attribs = NULL;
+
+	GtkExperimentTranscriptFormat *fmt = &trans->priv->interactive_format;
+	gchar *pattern;
 	gboolean res = TRUE;
 
-	gtk_experiment_transcript_free_format(&trans->priv->interactive_format);
-	trans->priv->interactive_format.regexp = NULL;
-	trans->priv->interactive_format.attribs = NULL;
+	if (default_attribs == NULL) {
+		PangoAttribute		*attrib;
+		PangoFontDescription	*font;
+		PangoColor		color;
 
-	if (format == NULL || *format == '\0') {
-		res = FALSE;
-	} else if (with_markup) {
-		res = gtk_experiment_transcript_parse_format(&trans->priv->interactive_format,
-							     format);
-	} else {
-		/** @todo !with_markup, default attributes */
-		res = TRUE;
+		default_attribs = pango_attr_list_new();
+
+		font = pango_font_description_from_string(DEFAULT_INTERACTIVE_FORMAT_FONT);
+		if (font != NULL) {
+			attrib = pango_attr_font_desc_new(font);
+			attrib->end_index = 1;
+			pango_attr_list_insert(default_attribs, attrib);
+			pango_font_description_free(font);
+		}
+
+		if (DEFAULT_INTERACTIVE_FORMAT_FGCOLOR != NULL &&
+		    pango_color_parse(&color, DEFAULT_INTERACTIVE_FORMAT_FGCOLOR)) {
+			attrib = pango_attr_foreground_new(color.red,
+							   color.green,
+							   color.blue);
+			attrib->end_index = 1;
+			pango_attr_list_insert(default_attribs, attrib);
+		}
+
+		if (DEFAULT_INTERACTIVE_FORMAT_BGCOLOR != NULL &&
+		    pango_color_parse(&color, DEFAULT_INTERACTIVE_FORMAT_BGCOLOR)) {
+			attrib = pango_attr_background_new(color.red,
+							   color.green,
+							   color.blue);
+			attrib->end_index = 1;
+			pango_attr_list_insert(default_attribs, attrib);
+		}
 	}
 
+	gtk_experiment_transcript_free_format(fmt);
+	fmt->regexp = NULL;
+	fmt->attribs = NULL;
+
+	if (format_str == NULL || !*format_str) {
+		res = FALSE;
+		goto redraw;
+	}
+
+	if (with_markup) {
+		res = gtk_experiment_transcript_parse_format(fmt, format_str);
+		goto redraw;
+	}
+	/* else if (!with_markup) */
+
+	fmt->attribs = pango_attr_list_copy(default_attribs);
+	if (fmt->attribs == NULL)
+		goto redraw;
+
+	pattern = g_strconcat("(", format_str, ")", NULL);
+	fmt->regexp = g_regex_new(pattern, FORMAT_REGEX_COMPILE_FLAGS, 0, NULL);
+	g_free(pattern);
+	if (fmt->regexp == NULL ||
+	    g_regex_get_capture_count(fmt->regexp) != 1) {
+		gtk_experiment_transcript_free_format(fmt);
+		fmt->regexp = NULL;
+		fmt->attribs = NULL;
+
+		goto redraw;
+	}
+	res = FALSE;
+
+redraw:
 	gtk_experiment_transcript_text_layer_redraw(trans);
 	return res;
 }
