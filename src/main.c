@@ -266,6 +266,8 @@ main(int argc, char *argv[])
 
 	gtk_init(&argc, &argv);
 
+	config_init_key_file();
+
 	builder = gtk_builder_new();
 
 	gtk_builder_add_from_file(builder, DEFAULT_UI, NULL);
@@ -311,14 +313,15 @@ main(int argc, char *argv[])
 	/* configure transcript widgets */
 	GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget)->speaker = g_strdup("Wizard");
 	GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget)->speaker = g_strdup("Proband");
-	format_selection_init(DEFAULT_FORMAT_DIR);
+	format_selection_init();
 
-	quickopen_directory = g_strdup(DEFAULT_QUICKOPEN_DIR);
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
 	gdk_threads_enter();
 	gtk_main();
 	gdk_threads_leave();
+
+	config_save_key_file();
 
 	return 0;
 }

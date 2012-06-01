@@ -6,6 +6,9 @@
 
 #include <gtk/gtk.h>
 
+/*
+ * main.c
+ */
 gboolean load_media_file(const gchar *file);
 gboolean load_transcript_file(const gchar *file);
 
@@ -27,20 +30,39 @@ extern GtkWidget *navigator_scrolledwindow,
 
 extern gchar *current_filename;
 
+/*
+ * config.c
+ */
+void config_init_key_file(void);
+
+void config_set_quickopen_directory(const gchar *dir);
+gchar *config_get_quickopen_directory(void);
+void config_set_formats_directory(const gchar *dir);
+gchar *config_get_formats_directory(void);
+
+void config_save_key_file(void);
+
+/*
+ * quick-open.c
+ */
 void refresh_quickopen_menu(GtkMenu *menu);
 
 extern GtkWidget *quickopen_menu,
 		 *quickopen_menu_empty_item;
 
-extern gchar *quickopen_directory;
-
-void format_selection_init(const gchar *dir);
+/*
+ * format-selection.c
+ */
+void format_selection_init(void);
 
 extern GtkWidget *transcript_wizard_combo,
 		 *transcript_proband_combo,
 		 *transcript_wizard_entry_check,
 		 *transcript_proband_entry_check;
 
+/*
+ * macros and inline functions
+ */
 #define BUILDER_INIT(BUILDER, VAR) do {					\
 	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\
 } while (0)

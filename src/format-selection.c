@@ -21,8 +21,6 @@ GtkWidget *transcript_wizard_combo,
 	  *transcript_wizard_entry_check,
 	  *transcript_proband_entry_check;
 
-static gchar *formats_directory;
-
 enum {
 	COL_NAME,
 	COL_FILENAME,
@@ -42,19 +40,24 @@ formats_menu_choosedir_item_activate_cb(GtkWidget *widget,
 		gtk_combo_box_get_model(GTK_COMBO_BOX(transcript_wizard_combo));
 
 	GtkWidget *dialog;
+	gchar *formats_directory;
 
 	dialog = gtk_file_chooser_dialog_new("Choose Directory...", GTK_WINDOW(widget),
 					     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 					     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 					     NULL);
+
+	formats_directory = config_get_formats_directory();
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),
 					    formats_directory);
+	g_free(formats_directory);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-		g_free(formats_directory);
 		formats_directory =
 			gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+		config_set_formats_directory(formats_directory);
+		g_free(formats_directory);
 
 		refresh_formats_store(GTK_LIST_STORE(model));
 	}
@@ -145,12 +148,13 @@ refresh_formats_store(GtkListStore *store)
 	gchar *wizard_filename = NULL;
 	gchar *proband_filename = NULL;
 
+	gchar *formats_directory;
 	GDir *dir;
 	const gchar *name;
 	GtkTreeIter iter;
 
 	if (pattern == NULL)
-		pattern = g_pattern_spec_new(EXPERIMENT_FORMAT_FILTER);
+		pattern = g_pattern_spec_new(EXPERIMENT_FORMATS_FILTER);
 
 	if (gtk_combo_box_get_active_iter(GTK_COMBO_BOX(transcript_wizard_combo),
 					  &iter))
@@ -165,6 +169,7 @@ refresh_formats_store(GtkListStore *store)
 	/* add null-entry */
 	gtk_list_store_append(store, &iter);
 
+	formats_directory = config_get_formats_directory();
 	dir = g_dir_open(formats_directory, 0, NULL);
 
 	while ((name = g_dir_read_name(dir)) != NULL) {
@@ -194,18 +199,17 @@ refresh_formats_store(GtkListStore *store)
 	}
 
 	g_dir_close(dir);
+	g_free(formats_directory);
 
 	g_free(proband_filename);
 	g_free(wizard_filename);
 }
 
 void
-format_selection_init(const gchar *dir)
+format_selection_init(void)
 {
 	GtkListStore	*formats_store;
 	GtkCellRenderer	*renderer;
-
-	formats_directory = g_strdup(dir);
 
 	formats_store = gtk_list_store_new(NUM_COLS,
 					   G_TYPE_STRING, G_TYPE_STRING);

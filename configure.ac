@@ -212,6 +212,8 @@ AC_SUBST(GTKAPP_CFLAGS)
 AC_SUBST(GTKAPP_LDFLAGS)
 
 # Some constants
+AC_DEFINE_UNQUOTED(CONFIG_KEY_FILE, [".$PACKAGE_TARNAME"], [Configuration filename (relative)])
+
 AC_DEFINE(GTK_VLC_PLAYER_TIME_ADJ_STEP,	[1000.],	[VLC Player time adjustment step increment])
 AC_DEFINE(GTK_VLC_PLAYER_TIME_ADJ_PAGE,	[30000.],	[VLC Player time adjustment page increment])
 
@@ -222,8 +224,8 @@ AC_DEFINE(DEFAULT_QUICKOPEN_DIR,	["."],		[Default directory for listing experime
 AC_DEFINE(EXPERIMENT_MOVIE_FILTER,	["*.mp4;*.avi"], [Filters for (quick) opening movies])
 AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT,	["xml"],	[File extension of experiment transcripts])
 
-AC_DEFINE(DEFAULT_FORMAT_DIR,		["."],		[Default directory for selecting formats])
-AC_DEFINE(EXPERIMENT_FORMAT_FILTER,	["*.fmt"],	[Format file filter])
+AC_DEFINE(DEFAULT_FORMATS_DIR,		["."],		[Default directory for selecting formats])
+AC_DEFINE(EXPERIMENT_FORMATS_FILTER,	["*.fmt"],	[Format file filter])
 
 AC_DEFINE(DEFAULT_INTERACTIVE_FORMAT_FONT,	["bold"],	[Default interactive format font description])
 AC_DEFINE(DEFAULT_INTERACTIVE_FORMAT_FGCOLOR,	[NULL],		[Default interactive format foreground color])

@@ -23,8 +23,6 @@ static void quickopen_item_on_activate(GtkWidget *widget, gpointer user_data);
 GtkWidget *quickopen_menu,
 	  *quickopen_menu_empty_item;
 
-gchar *quickopen_directory;
-
 /*
  * GtkBuilder signal callbacks
  * NOTE: for some strange reason the parameters are switched
@@ -35,19 +33,24 @@ quickopen_menu_choosedir_item_activate_cb(GtkWidget *widget,
 					  gpointer data __attribute__((unused)))
 {
 	GtkWidget *dialog;
+	gchar *quickopen_directory;
 
 	dialog = gtk_file_chooser_dialog_new("Choose Directory...", GTK_WINDOW(widget),
 					     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
 					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 					     GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 					     NULL);
+
+	quickopen_directory = config_get_quickopen_directory();
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),
 					    quickopen_directory);
+	g_free(quickopen_directory);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
-		g_free(quickopen_directory);
 		quickopen_directory =
 			gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
+		config_set_quickopen_directory(quickopen_directory);
+		g_free(quickopen_directory);
 
 		refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 	}
@@ -70,6 +73,7 @@ quickopen_filter(const gchar *name)
 	gchar *name_reversed = g_strreverse(g_strdup(name));
 	gchar **filters, **filter;
 
+	gchar *quickopen_directory;
 	gchar *trans_name, *p;
 	gboolean res;
 
@@ -89,7 +93,9 @@ quickopen_filter(const gchar *name)
 	if (res)
 		return FALSE;
 
+	quickopen_directory = config_get_quickopen_directory();
 	trans_name = g_build_filename(quickopen_directory, name, NULL);
+	g_free(quickopen_directory);
 	trans_name = g_realloc(trans_name, strlen(trans_name) +
 					   sizeof(EXPERIMENT_TRANSCRIPT_EXT));
 	if ((p = g_strrstr(trans_name, ".")) == NULL) {
@@ -119,6 +125,7 @@ refresh_quickopen_menu(GtkMenu *menu)
 
 	int fullnames_n;
 
+	gchar *quickopen_directory;
 	GDir *dir;
 	const gchar *name;
 
@@ -130,6 +137,7 @@ refresh_quickopen_menu(GtkMenu *menu)
 	fullnames = NULL;
 	fullnames_n = 0;
 
+	quickopen_directory = config_get_quickopen_directory();
 	dir = g_dir_open(quickopen_directory, 0, NULL);
 
 	while ((name = g_dir_read_name(dir)) != NULL) {
@@ -165,6 +173,7 @@ refresh_quickopen_menu(GtkMenu *menu)
 	g_ptr_array_sort(items, quickopen_item_cmp);
 
 	g_dir_close(dir);
+	g_free(quickopen_directory);
 
 	for (int i = 0; i < items->len; i++) {
 		GtkWidget *item = GTK_WIDGET(g_ptr_array_index(items, i));
