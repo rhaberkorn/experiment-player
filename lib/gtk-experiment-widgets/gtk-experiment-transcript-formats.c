@@ -169,6 +169,7 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 
 		switch (*buf) {
 		case '#':
+		case '\r':
 		case '\n':
 		case '\0':
 			continue;
