@@ -4,6 +4,8 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 
+#include <gdk/gdk.h>
+
 #include <gtk/gtk.h>
 
 /*
@@ -39,6 +41,93 @@ void config_set_quickopen_directory(const gchar *dir);
 gchar *config_get_quickopen_directory(void);
 void config_set_formats_directory(const gchar *dir);
 gchar *config_get_formats_directory(void);
+
+void config_generic_set_transcript_font(const gchar *actor, const gchar *key,
+					const PangoFontDescription *font);
+PangoFontDescription *config_generic_get_transcript_font(const gchar *actor,
+							 const gchar *key);
+
+void config_generic_set_transcript_color(const gchar *actor, const gchar *key,
+					 const GdkColor *color);
+gboolean config_generic_get_transcript_color(const gchar *actor, const gchar *key,
+					     GdkColor *color);
+
+static inline void
+config_set_transcript_font(const gchar *actor, const PangoFontDescription *font)
+{
+	config_generic_set_transcript_font(actor, "Widget-Font", font);
+}
+static inline PangoFontDescription *
+config_get_transcript_font(const gchar *actor)
+{
+	return config_generic_get_transcript_font(actor, "Widget-Font");
+}
+
+static inline void
+config_set_transcript_text_color(const gchar *actor, const GdkColor *color)
+{
+	config_generic_set_transcript_color(actor, "Widget-Text-Color", color);
+}
+static inline gboolean
+config_get_transcript_text_color(const gchar *actor, GdkColor *color)
+{
+	return config_generic_get_transcript_color(actor, "Widget-Text-Color",
+						   color);
+}
+
+static inline void
+config_set_transcript_bg_color(const gchar *actor, const GdkColor *color)
+{
+	config_generic_set_transcript_color(actor, "Widget-BG-Color", color);
+}
+static inline gboolean
+config_get_transcript_bg_color(const gchar *actor, GdkColor *color)
+{
+	return config_generic_get_transcript_color(actor, "Widget-BG-Color",
+						   color);
+}
+
+static inline void
+config_set_transcript_default_format_font(const gchar *actor,
+					  const PangoFontDescription *font)
+{
+	config_generic_set_transcript_font(actor, "Default-Format-Font", font);
+}
+static inline PangoFontDescription *
+config_get_transcript_default_format_font(const gchar *actor)
+{
+	return config_generic_get_transcript_font(actor, "Default-Format-Font");
+}
+
+static inline void
+config_set_transcript_default_format_text_color(const gchar *actor,
+						const GdkColor *color)
+{
+	config_generic_set_transcript_color(actor, "Default-Format-Text-Color",
+					    color);
+}
+static inline gboolean
+config_get_transcript_default_format_text_color(const gchar *actor,
+						GdkColor *color)
+{
+	return config_generic_get_transcript_color(actor, "Default-Format-Text-Color",
+						   color);
+}
+
+static inline void
+config_set_transcript_default_format_bg_color(const gchar *actor,
+					      const GdkColor *color)
+{
+	config_generic_set_transcript_color(actor, "Default-Format-BG-Color",
+					    color);
+}
+static inline gboolean
+config_get_transcript_default_format_bg_color(const gchar *actor,
+					      GdkColor *color)
+{
+	return config_generic_get_transcript_color(actor, "Default-Format-BG-Color",
+						   color);
+}
 
 void config_save_key_file(void);
 

@@ -43,6 +43,9 @@ GtkWidget *navigator_scrolledwindow,
 
 gchar *current_filename = NULL;
 
+#define SPEAKER_WIZARD	"Wizard"
+#define SPEAKER_PROBAND	"Proband"
+
 /*
  * GtkBuilder signal callbacks
  * NOTE: for some strange reason the parameters are switched
@@ -248,6 +251,8 @@ main(int argc, char *argv[])
 {
 	GtkBuilder *builder;
 	GtkAdjustment *adj;
+	PangoFontDescription *font_desc;
+	GdkColor color;
 
 	/* FIXME: support internationalization instead of enforcing English */
 #ifdef __WIN32__
@@ -311,8 +316,34 @@ main(int argc, char *argv[])
 	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
 
 	/* configure transcript widgets */
-	GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget)->speaker = g_strdup("Wizard");
-	GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget)->speaker = g_strdup("Proband");
+	GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget)->speaker =
+							g_strdup(SPEAKER_WIZARD);
+	font_desc = config_get_transcript_font(SPEAKER_WIZARD);
+	if (font_desc != NULL) {
+		gtk_widget_modify_font(transcript_wizard_widget, font_desc);
+		pango_font_description_free(font_desc);
+	}
+	if (config_get_transcript_text_color(SPEAKER_WIZARD, &color))
+		gtk_widget_modify_text(transcript_wizard_widget,
+				       GTK_STATE_NORMAL, &color);
+	if (config_get_transcript_bg_color(SPEAKER_WIZARD, &color))
+		gtk_widget_modify_bg(transcript_wizard_widget,
+				     GTK_STATE_NORMAL, &color);
+
+	GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget)->speaker =
+							g_strdup(SPEAKER_PROBAND);
+	font_desc = config_get_transcript_font(SPEAKER_PROBAND);
+	if (font_desc != NULL) {
+		gtk_widget_modify_font(transcript_proband_widget, font_desc);
+		pango_font_description_free(font_desc);
+	}
+	if (config_get_transcript_text_color(SPEAKER_PROBAND, &color))
+		gtk_widget_modify_text(transcript_proband_widget,
+				       GTK_STATE_NORMAL, &color);
+	if (config_get_transcript_bg_color(SPEAKER_PROBAND, &color))
+		gtk_widget_modify_bg(transcript_proband_widget,
+				     GTK_STATE_NORMAL, &color);
+
 	format_selection_init();
 
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
@@ -320,6 +351,21 @@ main(int argc, char *argv[])
 	gdk_threads_enter();
 	gtk_main();
 	gdk_threads_leave();
+
+	/** @todo only modify style if it isn't the default widget style */
+	config_set_transcript_font(SPEAKER_WIZARD,
+				   transcript_wizard_widget->style->font_desc);
+	config_set_transcript_text_color(SPEAKER_WIZARD,
+					 &transcript_wizard_widget->style->text[GTK_STATE_NORMAL]);
+	config_set_transcript_bg_color(SPEAKER_WIZARD,
+				       &transcript_wizard_widget->style->bg[GTK_STATE_NORMAL]);
+
+	config_set_transcript_font(SPEAKER_PROBAND,
+				   transcript_proband_widget->style->font_desc);
+	config_set_transcript_text_color(SPEAKER_PROBAND,
+					 &transcript_proband_widget->style->text[GTK_STATE_NORMAL]);
+	config_set_transcript_bg_color(SPEAKER_PROBAND,
+				       &transcript_proband_widget->style->bg[GTK_STATE_NORMAL]);
 
 	config_save_key_file();
 
