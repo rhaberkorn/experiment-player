@@ -257,6 +257,7 @@ main(int argc, char *argv[])
 	GtkAdjustment *adj;
 	PangoFontDescription *font_desc;
 	GdkColor color;
+	GtkRcStyle *modified_style;
 
 	/* FIXME: support internationalization instead of enforcing English */
 #ifdef __WIN32__
@@ -370,13 +371,17 @@ main(int argc, char *argv[])
 	gtk_main();
 	gdk_threads_leave();
 
-	/** @todo only modify style if it isn't the default widget style */
-	config_set_transcript_font(SPEAKER_WIZARD,
-				   transcript_wizard_widget->style->font_desc);
+	modified_style = gtk_widget_get_modifier_style(transcript_wizard_widget);
+	config_set_transcript_font(SPEAKER_WIZARD, modified_style->font_desc);
 	config_set_transcript_text_color(SPEAKER_WIZARD,
-					 &transcript_wizard_widget->style->text[GTK_STATE_NORMAL]);
+					 modified_style->color_flags[GTK_STATE_NORMAL] & GTK_RC_TEXT
+						? &modified_style->text[GTK_STATE_NORMAL]
+						: NULL);
 	config_set_transcript_bg_color(SPEAKER_WIZARD,
-				       &transcript_wizard_widget->style->bg[GTK_STATE_NORMAL]);
+				       modified_style->color_flags[GTK_STATE_NORMAL] & GTK_RC_BG
+						? &modified_style->bg[GTK_STATE_NORMAL]
+						: NULL);
+	g_object_unref(modified_style);
 
 	config_set_transcript_default_format_font(SPEAKER_WIZARD,
 						  transcript_wizard->interactive_format.default_font);
@@ -385,12 +390,17 @@ main(int argc, char *argv[])
 	config_set_transcript_default_format_bg_color(SPEAKER_WIZARD,
 						      transcript_wizard->interactive_format.default_bg_color);
 
-	config_set_transcript_font(SPEAKER_PROBAND,
-				   transcript_proband_widget->style->font_desc);
+	modified_style = gtk_widget_get_modifier_style(transcript_proband_widget);
+	config_set_transcript_font(SPEAKER_PROBAND, modified_style->font_desc);
 	config_set_transcript_text_color(SPEAKER_PROBAND,
-					 &transcript_proband_widget->style->text[GTK_STATE_NORMAL]);
+					 modified_style->color_flags[GTK_STATE_NORMAL] & GTK_RC_TEXT
+						? &modified_style->text[GTK_STATE_NORMAL]
+						: NULL);
 	config_set_transcript_bg_color(SPEAKER_PROBAND,
-				       &transcript_proband_widget->style->bg[GTK_STATE_NORMAL]);
+				       modified_style->color_flags[GTK_STATE_NORMAL] & GTK_RC_BG
+						? &modified_style->bg[GTK_STATE_NORMAL]
+						: NULL);
+	g_object_unref(modified_style);
 
 	config_set_transcript_default_format_font(SPEAKER_PROBAND,
 						  transcript_proband->interactive_format.default_font);

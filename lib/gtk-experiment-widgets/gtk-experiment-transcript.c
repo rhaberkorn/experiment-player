@@ -110,6 +110,7 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	klass->priv->interactive_format.regexp = NULL;
 	klass->priv->interactive_format.attribs = NULL;
 
+	/** @todo It should be possible to reset font and colors (to widget defaults) */
 	klass->priv->menu = gtk_menu_new();
 	gtk_menu_attach_to_widget(GTK_MENU(klass->priv->menu),
 				  GTK_WIDGET(klass), NULL);
