@@ -39,6 +39,8 @@ static void gtk_experiment_transcript_finalize(GObject *gobject);
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
 static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
+static gboolean scrolled(GtkWidget *widget, GdkEventScroll *event);
+
 static void choose_font_activated(GtkWidget *widget, gpointer data);
 static void choose_fg_color_activated(GtkWidget *widget, gpointer data);
 static void choose_bg_color_activated(GtkWidget *widget, gpointer data);
@@ -68,6 +70,7 @@ gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass)
 	widget_class->size_allocate = gtk_experiment_transcript_size_allocate;
 
 	widget_class->button_press_event = button_pressed;
+	widget_class->scroll_event = scrolled;
 
 	g_type_class_add_private(klass, sizeof(GtkExperimentTranscriptPrivate));
 }
@@ -412,6 +415,37 @@ button_pressed(GtkWidget *widget, GdkEventButton *event)
 
 	gtk_menu_popup(GTK_MENU(trans->priv->menu), NULL, NULL, NULL, NULL,
                        event->button, event->time);
+	return TRUE;
+}
+
+static gboolean
+scrolled(GtkWidget *widget, GdkEventScroll *event)
+{
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(widget);
+	GtkAdjustment *adj;
+
+	gdouble value;
+
+	if (trans->priv->time_adjustment == NULL)
+		return FALSE;
+	adj = GTK_ADJUSTMENT(trans->priv->time_adjustment);
+
+	value = gtk_adjustment_get_value(adj);
+
+	switch (event->direction) {
+	case GDK_SCROLL_UP:
+		value -= gtk_adjustment_get_step_increment(adj);
+		break;
+	case GDK_SCROLL_DOWN:
+		value += gtk_adjustment_get_step_increment(adj);
+	default:
+		break;
+	}
+
+	if (value <= gtk_adjustment_get_upper(adj) -
+		     gtk_adjustment_get_page_size(adj))
+		gtk_adjustment_set_value(adj, value);
+
 	return TRUE;
 }
 
