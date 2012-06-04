@@ -216,6 +216,7 @@ gtk_experiment_transcript_set_interactive_format(GtkExperimentTranscript *trans,
 
 		default_attribs = pango_attr_list_new();
 
+#ifdef DEFAULT_INTERACTIVE_FORMAT_FONT
 		font = pango_font_description_from_string(DEFAULT_INTERACTIVE_FORMAT_FONT);
 		if (font != NULL) {
 			attrib = pango_attr_font_desc_new(font);
@@ -223,24 +224,25 @@ gtk_experiment_transcript_set_interactive_format(GtkExperimentTranscript *trans,
 			pango_attr_list_insert(default_attribs, attrib);
 			pango_font_description_free(font);
 		}
-
-		if (DEFAULT_INTERACTIVE_FORMAT_FGCOLOR != NULL &&
-		    pango_color_parse(&color, DEFAULT_INTERACTIVE_FORMAT_FGCOLOR)) {
+#endif
+#ifdef DEFAULT_INTERACTIVE_FORMAT_FGCOLOR
+		if (pango_color_parse(&color, DEFAULT_INTERACTIVE_FORMAT_FGCOLOR)) {
 			attrib = pango_attr_foreground_new(color.red,
 							   color.green,
 							   color.blue);
 			attrib->end_index = 1;
 			pango_attr_list_insert(default_attribs, attrib);
 		}
-
-		if (DEFAULT_INTERACTIVE_FORMAT_BGCOLOR != NULL &&
-		    pango_color_parse(&color, DEFAULT_INTERACTIVE_FORMAT_BGCOLOR)) {
+#endif
+#ifdef DEFAULT_INTERACTIVE_FORMAT_BGCOLOR
+		if (pango_color_parse(&color, DEFAULT_INTERACTIVE_FORMAT_BGCOLOR)) {
 			attrib = pango_attr_background_new(color.red,
 							   color.green,
 							   color.blue);
 			attrib->end_index = 1;
 			pango_attr_list_insert(default_attribs, attrib);
 		}
+#endif
 	}
 
 	gtk_experiment_transcript_free_format(fmt);

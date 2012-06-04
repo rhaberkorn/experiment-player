@@ -12,6 +12,9 @@
 
 #include "experiment-player.h"
 
+static inline void set_default_string(const gchar *group_name, const gchar *key,
+				      const gchar *string);
+
 static GKeyFile	*keyfile;
 static gchar	*filename = NULL;
 
@@ -20,36 +23,6 @@ config_init_key_file(void)
 {
 	keyfile = g_key_file_new();
 
-	/* initialize defaults */
-	config_set_quickopen_directory(DEFAULT_QUICKOPEN_DIR);
-	config_set_formats_directory(DEFAULT_FORMATS_DIR);
-
-	if (DEFAULT_INTERACTIVE_FORMAT_FONT != NULL)
-		g_key_file_set_string(keyfile, "Wizard Transcript",
-				      "Default-Format-Font",
-				      DEFAULT_INTERACTIVE_FORMAT_FONT);
-	if (DEFAULT_INTERACTIVE_FORMAT_FGCOLOR != NULL)
-		g_key_file_set_string(keyfile, "Wizard Transcript",
-				      "Default-Format-Text-Color",
-				      DEFAULT_INTERACTIVE_FORMAT_FGCOLOR);
-	if (DEFAULT_INTERACTIVE_FORMAT_BGCOLOR != NULL)
-		g_key_file_set_string(keyfile, "Wizard Transcript",
-				      "Default-Format-BG-Color",
-				      DEFAULT_INTERACTIVE_FORMAT_BGCOLOR);
-
-	if (DEFAULT_INTERACTIVE_FORMAT_FONT != NULL)
-		g_key_file_set_string(keyfile, "Proband Transcript",
-				      "Default-Format-Font",
-				      DEFAULT_INTERACTIVE_FORMAT_FONT);
-	if (DEFAULT_INTERACTIVE_FORMAT_FGCOLOR != NULL)
-		g_key_file_set_string(keyfile, "Proband Transcript",
-				      "Default-Format-Text-Color",
-				      DEFAULT_INTERACTIVE_FORMAT_FGCOLOR);
-	if (DEFAULT_INTERACTIVE_FORMAT_BGCOLOR != NULL)
-		g_key_file_set_string(keyfile, "Proband Transcript",
-				      "Default-Format-BG-Color",
-				      DEFAULT_INTERACTIVE_FORMAT_BGCOLOR);
-
 	/* may fail if no serialized configuration exists */
 	g_key_file_load_from_data_dirs(keyfile, CONFIG_KEY_FILE, &filename,
 				       G_KEY_FILE_KEEP_COMMENTS, NULL);
@@ -57,6 +30,37 @@ config_init_key_file(void)
 	if (filename == NULL)
 		filename = g_build_filename(g_get_user_data_dir(),
 					    CONFIG_KEY_FILE, NULL);
+
+	/* initialize defaults */
+	set_default_string("Directories", "Quick-Open", DEFAULT_QUICKOPEN_DIR);
+	set_default_string("Directories", "Formats", DEFAULT_FORMATS_DIR);
+
+#ifdef DEFAULT_INTERACTIVE_FORMAT_FONT
+	set_default_string("Wizard Transcript", "Default-Format-Font",
+			   DEFAULT_INTERACTIVE_FORMAT_FONT);
+	set_default_string("Proband Transcript", "Default-Format-Font",
+			   DEFAULT_INTERACTIVE_FORMAT_FONT);
+#endif
+#ifdef DEFAULT_INTERACTIVE_FORMAT_FGCOLOR
+	set_default_string("Wizard Transcript", "Default-Format-Text-Color",
+			   DEFAULT_INTERACTIVE_FORMAT_FGCOLOR);
+	set_default_string("Proband Transcript", "Default-Format-Text-Color",
+			   DEFAULT_INTERACTIVE_FORMAT_FGCOLOR);
+#endif
+#ifdef DEFAULT_INTERACTIVE_FORMAT_BGCOLOR
+	set_default_string("Wizard Transcript", "Default-Format-BG-Color",
+			   DEFAULT_INTERACTIVE_FORMAT_BGCOLOR);
+	set_default_string("Proband Transcript", "Default-Format-BG-Color",
+			   DEFAULT_INTERACTIVE_FORMAT_BGCOLOR);
+#endif
+}
+
+static inline void
+set_default_string(const gchar *group_name, const gchar *key,
+		   const gchar *string)
+{
+	if (!g_key_file_has_key(keyfile, group_name, key, NULL))
+		g_key_file_set_string(keyfile, group_name, key, string);
 }
 
 void

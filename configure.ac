@@ -228,8 +228,8 @@ AC_DEFINE(DEFAULT_FORMATS_DIR,		["."],		[Default directory for selecting formats
 AC_DEFINE(EXPERIMENT_FORMATS_FILTER,	["*.fmt"],	[Format file filter])
 
 AC_DEFINE(DEFAULT_INTERACTIVE_FORMAT_FONT,	["bold"],	[Default interactive format font description])
-AC_DEFINE(DEFAULT_INTERACTIVE_FORMAT_FGCOLOR,	[NULL],		[Default interactive format foreground color])
-AC_DEFINE(DEFAULT_INTERACTIVE_FORMAT_BGCOLOR,	[NULL],		[Default interactive format background color])
+### AC_DEFINE(DEFAULT_INTERACTIVE_FORMAT_FGCOLOR,	["white"],	[Default interactive format foreground color])
+### AC_DEFINE(DEFAULT_INTERACTIVE_FORMAT_BGCOLOR,	["red"],	[Default interactive format background color])
 
 AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile])
 AC_CONFIG_FILES([lib/gtk-vlc-player/Makefile])
