@@ -422,15 +422,17 @@ static gboolean
 scrolled(GtkWidget *widget, GdkEventScroll *event)
 {
 	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(widget);
-	GtkAdjustment *adj;
 
-	gdouble value;
+	GtkAdjustment *adj;
+	gdouble value, real_upper;
 
 	if (trans->priv->time_adjustment == NULL)
 		return FALSE;
-	adj = GTK_ADJUSTMENT(trans->priv->time_adjustment);
 
+	adj = GTK_ADJUSTMENT(trans->priv->time_adjustment);
 	value = gtk_adjustment_get_value(adj);
+	real_upper = gtk_adjustment_get_upper(adj) -
+		     gtk_adjustment_get_page_size(adj);
 
 	switch (event->direction) {
 	case GDK_SCROLL_UP:
@@ -442,9 +444,7 @@ scrolled(GtkWidget *widget, GdkEventScroll *event)
 		break;
 	}
 
-	if (value <= gtk_adjustment_get_upper(adj) -
-		     gtk_adjustment_get_page_size(adj))
-		gtk_adjustment_set_value(adj, value);
+	gtk_adjustment_set_value(adj, value > real_upper ? real_upper : value);
 
 	return TRUE;
 }
