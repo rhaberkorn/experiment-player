@@ -13,6 +13,8 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 
+#include <gdk/gdk.h>
+
 #include <gtk/gtk.h>
 #include <experiment-reader.h>
 
@@ -84,6 +86,10 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 
 	klass->speaker = NULL;
 	klass->reverse = FALSE;
+
+	klass->interactive_format.default_font = NULL;
+	klass->interactive_format.default_text_color = NULL;
+	klass->interactive_format.default_bg_color = NULL;
 
 	klass->priv->time_adjustment = gtk_adjustment_new(0., 0., 0.,
 							  0., 0., 0.);
@@ -197,6 +203,11 @@ gtk_experiment_transcript_finalize(GObject *gobject)
 	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(gobject);
 
 	g_free(trans->speaker);
+
+	pango_font_description_free(trans->interactive_format.default_font);
+	gdk_color_free(trans->interactive_format.default_text_color);
+	gdk_color_free(trans->interactive_format.default_bg_color);
+
 	experiment_reader_free_contributions(trans->priv->contribs);
 	gtk_experiment_transcript_free_formats(trans->priv->formats);
 	gtk_experiment_transcript_free_format(&trans->priv->interactive_format);

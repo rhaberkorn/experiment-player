@@ -8,6 +8,8 @@
 #define __GTK_EXPERIMENT_TRANSCRIPT_H
 
 #include <glib-object.h>
+#include <gdk/gdk.h>
+
 #include <gtk/gtk.h>
 
 #include <experiment-reader.h>
@@ -44,6 +46,12 @@ typedef struct _GtkExperimentTranscript {
 
 	gchar *speaker;				/**< Name of speaker whose contributions are displayed (\b read-only) */
 	gboolean reverse;			/**< Reverse mode (\b read-write) */
+
+	struct _GtkExperimentTranscriptInteractiveFormat {
+		PangoFontDescription *default_font;	/**< Default interactive format font */
+		GdkColor *default_text_color;		/**< Default interactive format text color */
+		GdkColor *default_bg_color;		/**< Default interactive format background color */
+	} interactive_format;
 
 	GtkExperimentTranscriptPrivate *priv;	/**< @private Pointer to \b private instance attributes */
 } GtkExperimentTranscript;

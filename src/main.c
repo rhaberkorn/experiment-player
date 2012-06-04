@@ -16,6 +16,8 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 
+#include <gdk/gdk.h>
+
 #include <gtk/gtk.h>
 
 #include <gtk-vlc-player.h>
@@ -250,6 +252,8 @@ int
 main(int argc, char *argv[])
 {
 	GtkBuilder *builder;
+	GtkExperimentTranscript *transcript_wizard, *transcript_proband;
+
 	GtkAdjustment *adj;
 	PangoFontDescription *font_desc;
 	GdkColor color;
@@ -289,7 +293,9 @@ main(int argc, char *argv[])
 
 	BUILDER_INIT(builder, transcript_table);
 	BUILDER_INIT(builder, transcript_wizard_widget);
+	transcript_wizard = GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget);
 	BUILDER_INIT(builder, transcript_proband_widget);
+	transcript_proband = GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget);
 	BUILDER_INIT(builder, transcript_scroll_widget);
 
 	BUILDER_INIT(builder, transcript_wizard_combo);
@@ -316,8 +322,7 @@ main(int argc, char *argv[])
 	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
 
 	/* configure transcript widgets */
-	GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget)->speaker =
-							g_strdup(SPEAKER_WIZARD);
+	transcript_wizard->speaker = g_strdup(SPEAKER_WIZARD);
 	font_desc = config_get_transcript_font(SPEAKER_WIZARD);
 	if (font_desc != NULL) {
 		gtk_widget_modify_font(transcript_wizard_widget, font_desc);
@@ -330,8 +335,14 @@ main(int argc, char *argv[])
 		gtk_widget_modify_bg(transcript_wizard_widget,
 				     GTK_STATE_NORMAL, &color);
 
-	GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget)->speaker =
-							g_strdup(SPEAKER_PROBAND);
+	transcript_wizard->interactive_format.default_font =
+			config_get_transcript_default_format_font(SPEAKER_WIZARD);
+	if (config_get_transcript_default_format_text_color(SPEAKER_WIZARD, &color))
+		transcript_wizard->interactive_format.default_text_color = gdk_color_copy(&color);
+	if (config_get_transcript_default_format_bg_color(SPEAKER_WIZARD, &color))
+		transcript_wizard->interactive_format.default_bg_color = gdk_color_copy(&color);
+
+	transcript_proband->speaker = g_strdup(SPEAKER_PROBAND);
 	font_desc = config_get_transcript_font(SPEAKER_PROBAND);
 	if (font_desc != NULL) {
 		gtk_widget_modify_font(transcript_proband_widget, font_desc);
@@ -343,6 +354,13 @@ main(int argc, char *argv[])
 	if (config_get_transcript_bg_color(SPEAKER_PROBAND, &color))
 		gtk_widget_modify_bg(transcript_proband_widget,
 				     GTK_STATE_NORMAL, &color);
+
+	transcript_proband->interactive_format.default_font =
+			config_get_transcript_default_format_font(SPEAKER_PROBAND);
+	if (config_get_transcript_default_format_text_color(SPEAKER_PROBAND, &color))
+		transcript_proband->interactive_format.default_text_color = gdk_color_copy(&color);
+	if (config_get_transcript_default_format_bg_color(SPEAKER_PROBAND, &color))
+		transcript_proband->interactive_format.default_bg_color = gdk_color_copy(&color);
 
 	format_selection_init();
 
@@ -360,12 +378,26 @@ main(int argc, char *argv[])
 	config_set_transcript_bg_color(SPEAKER_WIZARD,
 				       &transcript_wizard_widget->style->bg[GTK_STATE_NORMAL]);
 
+	config_set_transcript_default_format_font(SPEAKER_WIZARD,
+						  transcript_wizard->interactive_format.default_font);
+	config_set_transcript_default_format_text_color(SPEAKER_WIZARD,
+							transcript_wizard->interactive_format.default_text_color);
+	config_set_transcript_default_format_bg_color(SPEAKER_WIZARD,
+						      transcript_wizard->interactive_format.default_bg_color);
+
 	config_set_transcript_font(SPEAKER_PROBAND,
 				   transcript_proband_widget->style->font_desc);
 	config_set_transcript_text_color(SPEAKER_PROBAND,
 					 &transcript_proband_widget->style->text[GTK_STATE_NORMAL]);
 	config_set_transcript_bg_color(SPEAKER_PROBAND,
 				       &transcript_proband_widget->style->bg[GTK_STATE_NORMAL]);
+
+	config_set_transcript_default_format_font(SPEAKER_PROBAND,
+						  transcript_proband->interactive_format.default_font);
+	config_set_transcript_default_format_text_color(SPEAKER_PROBAND,
+							transcript_proband->interactive_format.default_text_color);
+	config_set_transcript_default_format_bg_color(SPEAKER_PROBAND,
+						      transcript_proband->interactive_format.default_bg_color);
 
 	config_save_key_file();
 
