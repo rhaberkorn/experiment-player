@@ -28,8 +28,6 @@ static void gtk_experiment_transcript_size_request(GtkWidget *widget,
 						   GtkRequisition *requisition);
 static void gtk_experiment_transcript_size_allocate(GtkWidget *widget,
 						    GtkAllocation *allocation);
-static gboolean gtk_experiment_transcript_configure(GtkWidget *widget,
-						    GdkEventConfigure *event);
 static gboolean gtk_experiment_transcript_expose(GtkWidget *widget,
 						 GdkEventExpose *event);
 
@@ -38,6 +36,7 @@ static void gtk_experiment_transcript_finalize(GObject *gobject);
 
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
+static void state_changed(GtkWidget *widget, GtkStateType state);
 static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
 static gboolean scrolled(GtkWidget *widget, GdkEventScroll *event);
 
@@ -63,12 +62,11 @@ gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass)
 	gobject_class->finalize = gtk_experiment_transcript_finalize;
 
 	widget_class->realize = gtk_experiment_transcript_realize;
-	/* FIXME: configure-event handler not invoked! */
-	widget_class->configure_event = gtk_experiment_transcript_configure;
 	widget_class->expose_event = gtk_experiment_transcript_expose;
 	widget_class->size_request = gtk_experiment_transcript_size_request;
 	widget_class->size_allocate = gtk_experiment_transcript_size_allocate;
 
+	widget_class->state_changed = state_changed;
 	widget_class->button_press_event = button_pressed;
 	widget_class->scroll_event = scrolled;
 
@@ -239,6 +237,8 @@ gtk_experiment_transcript_realize(GtkWidget *widget)
 	attributes.visual = gtk_widget_get_visual(widget);
 	attributes.colormap = gtk_widget_get_colormap(widget);
 
+	gtk_widget_set_has_window(widget, TRUE);
+
 	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 	widget->window = gdk_window_new(gtk_widget_get_parent_window(widget),
 					&attributes, attributes_mask);
@@ -248,9 +248,6 @@ gtk_experiment_transcript_realize(GtkWidget *widget)
 	gdk_window_set_user_data(widget->window, widget);
 
 	gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
-
-	/* FIXME */
-	gtk_experiment_transcript_configure(widget, NULL);
 }
 
 static void 
@@ -265,38 +262,34 @@ static void
 gtk_experiment_transcript_size_allocate(GtkWidget *widget,
 					GtkAllocation *allocation)
 {
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(widget);
+	gboolean sizeChanged = widget->allocation.width != allocation->width ||
+			       widget->allocation.height != allocation->height;
+
 	widget->allocation = *allocation;
 
-	if (gtk_widget_get_realized(widget)) {
-		gdk_window_move_resize(gtk_widget_get_window(widget),
-				       allocation->x, allocation->y,
-				       allocation->width, allocation->height);
+	if (!gtk_widget_get_realized(widget))
+		return;
 
-		/* FIXME */
-		gtk_experiment_transcript_configure(widget, NULL);
-	}
-}
+	gdk_window_move_resize(gtk_widget_get_window(widget),
+			       allocation->x, allocation->y,
+			       allocation->width, allocation->height);
 
-static gboolean
-gtk_experiment_transcript_configure(GtkWidget *widget,
-				    GdkEventConfigure *event __attribute__((unused)))
-{
-	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(widget);
+	if (!sizeChanged)
+		return;
 
 	gtk_adjustment_set_page_size(GTK_ADJUSTMENT(trans->priv->time_adjustment),
-				     (gdouble)PX_TO_TIME(widget->allocation.height));
+				     (gdouble)PX_TO_TIME(allocation->height));
 
 	GOBJECT_UNREF_SAFE(trans->priv->layer_text);
 	trans->priv->layer_text = gdk_pixmap_new(gtk_widget_get_window(widget),
-						 widget->allocation.width,
-						 widget->allocation.height + LAYER_TEXT_INVISIBLE,
+						 allocation->width,
+						 allocation->height + LAYER_TEXT_INVISIBLE,
 						 -1);
 	pango_layout_set_width(trans->priv->layer_text_layout,
-			       widget->allocation.width*PANGO_SCALE);
+			       allocation->width*PANGO_SCALE);
 
 	gtk_experiment_transcript_text_layer_redraw(trans);
-
-	return TRUE;
 }
 
 static gboolean
@@ -402,6 +395,16 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 				0, y, trans->priv->layer_text_layout);
 		last_contrib_y = y;
 	}
+}
+
+static void
+state_changed(GtkWidget *widget, GtkStateType state __attribute__((unused)))
+{
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(widget);
+
+	if (gtk_widget_get_realized(widget) &&
+	    trans->priv->layer_text != NULL)
+		gtk_experiment_transcript_text_layer_redraw(trans);
 }
 
 static gboolean
