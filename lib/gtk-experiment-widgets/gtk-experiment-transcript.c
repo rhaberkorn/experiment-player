@@ -36,6 +36,8 @@ static void gtk_experiment_transcript_finalize(GObject *gobject);
 
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
+static void gtk_experiment_transcript_reconfigure(GtkExperimentTranscript *trans);
+
 static void state_changed(GtkWidget *widget, GtkStateType state);
 static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
 static gboolean scrolled(GtkWidget *widget, GdkEventScroll *event);
@@ -248,6 +250,8 @@ gtk_experiment_transcript_realize(GtkWidget *widget)
 	gdk_window_set_user_data(widget->window, widget);
 
 	gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+
+	gtk_experiment_transcript_reconfigure(GTK_EXPERIMENT_TRANSCRIPT(widget));
 }
 
 static void 
@@ -266,30 +270,16 @@ gtk_experiment_transcript_size_allocate(GtkWidget *widget,
 	gboolean sizeChanged = widget->allocation.width != allocation->width ||
 			       widget->allocation.height != allocation->height;
 
-	widget->allocation = *allocation;
+	gtk_widget_set_allocation(widget, allocation);
 
-	if (!gtk_widget_get_realized(widget))
-		return;
+	if (gtk_widget_get_realized(widget)) {
+		gdk_window_move_resize(gtk_widget_get_window(widget),
+				       allocation->x, allocation->y,
+				       allocation->width, allocation->height);
 
-	gdk_window_move_resize(gtk_widget_get_window(widget),
-			       allocation->x, allocation->y,
-			       allocation->width, allocation->height);
-
-	if (!sizeChanged)
-		return;
-
-	gtk_adjustment_set_page_size(GTK_ADJUSTMENT(trans->priv->time_adjustment),
-				     (gdouble)PX_TO_TIME(allocation->height));
-
-	GOBJECT_UNREF_SAFE(trans->priv->layer_text);
-	trans->priv->layer_text = gdk_pixmap_new(gtk_widget_get_window(widget),
-						 allocation->width,
-						 allocation->height + LAYER_TEXT_INVISIBLE,
-						 -1);
-	pango_layout_set_width(trans->priv->layer_text_layout,
-			       allocation->width*PANGO_SCALE);
-
-	gtk_experiment_transcript_text_layer_redraw(trans);
+		if (sizeChanged || trans->priv->layer_text == NULL)
+			gtk_experiment_transcript_reconfigure(trans);
+	}
 }
 
 static gboolean
@@ -317,6 +307,25 @@ time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
 	 * heuristic to improve performance in the common case of advancing
 	 * time in small steps
 	 */
+	gtk_experiment_transcript_text_layer_redraw(trans);
+}
+
+static void
+gtk_experiment_transcript_reconfigure(GtkExperimentTranscript *trans)
+{
+	GtkWidget *widget = GTK_WIDGET(trans);
+
+	gtk_adjustment_set_page_size(GTK_ADJUSTMENT(trans->priv->time_adjustment),
+				     (gdouble)PX_TO_TIME(widget->allocation.height));
+
+	GOBJECT_UNREF_SAFE(trans->priv->layer_text);
+	trans->priv->layer_text = gdk_pixmap_new(gtk_widget_get_window(widget),
+						 widget->allocation.width,
+						 widget->allocation.height + LAYER_TEXT_INVISIBLE,
+						 -1);
+	pango_layout_set_width(trans->priv->layer_text_layout,
+			       widget->allocation.width*PANGO_SCALE);
+
 	gtk_experiment_transcript_text_layer_redraw(trans);
 }
 
