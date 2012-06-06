@@ -121,7 +121,8 @@ generic_transcript_entry_changed_cb(gpointer user_data, GtkEditable *editable)
 
 	gtk_entry_set_icon_from_stock(GTK_ENTRY(editable),
 				      GTK_ENTRY_ICON_PRIMARY,
-				      res ? "gtk-dialog-error" : "gtk-apply");
+				      res ? GTK_STOCK_DIALOG_ERROR
+					  : GTK_STOCK_APPLY);
 	gtk_entry_set_icon_sensitive(GTK_ENTRY(editable),
 				     GTK_ENTRY_ICON_PRIMARY,
 				     text != NULL && *text);

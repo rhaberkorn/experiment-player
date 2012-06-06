@@ -59,8 +59,8 @@ playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 	gboolean is_playing = gtk_vlc_player_toggle(GTK_VLC_PLAYER(widget));
 
 	button_image_set_from_stock(GTK_BUTTON(data),
-				    is_playing ? "gtk-media-play"
-					       : "gtk-media-pause");
+				    is_playing ? GTK_STOCK_MEDIA_PLAY
+					       : GTK_STOCK_MEDIA_PAUSE);
 }
 
 void
@@ -69,7 +69,7 @@ stop_button_clicked_cb(GtkWidget *widget,
 {
 	gtk_vlc_player_stop(GTK_VLC_PLAYER(widget));
 	button_image_set_from_stock(GTK_BUTTON(playpause_button),
-				    "gtk-media-play");
+				    GTK_STOCK_MEDIA_PLAY);
 }
 
 void
@@ -186,7 +186,7 @@ load_media_file(const gchar *file)
 	gtk_widget_set_sensitive(controls_hbox, TRUE);
 
 	button_image_set_from_stock(GTK_BUTTON(playpause_button),
-				    "gtk-media-play");
+				    GTK_STOCK_MEDIA_PLAY);
 
 	return FALSE;
 }
