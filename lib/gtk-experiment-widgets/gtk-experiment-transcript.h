@@ -76,6 +76,10 @@ gboolean gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 gboolean gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 						 const gchar *filename);
 
+void gtk_experiment_transcript_set_alignment(GtkExperimentTranscript *trans,
+					     PangoAlignment alignment);
+PangoAlignment gtk_experiment_transcript_get_alignment(GtkExperimentTranscript *trans);
+
 gboolean gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 						const gchar *filename);
 gboolean gtk_experiment_transcript_set_interactive_format(GtkExperimentTranscript *trans,

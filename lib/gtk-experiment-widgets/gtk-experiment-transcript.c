@@ -43,8 +43,10 @@ static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
 static gboolean scrolled(GtkWidget *widget, GdkEventScroll *event);
 
 static void choose_font_activated(GtkWidget *widget, gpointer data);
-static void choose_fg_color_activated(GtkWidget *widget, gpointer data);
+static void choose_text_color_activated(GtkWidget *widget, gpointer data);
 static void choose_bg_color_activated(GtkWidget *widget, gpointer data);
+static void text_alignment_activated(GtkWidget *widget, gpointer data);
+
 static void reverse_activated(GtkWidget *widget, gpointer data);
 
 /**
@@ -83,7 +85,7 @@ gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass)
 static void
 gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 {
-	GtkWidget *item;
+	GtkWidget *item, *submenu, *image;
 
 	klass->priv = GTK_EXPERIMENT_TRANSCRIPT_GET_PRIVATE(klass);
 
@@ -118,23 +120,68 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	gtk_menu_attach_to_widget(GTK_MENU(klass->priv->menu),
 				  GTK_WIDGET(klass), NULL);
 
-	item = gtk_menu_item_new_with_mnemonic("_Choose Font...");
+	item = gtk_image_menu_item_new_with_mnemonic("Choose _Font...");
+	image = gtk_image_new_from_stock(GTK_STOCK_SELECT_FONT,
+					 GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), image);
 	g_signal_connect(item, "activate",
 			 G_CALLBACK(choose_font_activated), klass);
 	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
 	gtk_widget_show(item);
 
-	item = gtk_menu_item_new_with_mnemonic("Choose _Foreground Color...");
+	item = gtk_image_menu_item_new_with_mnemonic("Choose _Text Color...");
+	image = gtk_image_new_from_stock(GTK_STOCK_SELECT_COLOR,
+					 GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), image);
 	g_signal_connect(item, "activate",
-			 G_CALLBACK(choose_fg_color_activated), klass);
+			 G_CALLBACK(choose_text_color_activated), klass);
 	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
 	gtk_widget_show(item);
 
-	item = gtk_menu_item_new_with_mnemonic("Choose _Background Color...");
+	item = gtk_image_menu_item_new_with_mnemonic("Choose _Background Color...");
+	image = gtk_image_new_from_stock(GTK_STOCK_SELECT_COLOR,
+					 GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), image);
 	g_signal_connect(item, "activate",
 			 G_CALLBACK(choose_bg_color_activated), klass);
 	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
 	gtk_widget_show(item);
+
+	submenu = gtk_menu_new();
+	item = gtk_menu_item_new_with_label("Text Alignment");
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), submenu);
+	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
+	gtk_widget_show(item);
+
+	/*
+	 * position in alignment_group list corresponds with PangoAlignment
+	 * (PANGO_ALIGN_RIGHT, PANGO_ALIGN_CENTER, PANGO_ALIGN_LEFT)
+	 */
+	item = gtk_radio_menu_item_new_with_mnemonic(NULL, "_Left");
+	klass->priv->alignment_group =
+			gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+	g_signal_connect(item, "activate",
+			 G_CALLBACK(text_alignment_activated), klass);
+	gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
+
+	item = gtk_radio_menu_item_new_with_mnemonic(klass->priv->alignment_group,
+						     "_Center");
+	klass->priv->alignment_group =
+			gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+	g_signal_connect(item, "activate",
+			 G_CALLBACK(text_alignment_activated), klass);
+	gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
+
+	item = gtk_radio_menu_item_new_with_mnemonic(klass->priv->alignment_group,
+						     "_Right");
+	klass->priv->alignment_group =
+			gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+	g_signal_connect(item, "activate",
+			 G_CALLBACK(text_alignment_activated), klass);
+	gtk_menu_shell_append(GTK_MENU_SHELL(submenu), item);
+
+	gtk_widget_show_all(submenu);
+	gtk_experiment_transcript_set_alignment(klass, PANGO_ALIGN_LEFT);
 
 	item = gtk_separator_menu_item_new();
 	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
@@ -495,14 +542,14 @@ choose_font_activated(GtkWidget *widget __attribute__((unused)),
 }
 
 static void
-choose_fg_color_activated(GtkWidget *widget __attribute__((unused)),
-			  gpointer data)
+choose_text_color_activated(GtkWidget *widget __attribute__((unused)),
+			    gpointer data)
 {
 	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(data);
 
 	GtkWidget *dialog, *colorsel;
 
-	dialog = gtk_color_selection_dialog_new("Choose Foreground Color...");
+	dialog = gtk_color_selection_dialog_new("Choose Text Color...");
 	colorsel = gtk_color_selection_dialog_get_color_selection(GTK_COLOR_SELECTION_DIALOG(dialog));
 
 	gtk_color_selection_set_current_color(GTK_COLOR_SELECTION(colorsel),
@@ -548,6 +595,34 @@ choose_bg_color_activated(GtkWidget *widget __attribute__((unused)),
 	}
 
 	gtk_widget_destroy(dialog);
+}
+
+static void
+text_alignment_activated(GtkWidget *widget __attribute__((unused)),
+			 gpointer data)
+{
+	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(data);
+	PangoAlignment alignment;
+
+	if (trans->priv->layer_text_layout == NULL)
+		return;
+
+	alignment = PANGO_ALIGN_RIGHT;
+	for (GSList *cur = trans->priv->alignment_group;
+	     cur != NULL;
+	     cur = cur->next, alignment--) {
+		if (!gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(cur->data)))
+			continue;
+
+		pango_layout_set_alignment(trans->priv->layer_text_layout,
+					   alignment);
+
+		if (gtk_widget_get_realized(GTK_WIDGET(trans)) &&
+		    trans->priv->layer_text != NULL)
+			gtk_experiment_transcript_text_layer_redraw(trans);
+
+		break;
+	}
 }
 
 static void
@@ -610,6 +685,28 @@ gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 	}
 
 	return res;
+}
+
+void
+gtk_experiment_transcript_set_alignment(GtkExperimentTranscript *trans,
+					PangoAlignment alignment)
+{
+	PangoAlignment cur_alignment = PANGO_ALIGN_RIGHT;
+
+	for (GSList *cur = trans->priv->alignment_group;
+	     cur != NULL;
+	     cur = cur->next, cur_alignment--)
+		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(cur->data),
+					       cur_alignment == alignment);
+}
+
+PangoAlignment
+gtk_experiment_transcript_get_alignment(GtkExperimentTranscript *trans)
+{
+	if (trans->priv->layer_text_layout == NULL)
+		return PANGO_ALIGN_LEFT;
+
+	return pango_layout_get_alignment(trans->priv->layer_text_layout);
 }
 
 GtkAdjustment *

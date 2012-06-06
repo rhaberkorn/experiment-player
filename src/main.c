@@ -256,6 +256,7 @@ main(int argc, char *argv[])
 
 	GtkAdjustment *adj;
 	PangoFontDescription *font_desc;
+	PangoAlignment alignment;
 	GdkColor color;
 	GtkRcStyle *modified_style;
 
@@ -322,7 +323,9 @@ main(int argc, char *argv[])
 	adj = gtk_vlc_player_get_volume_adjustment(GTK_VLC_PLAYER(player_widget));
 	gtk_scale_button_set_adjustment(GTK_SCALE_BUTTON(volume_button), adj);
 
-	/* configure transcript widgets */
+	/*
+	 * configure transcript widgets
+	 */
 	transcript_wizard->speaker = g_strdup(SPEAKER_WIZARD);
 	font_desc = config_get_transcript_font(SPEAKER_WIZARD);
 	if (font_desc != NULL) {
@@ -335,6 +338,9 @@ main(int argc, char *argv[])
 	if (config_get_transcript_bg_color(SPEAKER_WIZARD, &color))
 		gtk_widget_modify_bg(transcript_wizard_widget,
 				     GTK_STATE_NORMAL, &color);
+
+	alignment = config_get_transcript_alignment(SPEAKER_WIZARD);
+	gtk_experiment_transcript_set_alignment(transcript_wizard, alignment);
 
 	transcript_wizard->interactive_format.default_font =
 			config_get_transcript_default_format_font(SPEAKER_WIZARD);
@@ -356,6 +362,9 @@ main(int argc, char *argv[])
 		gtk_widget_modify_bg(transcript_proband_widget,
 				     GTK_STATE_NORMAL, &color);
 
+	alignment = config_get_transcript_alignment(SPEAKER_PROBAND);
+	gtk_experiment_transcript_set_alignment(transcript_proband, alignment);
+
 	transcript_proband->interactive_format.default_font =
 			config_get_transcript_default_format_font(SPEAKER_PROBAND);
 	if (config_get_transcript_default_format_text_color(SPEAKER_PROBAND, &color))
@@ -371,6 +380,9 @@ main(int argc, char *argv[])
 	gtk_main();
 	gdk_threads_leave();
 
+	/*
+	 * update config file
+	 */
 	modified_style = gtk_widget_get_modifier_style(transcript_wizard_widget);
 	config_set_transcript_font(SPEAKER_WIZARD, modified_style->font_desc);
 	config_set_transcript_text_color(SPEAKER_WIZARD,
@@ -382,6 +394,9 @@ main(int argc, char *argv[])
 						? &modified_style->bg[GTK_STATE_NORMAL]
 						: NULL);
 	g_object_unref(modified_style);
+
+	alignment = gtk_experiment_transcript_get_alignment(transcript_wizard);
+	config_set_transcript_alignment(SPEAKER_WIZARD, alignment);
 
 	config_set_transcript_default_format_font(SPEAKER_WIZARD,
 						  transcript_wizard->interactive_format.default_font);
@@ -401,6 +416,9 @@ main(int argc, char *argv[])
 						? &modified_style->bg[GTK_STATE_NORMAL]
 						: NULL);
 	g_object_unref(modified_style);
+
+	alignment = gtk_experiment_transcript_get_alignment(transcript_proband);
+	config_set_transcript_alignment(SPEAKER_PROBAND, alignment);
 
 	config_set_transcript_default_format_font(SPEAKER_PROBAND,
 						  transcript_proband->interactive_format.default_font);

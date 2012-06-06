@@ -34,7 +34,8 @@ struct _GtkExperimentTranscriptPrivate {
 	GSList		*formats;
 	GtkExperimentTranscriptFormat interactive_format;
 
-	GtkWidget	*menu;		/**< Drop-down menu, doesn't have to be unreferenced manually */
+	GtkWidget	*menu;			/**< Drop-down menu, doesn't have to be unreferenced manually */
+	GSList		*alignment_group;	/**< GtkRadioMenuItem group (owned by GTK) */
 };
 
 #define DEFAULT_WIDTH		100

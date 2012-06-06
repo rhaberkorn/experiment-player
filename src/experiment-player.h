@@ -129,6 +129,10 @@ config_get_transcript_default_format_bg_color(const gchar *actor,
 						   color);
 }
 
+void config_set_transcript_alignment(const gchar *actor,
+				     PangoAlignment alignment);
+PangoAlignment config_get_transcript_alignment(const gchar *actor);
+
 void config_save_key_file(void);
 
 /*
