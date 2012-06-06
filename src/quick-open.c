@@ -69,28 +69,36 @@ quickopen_menu_refresh_item_activate_cb(GtkWidget *widget,
 static inline gboolean
 quickopen_filter(const gchar *name)
 {
+	static GPatternSpec **patterns = NULL;
+
 	guint name_length = strlen(name);
 	gchar *name_reversed = g_strreverse(g_strdup(name));
-	gchar **filters, **filter;
 
 	gchar *quickopen_directory;
 	gchar *trans_name, *p;
-	gboolean res;
+	gboolean res = FALSE;
 
-	filters = g_strsplit(EXPERIMENT_MOVIE_FILTER, ";", 0);
-	for (filter = filters; *filter != NULL; filter++) {
-		GPatternSpec *pattern = g_pattern_spec_new(*filter);
+	if (patterns == NULL) {
+		patterns = (GPatternSpec **)
+			   g_strsplit(EXPERIMENT_MOVIE_FILTER, ";", 0);
 
-		res = g_pattern_match(pattern, name_length,
+		for (GPatternSpec **filter = patterns; *filter != NULL; filter++) {
+			GPatternSpec *pattern;
+
+			pattern = g_pattern_spec_new((gchar *)*filter);
+			g_free(*filter);
+			*filter = pattern;
+		}
+	}
+
+	for (GPatternSpec **pattern = patterns; *pattern != NULL; pattern++) {
+		res = g_pattern_match(*pattern, name_length,
 				      name, name_reversed);
-		g_pattern_spec_free(pattern);
 		if (res)
 			break;
 	}
-	res = *filter == NULL;
-	g_strfreev(filters);
 	g_free(name_reversed);
-	if (res)
+	if (!res)
 		return FALSE;
 
 	quickopen_directory = config_get_quickopen_directory();
