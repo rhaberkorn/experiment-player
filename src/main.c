@@ -29,6 +29,8 @@
 
 static inline void button_image_set_from_stock(GtkButton *widget, const gchar *name);
 
+GtkWidget *about_dialog;
+
 GtkWidget *player_widget,
 	  *controls_hbox,
 	  *scale_widget,
@@ -52,6 +54,14 @@ gchar *current_filename = NULL;
  * GtkBuilder signal callbacks
  * NOTE: for some strange reason the parameters are switched
  */
+
+void
+help_menu_about_item_activate_cb(GtkWidget *widget,
+				 gpointer data __attribute__((unused)))
+{
+	gtk_dialog_run(GTK_DIALOG(widget));
+	gtk_widget_hide(widget);
+}
 
 void
 playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
@@ -276,6 +286,7 @@ main(int argc, char *argv[])
 	gdk_threads_init();
 
 	gtk_init(&argc, &argv);
+	g_set_prgname(PACKAGE_NAME);
 
 	config_init_key_file();
 
@@ -283,6 +294,8 @@ main(int argc, char *argv[])
 
 	gtk_builder_add_from_file(builder, DEFAULT_UI, NULL);
 	gtk_builder_connect_signals(builder, NULL);
+
+	BUILDER_INIT(builder, about_dialog);
 
 	BUILDER_INIT(builder, player_widget);
 	BUILDER_INIT(builder, controls_hbox);
@@ -309,6 +322,14 @@ main(int argc, char *argv[])
 	BUILDER_INIT(builder, navigator_widget);
 
 	g_object_unref(G_OBJECT(builder));
+
+	/* configure about dialog */
+	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(about_dialog),
+					  PACKAGE_NAME);
+	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(about_dialog),
+				     PACKAGE_VERSION);
+	gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(about_dialog),
+				     PACKAGE_URL);
 
 	/** @todo most of this could be done in Glade with proper catalog files */
 	/* connect timeline, volume button and other widgets with player widget */

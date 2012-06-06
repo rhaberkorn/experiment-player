@@ -16,6 +16,8 @@ gboolean load_transcript_file(const gchar *file);
 
 void show_message_dialog_gerror(GError *err);
 
+extern GtkWidget *about_dialog;
+
 extern GtkWidget *player_widget,
 		 *controls_hbox,
 		 *scale_widget,
