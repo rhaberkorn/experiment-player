@@ -1,3 +1,25 @@
+/**
+ * @file
+ * Configuration file handling functions
+ */
+
+/*
+ * Copyright (C) 2012 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -97,6 +119,7 @@ get_group_by_actor(const gchar *actor)
 	return group;
 }
 
+/** @private */
 void
 config_generic_set_transcript_font(const gchar *actor, const gchar *key,
 				   const PangoFontDescription *font)
@@ -112,6 +135,7 @@ config_generic_set_transcript_font(const gchar *actor, const gchar *key,
 	}
 }
 
+/** @private */
 PangoFontDescription *
 config_generic_get_transcript_font(const gchar *actor, const gchar *key)
 {
@@ -128,6 +152,7 @@ config_generic_get_transcript_font(const gchar *actor, const gchar *key)
 	return font_desc;
 }
 
+/** @private */
 void
 config_generic_set_transcript_color(const gchar *actor, const gchar *key,
 				    const GdkColor *color)
@@ -143,6 +168,7 @@ config_generic_set_transcript_color(const gchar *actor, const gchar *key,
 	}
 }
 
+/** @private */
 gboolean
 config_generic_get_transcript_color(const gchar *actor, const gchar *key,
 				    GdkColor *color)

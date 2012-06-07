@@ -1,3 +1,26 @@
+/**
+ * @file
+ * Functions for handling the transcripts' format file selection and
+ * interactive format entry.
+ */
+
+/*
+ * Copyright (C) 2012 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -32,6 +55,7 @@ enum {
  * NOTE: for some strange reason the parameters are switched
  */
 
+/** @private */
 void
 formats_menu_choosedir_item_activate_cb(GtkWidget *widget,
 					gpointer data __attribute__((unused)))
@@ -65,6 +89,7 @@ formats_menu_choosedir_item_activate_cb(GtkWidget *widget,
 	gtk_widget_destroy(dialog);
 }
 
+/** @private */
 void
 formats_menu_refresh_item_activate_cb(GtkWidget *widget,
 				      gpointer data __attribute__((unused)))
@@ -74,6 +99,7 @@ formats_menu_refresh_item_activate_cb(GtkWidget *widget,
 	refresh_formats_store(GTK_LIST_STORE(model));
 }
 
+/** @private */
 void
 generic_transcript_combo_changed_cb(gpointer user_data, GtkComboBox *combo)
 {
@@ -98,8 +124,7 @@ generic_transcript_combo_changed_cb(gpointer user_data, GtkComboBox *combo)
 #endif
 }
 
-
-
+/** @private */
 void
 generic_transcript_entry_changed_cb(gpointer user_data, GtkEditable *editable)
 {
@@ -128,6 +153,7 @@ generic_transcript_entry_changed_cb(gpointer user_data, GtkEditable *editable)
 				     text != NULL && *text);
 }
 
+/** @private */
 void
 generic_transcript_entry_check_toggled_cb(gpointer user_data,
 					  GtkToggleButton *widget __attribute__((unused)))

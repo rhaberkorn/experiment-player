@@ -1,3 +1,25 @@
+/**
+ * @file
+ * Main program header
+ */
+
+/*
+ * Copyright (C) 2012 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef __EXPERIMENT_PLAYER_H
 #define __EXPERIMENT_PLAYER_H
 
@@ -44,32 +66,40 @@ gchar *config_get_quickopen_directory(void);
 void config_set_formats_directory(const gchar *dir);
 gchar *config_get_formats_directory(void);
 
+/** @private */
 void config_generic_set_transcript_font(const gchar *actor, const gchar *key,
 					const PangoFontDescription *font);
+/** @private */
 PangoFontDescription *config_generic_get_transcript_font(const gchar *actor,
 							 const gchar *key);
 
+/** @private */
 void config_generic_set_transcript_color(const gchar *actor, const gchar *key,
 					 const GdkColor *color);
+/** @private */
 gboolean config_generic_get_transcript_color(const gchar *actor, const gchar *key,
 					     GdkColor *color);
 
+/** @public */
 static inline void
 config_set_transcript_font(const gchar *actor, const PangoFontDescription *font)
 {
 	config_generic_set_transcript_font(actor, "Widget-Font", font);
 }
+/** @public */
 static inline PangoFontDescription *
 config_get_transcript_font(const gchar *actor)
 {
 	return config_generic_get_transcript_font(actor, "Widget-Font");
 }
 
+/** @public */
 static inline void
 config_set_transcript_text_color(const gchar *actor, const GdkColor *color)
 {
 	config_generic_set_transcript_color(actor, "Widget-Text-Color", color);
 }
+/** @public */
 static inline gboolean
 config_get_transcript_text_color(const gchar *actor, GdkColor *color)
 {
@@ -77,11 +107,13 @@ config_get_transcript_text_color(const gchar *actor, GdkColor *color)
 						   color);
 }
 
+/** @public */
 static inline void
 config_set_transcript_bg_color(const gchar *actor, const GdkColor *color)
 {
 	config_generic_set_transcript_color(actor, "Widget-BG-Color", color);
 }
+/** @public */
 static inline gboolean
 config_get_transcript_bg_color(const gchar *actor, GdkColor *color)
 {
@@ -89,18 +121,21 @@ config_get_transcript_bg_color(const gchar *actor, GdkColor *color)
 						   color);
 }
 
+/** @public */
 static inline void
 config_set_transcript_default_format_font(const gchar *actor,
 					  const PangoFontDescription *font)
 {
 	config_generic_set_transcript_font(actor, "Default-Format-Font", font);
 }
+/** @public */
 static inline PangoFontDescription *
 config_get_transcript_default_format_font(const gchar *actor)
 {
 	return config_generic_get_transcript_font(actor, "Default-Format-Font");
 }
 
+/** @public */
 static inline void
 config_set_transcript_default_format_text_color(const gchar *actor,
 						const GdkColor *color)
@@ -108,6 +143,7 @@ config_set_transcript_default_format_text_color(const gchar *actor,
 	config_generic_set_transcript_color(actor, "Default-Format-Text-Color",
 					    color);
 }
+/** @public */
 static inline gboolean
 config_get_transcript_default_format_text_color(const gchar *actor,
 						GdkColor *color)
@@ -116,6 +152,7 @@ config_get_transcript_default_format_text_color(const gchar *actor,
 						   color);
 }
 
+/** @public */
 static inline void
 config_set_transcript_default_format_bg_color(const gchar *actor,
 					      const GdkColor *color)
@@ -123,6 +160,7 @@ config_set_transcript_default_format_bg_color(const gchar *actor,
 	config_generic_set_transcript_color(actor, "Default-Format-BG-Color",
 					    color);
 }
+/** @public */
 static inline gboolean
 config_get_transcript_default_format_bg_color(const gchar *actor,
 					      GdkColor *color)
@@ -158,10 +196,12 @@ extern GtkWidget *transcript_wizard_combo,
 /*
  * macros and inline functions
  */
+/** @private */
 #define BUILDER_INIT(BUILDER, VAR) do {					\
 	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\
 } while (0)
 
+/** @public */
 static inline gchar *
 path_strip_extension(const gchar *filename)
 {

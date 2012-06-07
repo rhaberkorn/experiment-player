@@ -1,3 +1,26 @@
+/**
+ * @file
+ * Program entry point, UI initialization, widget connections and GTK event
+ * loop.
+ */
+
+/*
+ * Copyright (C) 2012 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -27,7 +50,8 @@
 
 #include "experiment-player.h"
 
-static inline void button_image_set_from_stock(GtkButton *widget, const gchar *name);
+static inline void button_image_set_from_stock(GtkButton *widget,
+					       const gchar *name);
 
 GtkWidget *about_dialog;
 
@@ -55,6 +79,7 @@ gchar *current_filename = NULL;
  * NOTE: for some strange reason the parameters are switched
  */
 
+/** @private */
 void
 help_menu_about_item_activate_cb(GtkWidget *widget,
 				 gpointer data __attribute__((unused)))
@@ -63,6 +88,7 @@ help_menu_about_item_activate_cb(GtkWidget *widget,
 	gtk_widget_hide(widget);
 }
 
+/** @private */
 void
 playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 {
@@ -73,6 +99,7 @@ playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 					       : GTK_STOCK_MEDIA_PAUSE);
 }
 
+/** @private */
 void
 stop_button_clicked_cb(GtkWidget *widget,
 		       gpointer data __attribute__((unused)))
@@ -82,6 +109,7 @@ stop_button_clicked_cb(GtkWidget *widget,
 				    GTK_STOCK_MEDIA_PLAY);
 }
 
+/** @private */
 void
 file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 				     gpointer data __attribute__((unused)))
@@ -110,6 +138,7 @@ file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 	gtk_widget_destroy(dialog);
 }
 
+/** @private */
 void
 file_menu_opentranscript_item_activate_cb(GtkWidget *widget,
 					  gpointer data __attribute__((unused)))
@@ -138,6 +167,7 @@ file_menu_opentranscript_item_activate_cb(GtkWidget *widget,
 	gtk_widget_destroy(dialog);
 }
 
+/** @private */
 void
 help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 				  gpointer data __attribute__((unused)))
@@ -161,6 +191,7 @@ help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 	}
 }
 
+/** @private */
 void
 navigator_widget_time_selected_cb(GtkWidget *widget, gint64 selected_time,
 				  gpointer user_data __attribute__((unused)))
@@ -168,6 +199,7 @@ navigator_widget_time_selected_cb(GtkWidget *widget, gint64 selected_time,
 	gtk_vlc_player_seek(GTK_VLC_PLAYER(widget), selected_time);
 }
 
+/** @private */
 void
 generic_quit_cb(GtkWidget *widget __attribute__((unused)),
 		gpointer data __attribute__((unused)))
@@ -258,6 +290,7 @@ show_message_dialog_gerror(GError *err)
 	gtk_widget_destroy(dialog);
 }
 
+/** @private */
 int
 main(int argc, char *argv[])
 {
