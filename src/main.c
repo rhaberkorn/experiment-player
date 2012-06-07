@@ -74,6 +74,13 @@ gchar *current_filename = NULL;
 #define SPEAKER_WIZARD	"Wizard"
 #define SPEAKER_PROBAND	"Proband"
 
+/** @private */
+GQuark
+experiment_player_error_quark(void)
+{
+	return g_quark_from_static_string("experiment-player-error-quark");
+}
+
 /*
  * GtkBuilder signal callbacks
  * NOTE: for some strange reason the parameters are switched
@@ -172,22 +179,23 @@ void
 help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 				  gpointer data __attribute__((unused)))
 {
-	GError *err = NULL;
+	GError *error = NULL;
 	gboolean res;
 
 #ifdef HAVE_WINDOWS_H
 	res = (int)ShellExecute(NULL, "open", HELP_URI,
-				NULL, NULL, SW_SHOWNORMAL) <= 32;
-	if (res)
-		err = g_error_new(g_quark_from_static_string("Cannot open!"), 0,
-				  "Cannot open '%s'!", HELP_URI);
+				NULL, NULL, SW_SHOWNORMAL) > 32;
+	if (!res)
+		error = g_error_new(EXPERIMENT_PLAYER_ERROR,
+				    EXPERIMENT_PLAYER_ERROR_OPEN,
+				    "Cannot open \"%s\"!", HELP_URI);
 #else
-	res = !gtk_show_uri(NULL, HELP_URI, GDK_CURRENT_TIME, &err);
+	res = gtk_show_uri(NULL, HELP_URI, GDK_CURRENT_TIME, &error);
 #endif
 
-	if (res) {
-		show_message_dialog_gerror(err);
-		g_error_free(err);
+	if (!res) {
+		show_message_dialog_gerror(error);
+		g_error_free(error);
 	}
 }
 

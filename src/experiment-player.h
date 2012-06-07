@@ -30,9 +30,21 @@
 
 #include <gtk/gtk.h>
 
+/** Main program error domain */
+#define EXPERIMENT_PLAYER_ERROR \
+	(experiment_player_error_quark())
+
+/** Main program error codes */
+typedef enum {
+	EXPERIMENT_PLAYER_ERROR_OPEN	/**< Error opening file/URI */
+} ExperimentPlayerError;
+
 /*
  * main.c
  */
+/** @private */
+GQuark experiment_player_error_quark(void);
+
 gboolean load_media_file(const gchar *file);
 gboolean load_transcript_file(const gchar *file);
 
