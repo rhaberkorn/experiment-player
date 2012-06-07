@@ -572,6 +572,7 @@ gtk_vlc_player_get_length(GtkVlcPlayer *player)
 
 /**
  * @brief Get time-adjustment currently used by \e GtkVlcPlayer
+ *
  * The time-adjustment is an alternative to signal-callbacks and using the API
  * for synchronizing the \e GtkVlcPlayer widget's current playback position with
  * another widget (e.g. a \e GtkScale).
