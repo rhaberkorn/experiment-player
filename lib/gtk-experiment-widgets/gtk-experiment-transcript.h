@@ -62,8 +62,14 @@ typedef struct _GtkExperimentTranscript {
 	GtkWidget parent_instance;		/**< Parent instance structure */
 
 	gchar *speaker;				/**< Name of speaker whose contributions are displayed (\b read-only) */
-	gboolean reverse;			/**< Reverse mode (\b read-write) */
+	gboolean reverse;			/**< Reverse mode activated (\b read-only) */
 
+	/**
+	 * Default formattings to apply for interactive for interactive format
+	 * rules if no Pango markup is specified.
+	 * A \c NULL pointer means that the correspondig text property will not
+	 * be changed. After widget instantiation all fields are \c NULL.
+	 */
 	struct _GtkExperimentTranscriptInteractiveFormat {
 		PangoFontDescription *default_font;	/**< Default interactive format font */
 		GdkColor *default_text_color;		/**< Default interactive format text color */

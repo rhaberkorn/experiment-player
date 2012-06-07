@@ -159,6 +159,21 @@ gtk_experiment_transcript_free_formats(GSList *formats)
  * API
  */
 
+/**
+ * @brief Load a format file to use with the transcript widget
+ *
+ * Loading a format file applies additional formattings (highlighting) to the
+ * transcript's contributions according to the rules specified in the file.
+ * For information about the format file syntax and semantics, refer to the
+ * "Experiment Player" manual.
+ *
+ * The format file is parsed and and compiled to an internal representation.
+ *
+ * @param trans    Widget instance
+ * @param filename File name of format file to load (\c NULL or empty string
+ *                 resets any formattings of a previously loaded file)
+ * @return \c TRUE on error, else \c FALSE
+ */
 /** @todo report errors using GError */
 gboolean
 gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
@@ -215,6 +230,28 @@ redraw:
 	return res;
 }
 
+/**
+ * @brief Specify an interactive format string for a transcript widget
+ *
+ * Associates a single format rule with a transcript widget. The formatting
+ * changes are cumulatively applied after any changes introduced by a format
+ * file loaded into the widget. The interactive format rule is independant of
+ * any format file rules, that is it is not reset when format file rules are
+ * reset.
+ * A rule may also be given without Pango markup (plain regular expression),
+ * applying default formattings for that regular expression. Default formattings
+ * may be configured via public instance attributes of the widget.
+ * For information about the format rule syntax and semantics, refer to the
+ * "Experiment Player" manual.
+ *
+ * @sa gtk_experiment_transcript_load_formats
+ *
+ * @param trans       Widget instance
+ * @param format_str  Format rule string (with or without markup)
+ * @param with_markup Must be \c TRUE if the format_str contains Pango markup,
+ *                    else \c FALSE
+ * @return \c TRUE on error, else \c FALSE
+ */
 gboolean
 gtk_experiment_transcript_set_interactive_format(GtkExperimentTranscript *trans,
 						 const gchar *format_str,

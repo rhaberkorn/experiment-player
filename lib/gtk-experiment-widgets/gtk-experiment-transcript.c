@@ -676,6 +676,17 @@ gtk_experiment_transcript_new(const gchar *speaker)
 	return GTK_WIDGET(trans);
 }
 
+/**
+ * @brief Load contributions from an experiment transcript file.
+ *
+ * The transcript file is given as an \e ExperimentReader object instance.
+ * Only contributions (every text fragment identified by a timepoint) of the
+ * configured speaker are used.
+ *
+ * @param trans Widget instance
+ * @param exp   \e ExperimentReader instance
+ * @return \c TRUE on error, else \c FALSE
+ */
 gboolean
 gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 			       ExperimentReader *exp)
@@ -689,6 +700,19 @@ gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 	return trans->priv->contribs == NULL;
 }
 
+/**
+ * @brief Load contributions from an experiment transcript file.
+ *
+ * The transcript file is given as a file name.
+ * Only contributions (every text fragment identified by a timepoint) of the
+ * configured speaker are used.
+ *
+ * @sa gtk_experiment_transcript_load
+ *
+ * @param trans    Widget instance
+ * @param filename \e ExperimentReader instance
+ * @return \c TRUE on error, else \c FALSE
+ */
 gboolean
 gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 					const gchar *filename)
@@ -704,6 +728,14 @@ gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 	return res;
 }
 
+/**
+ * @brief Set alignment (justification) of text blocks in a transcript widget
+ *
+ * The alignment defaults to \c PANGO_ALIGN_LEFT for new widget instances.
+ *
+ * @param trans     Widget instance
+ * @param alignment New text alignment
+ */
 void
 gtk_experiment_transcript_set_alignment(GtkExperimentTranscript *trans,
 					PangoAlignment alignment)
@@ -717,6 +749,14 @@ gtk_experiment_transcript_set_alignment(GtkExperimentTranscript *trans,
 					       cur_alignment == alignment);
 }
 
+/**
+ * @brief Get alignment (justification) of text blocks in a transcript widget
+ *
+ * @sa gtk_experiment_transcript_set_alignment
+ *
+ * @param trans Widget instance
+ * @return Current text alignment
+ */
 PangoAlignment
 gtk_experiment_transcript_get_alignment(GtkExperimentTranscript *trans)
 {
@@ -725,6 +765,19 @@ gtk_experiment_transcript_get_alignment(GtkExperimentTranscript *trans)
 
 	return pango_layout_get_alignment(trans->priv->layer_text_layout);
 }
+
+/**
+ * @brief Get time-adjustment currently used by a transcript widget
+ *
+ * The time-adjustment is the only way to control the portion of the transcript
+ * displayed by the widget.
+ * The adjustment's value is in milliseconds.
+ * The widget will initialize one on construction, so there \e should always be
+ * an adjustment to get.
+ *
+ * @param trans Widget instance
+ * @return Currently used time-adjustment
+ */
 
 GtkAdjustment *
 gtk_experiment_transcript_get_time_adjustment(GtkExperimentTranscript *trans)
@@ -743,7 +796,7 @@ gtk_experiment_transcript_get_time_adjustment(GtkExperimentTranscript *trans)
  *
  * @sa gtk_experiment_transcript_get_time_adjustment
  *
- * @param trans \e GtkExperimentTranscript instance
+ * @param trans Widget instance
  * @param adj   New \e GtkAdjustment to use as time-adjustment.
  */
 void
