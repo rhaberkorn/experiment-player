@@ -692,7 +692,7 @@ gtk_experiment_transcript_new(const gchar *speaker)
  *
  * @param trans Widget instance
  * @param exp   \e ExperimentReader instance
- * @return \c TRUE on error, else \c FALSE
+ * @return \c TRUE on success, else \c FALSE
  */
 gboolean
 gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
@@ -704,7 +704,7 @@ gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 
 	gtk_experiment_transcript_text_layer_redraw(trans);
 
-	return trans->priv->contribs == NULL;
+	return trans->priv->contribs != NULL;
 }
 
 /**
@@ -718,13 +718,13 @@ gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
  *
  * @param trans    Widget instance
  * @param filename \e ExperimentReader instance
- * @return \c TRUE on error, else \c FALSE
+ * @return \c TRUE on success, else \c FALSE
  */
 gboolean
 gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 					const gchar *filename)
 {
-	gboolean res = TRUE;
+	gboolean res = FALSE;
 	ExperimentReader *exp = experiment_reader_new(filename);
 
 	if (exp != NULL) {

@@ -234,7 +234,7 @@ quickopen_item_on_activate(GtkWidget *widget, gpointer user_data)
 	gtk_container_foreach(GTK_CONTAINER(quickopen_menu),
 			      reconfigure_all_check_menu_items_cb, widget);
 
-	if (load_media_file(filename)) {
+	if (!load_media_file(filename)) {
 		/* FIXME */
 	}
 
@@ -248,7 +248,7 @@ quickopen_item_on_activate(GtkWidget *widget, gpointer user_data)
 	}
 	g_stpcpy(++p, EXPERIMENT_TRANSCRIPT_EXT);
 
-	if (load_transcript_file(trans_name)) {
+	if (!load_transcript_file(trans_name)) {
 		/* FIXME */
 	}
 

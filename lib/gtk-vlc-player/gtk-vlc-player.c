@@ -420,7 +420,7 @@ gtk_vlc_player_new(void)
  *
  * @param player \e GtkVlcPlayer instance to load file into.
  * @param file   \e Filename to load
- * @return \c TRUE on error, else \c FALSE
+ * @return \c TRUE on success, else \c FALSE
  */
 gboolean
 gtk_vlc_player_load_filename(GtkVlcPlayer *player, const gchar *file)
@@ -430,11 +430,11 @@ gtk_vlc_player_load_filename(GtkVlcPlayer *player, const gchar *file)
 	media = libvlc_media_new_path(player->priv->vlc_inst,
 				      (const char *)file);
 	if (media == NULL)
-		return TRUE;
+		return FALSE;
 	vlc_player_load_media(player, media);
 	libvlc_media_release(media);
 
-	return FALSE;
+	return TRUE;
 }
 
 /**
@@ -446,7 +446,7 @@ gtk_vlc_player_load_filename(GtkVlcPlayer *player, const gchar *file)
  *
  * @param player \e GtkVlcPlayer instance to load media into.
  * @param uri    \e URI to load
- * @return \c TRUE on error, else \c FALSE
+ * @return \c TRUE on success, else \c FALSE
  */
 gboolean
 gtk_vlc_player_load_uri(GtkVlcPlayer *player, const gchar *uri)
@@ -456,11 +456,11 @@ gtk_vlc_player_load_uri(GtkVlcPlayer *player, const gchar *uri)
 	media = libvlc_media_new_location(player->priv->vlc_inst,
 					  (const char *)uri);
 	if (media == NULL)
-		return TRUE;
+		return FALSE;
 	vlc_player_load_media(player, media);
 	libvlc_media_release(media);
 
-	return FALSE;
+	return TRUE;
 }
 
 /**

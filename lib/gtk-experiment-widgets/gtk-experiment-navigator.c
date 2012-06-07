@@ -365,7 +365,7 @@ gtk_experiment_navigator_new(void)
  *
  * @param navi Object instance to display the structure in
  * @param exp  \e ExperimentReader instance of opened XML-file
- * @return \c TRUE on error, else \c FALSE
+ * @return \c TRUE on success, else \c FALSE
  */
 gboolean
 gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
@@ -374,7 +374,7 @@ gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
 	/** @todo Clear contents */
 	/** @todo Process XML file and fill \e TreeViewStore */
 
-	return FALSE;
+	return TRUE;
 }
 
 /**
@@ -387,7 +387,7 @@ gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
  *
  * @param navi Object instance to display the structure in
  * @param exp  Filename of XML-file to open and use for configuring \e navi
- * @return \c TRUE on error, else \c FALSE
+ * @return \c TRUE on success, else \c FALSE
  */
 gboolean
 gtk_experiment_navigator_load_filename(GtkExperimentNavigator *navi,

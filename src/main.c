@@ -134,7 +134,7 @@ file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 
 		file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
-		if (load_media_file(file)) {
+		if (!load_media_file(file)) {
 			/* TODO */
 		}
 		refresh_quickopen_menu(GTK_MENU(quickopen_menu));
@@ -163,7 +163,7 @@ file_menu_opentranscript_item_activate_cb(GtkWidget *widget,
 
 		file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
 
-		if (load_transcript_file(file)) {
+		if (!load_transcript_file(file)) {
 			/* TODO */
 		}
 		refresh_quickopen_menu(GTK_MENU(quickopen_menu));
@@ -227,8 +227,8 @@ button_image_set_from_stock(GtkButton *widget, const gchar *name)
 gboolean
 load_media_file(const gchar *file)
 {
-	if (gtk_vlc_player_load_filename(GTK_VLC_PLAYER(player_widget), file))
-		return TRUE;
+	if (!gtk_vlc_player_load_filename(GTK_VLC_PLAYER(player_widget), file))
+		return FALSE;
 
 	g_free(current_filename);
 	current_filename = g_strdup(file);
@@ -238,7 +238,7 @@ load_media_file(const gchar *file)
 	button_image_set_from_stock(GTK_BUTTON(playpause_button),
 				    GTK_STOCK_MEDIA_PLAY);
 
-	return FALSE;
+	return TRUE;
 }
 
 gboolean
@@ -249,27 +249,27 @@ load_transcript_file(const gchar *file)
 
 	reader = experiment_reader_new(file);
 	if (reader == NULL)
-		return TRUE;
+		return FALSE;
 
 	res = gtk_experiment_transcript_load(GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget),
 					     reader);
-	if (res) {
+	if (!res) {
 		g_object_unref(G_OBJECT(reader));
-		return TRUE;
+		return FALSE;
 	}
 
 	res = gtk_experiment_transcript_load(GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget),
 					     reader);
-	if (res) {
+	if (!res) {
 		g_object_unref(G_OBJECT(reader));
-		return TRUE;
+		return FALSE;
 	}
 
 	res = gtk_experiment_navigator_load(GTK_EXPERIMENT_NAVIGATOR(navigator_widget),
 					    reader);
-	if (res) {
+	if (!res) {
 		g_object_unref(G_OBJECT(reader));
-		return TRUE;
+		return FALSE;
 	}
 
 	g_object_unref(reader);
@@ -277,7 +277,7 @@ load_transcript_file(const gchar *file)
 	gtk_widget_set_sensitive(transcript_table, TRUE);
 	gtk_widget_set_sensitive(navigator_scrolledwindow, TRUE);
 
-	return FALSE;
+	return TRUE;
 }
 
 void
