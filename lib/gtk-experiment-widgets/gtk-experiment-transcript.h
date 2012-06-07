@@ -25,6 +25,7 @@
 #define __GTK_EXPERIMENT_TRANSCRIPT_H
 
 #include <glib-object.h>
+#include <glib.h>
 #include <gdk/gdk.h>
 
 #include <gtk/gtk.h>
@@ -33,6 +34,17 @@
 
 G_BEGIN_DECLS
 
+/** \e GtkExperimentTranscript error domain */
+#define GTK_EXPERIMENT_TRANSCRIPT_ERROR \
+	(gtk_experiment_transcript_error_quark())
+
+/** \e GtkExperimentTranscript error codes */
+typedef enum {
+	GTK_EXPERIMENT_TRANSCRIPT_ERROR_FILEOPEN,	/**< Error opening file */
+	GTK_EXPERIMENT_TRANSCRIPT_ERROR_REGEXCAPTURES	/**< Additional regular expression captures used */
+} GtkExperimentTranscriptError;
+
+/** \e GtkExperimentTranscript type */
 #define GTK_TYPE_EXPERIMENT_TRANSCRIPT \
 	(gtk_experiment_transcript_get_type())
 /**
@@ -87,6 +99,8 @@ typedef struct _GtkExperimentTranscriptClass {
 } GtkExperimentTranscriptClass;
 
 /** @private */
+GQuark gtk_experiment_transcript_error_quark(void);
+/** @private */
 GType gtk_experiment_transcript_get_type(void);
 
 /*
@@ -104,10 +118,12 @@ void gtk_experiment_transcript_set_alignment(GtkExperimentTranscript *trans,
 PangoAlignment gtk_experiment_transcript_get_alignment(GtkExperimentTranscript *trans);
 
 gboolean gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
-						const gchar *filename);
+						const gchar *filename,
+						GError **error);
 gboolean gtk_experiment_transcript_set_interactive_format(GtkExperimentTranscript *trans,
 							  const gchar *format_str,
-							  gboolean with_markup);
+							  gboolean with_markup,
+							  GError **error);
 
 GtkAdjustment *gtk_experiment_transcript_get_time_adjustment(GtkExperimentTranscript *trans);
 void gtk_experiment_transcript_set_time_adjustment(GtkExperimentTranscript *trans,

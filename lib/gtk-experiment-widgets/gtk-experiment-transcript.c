@@ -66,6 +66,13 @@ static void text_alignment_activated(GtkWidget *widget, gpointer data);
 
 static void reverse_activated(GtkWidget *widget, gpointer data);
 
+/** @private */
+GQuark
+gtk_experiment_transcript_error_quark(void)
+{
+	return g_quark_from_static_string("gtk-experiment-transcript-error-quark");
+}
+
 /**
  * @private
  * Will create \e gtk_experiment_transcript_get_type and set

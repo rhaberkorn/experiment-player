@@ -109,6 +109,8 @@ generic_transcript_combo_changed_cb(gpointer user_data, GtkComboBox *combo)
 	GtkTreeIter iter;
 	gchar *filename = NULL;
 
+	GError *error = NULL;
+
 	if (gtk_combo_box_get_active_iter(combo, &iter))
 		gtk_tree_model_get(model, &iter, COL_FILENAME, &filename, -1);
 
@@ -116,7 +118,12 @@ generic_transcript_combo_changed_cb(gpointer user_data, GtkComboBox *combo)
 	 * filename may be empty (null-entry) in which case any active format
 	 * will be reset
 	 */
-	gtk_experiment_transcript_load_formats(trans, filename);
+	if (!gtk_experiment_transcript_load_formats(trans, filename, &error)) {
+		show_message_dialog_gerror(error);
+		g_error_free(error);
+
+		gtk_combo_box_set_active_iter(combo, NULL);
+	}
 	g_free(filename);
 
 #if 0
@@ -142,12 +149,12 @@ generic_transcript_entry_changed_cb(gpointer user_data, GtkEditable *editable)
 	isMarkup = gtk_toggle_button_get_active(toggle);
 
 	res = gtk_experiment_transcript_set_interactive_format(trans, text,
-							       isMarkup);
+							       isMarkup, NULL);
 
 	gtk_entry_set_icon_from_stock(GTK_ENTRY(editable),
 				      GTK_ENTRY_ICON_PRIMARY,
-				      res ? GTK_STOCK_DIALOG_ERROR
-					  : GTK_STOCK_APPLY);
+				      res ? GTK_STOCK_APPLY
+					  : GTK_STOCK_DIALOG_ERROR);
 	gtk_entry_set_icon_sensitive(GTK_ENTRY(editable),
 				     GTK_ENTRY_ICON_PRIMARY,
 				     text != NULL && *text);
