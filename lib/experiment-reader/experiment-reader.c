@@ -52,6 +52,10 @@ static gint experiment_reader_contrib_cmp(const ExperimentReaderContrib *a,
 					  const ExperimentReaderContrib *b);
 
 /** @private */
+#define XML_CHAR(STR) \
+	((const xmlChar *)(STR))
+
+/** @private */
 #define EXPERIMENT_READER_GET_PRIVATE(obj) \
 	(G_TYPE_INSTANCE_GET_PRIVATE((obj), EXPERIMENT_TYPE_READER, ExperimentReaderPrivate))
 
@@ -113,9 +117,9 @@ get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref)
 
 	/** @todo precompile XPath expression */
 	xmlStrPrintf(expr, sizeof(expr),
-		     (const xmlChar *)"/session/timeline/"
-				      "timepoint[@timepoint-id = '%s']/"
-				      "@absolute-time", ref);
+		     XML_CHAR("/session/timeline/"
+			      "timepoint[@timepoint-id = '%s']/"
+			      "@absolute-time"), ref);
 
 	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
 	assert(xpathObj != NULL);
@@ -148,16 +152,18 @@ generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 
 	for (int i = 0; i < nodes->nodeNr; i++) {
 		xmlNode *cur = nodes->nodeTab[i];
-		xmlNode *contrib = get_first_element(cur->children, "contribution");
+		xmlNode *contrib = get_first_element(cur->children,
+						     "contribution");
 		assert(cur != NULL && cur->type == XML_ELEMENT_NODE);
 
-		xmlChar	*topic_id = xmlGetProp(cur, (const xmlChar *)"id");
+		xmlChar	*topic_id = xmlGetProp(cur, XML_CHAR("id"));
 		gint64	start_time = -1;
 
 		if (contrib != NULL) {
 			xmlChar *contrib_start_ref;
 
-			contrib_start_ref = xmlGetProp(contrib, (const xmlChar *)"start-reference");
+			contrib_start_ref = xmlGetProp(contrib,
+						       XML_CHAR("start-reference"));
 			start_time = get_timepoint_by_ref(reader->priv->doc,
 							  contrib_start_ref);
 			xmlFree(contrib_start_ref);
@@ -180,6 +186,91 @@ experiment_reader_contrib_cmp(const ExperimentReaderContrib *a,
 	if (a->start_time > b->start_time)
 		return 1;
 	return 0;
+}
+
+static void
+insert_contribution(gint64 start_time, const gchar *text, GList **list)
+{
+	ExperimentReaderContrib *contrib;
+
+	if (text == NULL)
+		return;
+
+	contrib = g_malloc(sizeof(ExperimentReaderContrib) + strlen(text) + 1);
+	contrib->start_time = start_time;
+	g_stpcpy(contrib->text, text);
+
+	*list = g_list_insert_sorted(*list, contrib,
+				     (GCompareFunc)experiment_reader_contrib_cmp);
+}
+
+static inline void
+process_contribution(xmlDoc *doc, xmlNode *contrib, GList **list)
+{
+	xmlChar *ref;
+	gint64 start_time;
+
+	gchar *text = NULL;
+
+	ref = xmlGetProp(contrib, XML_CHAR("start-reference"));
+	start_time = get_timepoint_by_ref(doc, ref);
+	xmlFree(ref);
+
+	for (xmlNode *cur = contrib->children; cur != NULL; cur = cur->next) {
+		xmlChar *content;
+		gchar *new;
+
+		switch (cur->type) {
+		case XML_TEXT_NODE:
+			content = xmlNodeGetContent(cur);
+
+			new = g_strconcat(text != NULL ? text : "",
+					  g_strstrip((gchar *)content),
+					  " ", NULL);
+			g_free(text);
+			text = new;
+
+			xmlFree(content);
+			break;
+
+		case XML_ELEMENT_NODE:
+			if (!xmlStrcmp(cur->name, XML_CHAR("pause"))) {
+				xmlChar *duration;
+
+				duration = xmlGetProp(cur, XML_CHAR("duration"));
+				if (duration == NULL)
+					break;
+
+				if (!xmlStrcmp(duration, XML_CHAR("micro")) ||
+				    !xmlStrcmp(duration, XML_CHAR("short")))
+					new = g_strconcat(text != NULL ? text : "",
+							  " ...", NULL);
+				else
+					new = g_strconcat(text != NULL ? text : "",
+							  "\n", NULL);
+				g_free(text);
+				text = new;
+
+				xmlFree(duration);
+			} else if (!xmlStrcmp(cur->name, XML_CHAR("time"))) {
+				insert_contribution(start_time, text, list);
+				g_free(text);
+				text = NULL;
+
+				ref = xmlGetProp(cur,
+						 XML_CHAR("timepoint-reference"));
+				start_time = get_timepoint_by_ref(doc, ref);
+				xmlFree(ref);
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	insert_contribution(start_time, text, list);
+	g_free(text);
 }
 
 /*
@@ -242,89 +333,15 @@ experiment_reader_get_contributions_by_speaker(ExperimentReader *reader,
 
 	/* Evaluate xpath expression */
 	xmlStrPrintf(expr, sizeof(expr),
-		     (const xmlChar *)
-		     "//contribution[@speaker-reference = "
-		     "/session/speakers/speaker[name = '%s']/@speaker-id]",
+		     XML_CHAR("//contribution[@speaker-reference = "
+			      "/session/speakers/speaker[name = '%s']/@speaker-id]"),
 		     speaker);
 	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
 
 	for (int i = 0; i < xpathObj->nodesetval->nodeNr; i++) {
 		xmlNode *contrib = xpathObj->nodesetval->nodeTab[i];
-		xmlChar *ref;
-		gint64 start_time;
 
-		gchar *text = NULL;
-
-		ref = xmlGetProp(contrib, (const xmlChar *)"start-reference");
-		start_time = get_timepoint_by_ref(reader->priv->doc, ref);
-		xmlFree(ref);
-
-		for (xmlNode *cur = contrib->children; cur != NULL; cur = cur->next) {
-			xmlChar *content;
-			gchar *new;
-
-			switch (cur->type) {
-			case XML_TEXT_NODE:
-				content = xmlNodeGetContent(cur);
-
-				new = g_strconcat(text != NULL ? text : "",
-						  g_strstrip((gchar *)content),
-						  " ", NULL);
-				g_free(text);
-				text = new;
-
-				xmlFree(content);
-				break;
-
-			case XML_ELEMENT_NODE:
-				if (!xmlStrcmp(cur->name, (const xmlChar *)"pause")) {
-					xmlChar *duration = xmlGetProp(cur, (const xmlChar *)"duration");
-
-					if (duration != NULL) {
-						if (!xmlStrcmp(duration, (const xmlChar *)"micro") ||
-						    !xmlStrcmp(duration, (const xmlChar *)"short"))
-							new = g_strconcat(text != NULL ? text : "", " ...", NULL);
-						else
-							new = g_strconcat(text != NULL ? text : "", "\n", NULL);
-						g_free(text);
-						text = new;
-
-						xmlFree(duration);
-					}
-				} else if (!xmlStrcmp(cur->name, (const xmlChar *)"time")) {
-					if (text != NULL) {
-						ExperimentReaderContrib *contrib = g_malloc(sizeof(ExperimentReaderContrib) + strlen(text) + 1);
-
-						contrib->start_time = start_time;
-						g_stpcpy(contrib->text, text);
-
-						list = g_list_insert_sorted(list, contrib, (GCompareFunc)experiment_reader_contrib_cmp);
-
-						g_free(text);
-						text = NULL;
-					}
-
-					ref = xmlGetProp(cur, (const xmlChar *)"timepoint-reference");
-					start_time = get_timepoint_by_ref(reader->priv->doc, ref);
-					xmlFree(ref);
-				}
-				break;
-
-			default:
-				break;
-			}
-		}
-
-		if (text != NULL) {
-			ExperimentReaderContrib *contrib = g_malloc(sizeof(ExperimentReaderContrib) + strlen(text) + 1);
-
-			contrib->start_time = start_time;
-			g_stpcpy(contrib->text, text);
-
-			list = g_list_insert_sorted(list, contrib, (GCompareFunc)experiment_reader_contrib_cmp);
-
-			g_free(text);
-		}
+		process_contribution(reader->priv->doc, contrib, &list);
 	}
 
 	xmlXPathFreeObject(xpathObj);
@@ -395,7 +412,7 @@ experiment_reader_foreach_greeting_topic(ExperimentReader *reader,
 	xmlXPathObject	*xpathObj;
 
 	xpathCtx = xmlXPathNewContext(reader->priv->doc);
-	xpathObj = xmlXPathEvalExpression((const xmlChar *)"/session/greeting/topic",
+	xpathObj = xmlXPathEvalExpression(XML_CHAR("/session/greeting/topic"),
 					  xpathCtx);
 
 	generic_foreach_topic(reader, xpathObj->nodesetval,
@@ -424,8 +441,8 @@ experiment_reader_foreach_exp_initial_narrative_topic(reader, callback, userdata
 	xmlXPathObject	*xpathObj;
 
 	xpathCtx = xmlXPathNewContext(reader->priv->doc);
-	xpathObj = xmlXPathEvalExpression((const xmlChar *)"/session/experiment/"
-							   "initial-narrative/topic",
+	xpathObj = xmlXPathEvalExpression(XML_CHAR("/session/experiment/"
+						   "initial-narrative/topic"),
 					  xpathCtx);
 
 	generic_foreach_topic(reader, xpathObj->nodesetval,
@@ -461,8 +478,8 @@ experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, u
 
 	/* Evaluate xpath expression */
 	xmlStrPrintf(expr, sizeof(expr),
-		     (const xmlChar *)"/session/experiment/last-minute/"
-				      "phase[@id = '%d']/topic",
+		     XML_CHAR("/session/experiment/last-minute/"
+			      "phase[@id = '%d']/topic"),
 		     phase);
 	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
 
@@ -490,7 +507,7 @@ experiment_reader_foreach_farewell_topic(ExperimentReader *reader,
 	xmlXPathObject	*xpathObj;
 
 	xpathCtx = xmlXPathNewContext(reader->priv->doc);
-	xpathObj = xmlXPathEvalExpression((const xmlChar *)"/session/farewell/topic",
+	xpathObj = xmlXPathEvalExpression(XML_CHAR("/session/farewell/topic"),
 					  xpathCtx);
 
 	generic_foreach_topic(reader, xpathObj->nodesetval,
