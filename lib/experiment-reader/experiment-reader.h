@@ -86,9 +86,13 @@ typedef void (*ExperimentReaderTopicCallback)(ExperimentReader *reader,
 					      gint64 start_time,
 					      gpointer data);
 
+/**
+ * Structure describing a contribution. Every text-fragment identified by
+ * a distinct \e timepoint is considered a contribution.
+ */
 typedef struct {
-	gint64	start_time;
-	gchar	text[];
+	gint64	start_time;	/**< Contribution's start time in milliseconds */
+	gchar	text[];		/**< Contribution's text content (part of the structure) */
 } ExperimentReaderContrib;
 
 /*
@@ -108,20 +112,20 @@ void experiment_reader_free_contributions(
 void experiment_reader_foreach_greeting_topic(
 	ExperimentReader		*reader,
 	ExperimentReaderTopicCallback	callback,
-	gpointer			data);
+	gpointer			userdata);
 void experiment_reader_foreach_exp_initial_narrative_topic(
 	ExperimentReader		*reader,
 	ExperimentReaderTopicCallback	callback,
-	gpointer			data);
+	gpointer			userdata);
 void experiment_reader_foreach_exp_last_minute_phase_topic(
 	ExperimentReader		*reader,
 	gint				phase,
 	ExperimentReaderTopicCallback	callback,
-	gpointer			data);
+	gpointer			userdata);
 void experiment_reader_foreach_farewell_topic(
 	ExperimentReader		*reader,
 	ExperimentReaderTopicCallback	callback,
-	gpointer			data);
+	gpointer			userdata);
 
 G_END_DECLS
 

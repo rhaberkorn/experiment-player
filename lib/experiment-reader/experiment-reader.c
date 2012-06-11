@@ -209,6 +209,24 @@ experiment_reader_new(const gchar *filename)
 	return reader;
 }
 
+/**
+ * @brief Retrieve list of contributions by speaker
+ *
+ * Returns a newly-allocated doubly-linked list of
+ * \ref ExperimentReaderContrib structures representing all contributions
+ * by a given speaker. Every text fragment with a \e timepoint reference is
+ * considered a contribution.
+ * The list is sorted by the contributions' start times, in ascending order.
+ *
+ * @sa ExperimentReaderContrib
+ * @sa experiment_reader_get_contribution_by_time
+ * @sa experiment_reader_free_contributions
+ *
+ * @param reader  \e ExperimentReader instance
+ * @param speaker Full name of the speaker (e.g. "Wizard")
+ * @return Newly allocated list of contributions (must be freed with
+ *         \ref experiment_reader_free_contributions)
+ */
 GList *
 experiment_reader_get_contributions_by_speaker(ExperimentReader *reader,
 					       const gchar *speaker)
@@ -315,12 +333,26 @@ experiment_reader_get_contributions_by_speaker(ExperimentReader *reader,
 	return list;
 }
 
+/**
+ * @brief Get a contribution by time
+ *
+ * Gets the closest contribution after the specified time or the last one
+ * if there is no contribution after or at the specified time.
+ * The contribution is returned as a pointer into the contribution list
+ * so that the list may be traversed by the caller.
+ *
+ * @param contribs List of \ref ExperimentReaderContrib structures as returned
+ *                 by \ref experiment_reader_get_contributions_by_speaker
+ * @param timept   Time in milliseconds
+ * @return List of contributions beginning with the desired contribution.
+ *         It is a pointer into contribs and must not be freed directly.
+ */
 GList *
-experiment_reader_get_contribution_by_time(GList *contribs,
-					   gint64 timept)
+experiment_reader_get_contribution_by_time(GList *contribs, gint64 timept)
 {
 	for (GList *cur = contribs; cur != NULL; cur = cur->next) {
-		ExperimentReaderContrib *contrib = (ExperimentReaderContrib *)cur->data;
+		ExperimentReaderContrib *contrib =
+					(ExperimentReaderContrib *)cur->data;
 
 		if (contrib->start_time >= timept ||
 		    cur->next == NULL)
@@ -330,6 +362,13 @@ experiment_reader_get_contribution_by_time(GList *contribs,
 	return NULL;
 }
 
+/**
+ * @brief Free list of contributions and associated data
+ *
+ * @sa experiment_reader_get_contributions_by_speaker
+ *
+ * @param contribs List of \ref ExperimentReaderContrib structures to free
+ */
 void
 experiment_reader_free_contributions(GList *contribs)
 {
