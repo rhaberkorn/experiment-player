@@ -216,8 +216,8 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 		g_set_error(error,
 			    GTK_EXPERIMENT_TRANSCRIPT_ERROR,
 			    GTK_EXPERIMENT_TRANSCRIPT_ERROR_FILEOPEN,
-			    "Failed to open format file:\n%s",
-			    g_strerror(errno));
+			    "Failed to open format file \"%s\":\n%s",
+			    filename, g_strerror(errno));
 
 		goto redraw;
 	}
