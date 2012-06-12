@@ -50,6 +50,9 @@ static gboolean generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *node
 
 static gint experiment_reader_contrib_cmp(const ExperimentReaderContrib *a,
 					  const ExperimentReaderContrib *b);
+static void insert_contribution(gint64 start_time, gchar *text, GList **list);
+static inline void process_contribution(xmlDoc *doc, xmlNode *contrib,
+					GList **list);
 
 /** @private */
 #define XML_CHAR(STR) \
@@ -189,7 +192,7 @@ experiment_reader_contrib_cmp(const ExperimentReaderContrib *a,
 }
 
 static void
-insert_contribution(gint64 start_time, const gchar *text, GList **list)
+insert_contribution(gint64 start_time, gchar *text, GList **list)
 {
 	ExperimentReaderContrib *contrib;
 
@@ -198,7 +201,7 @@ insert_contribution(gint64 start_time, const gchar *text, GList **list)
 
 	contrib = g_malloc(sizeof(ExperimentReaderContrib) + strlen(text) + 1);
 	contrib->start_time = start_time;
-	g_stpcpy(contrib->text, text);
+	g_stpcpy(contrib->text, g_strchomp(text));
 
 	*list = g_list_insert_sorted(*list, contrib,
 				     (GCompareFunc)experiment_reader_contrib_cmp);
@@ -244,9 +247,11 @@ process_contribution(xmlDoc *doc, xmlNode *contrib, GList **list)
 				if (!xmlStrcmp(duration, XML_CHAR("micro")) ||
 				    !xmlStrcmp(duration, XML_CHAR("short")))
 					new = g_strconcat(text != NULL ? text : "",
-							  " ...", NULL);
+							  "... ", NULL);
+				else if (text == NULL)
+					new = g_strdup("...\n");
 				else
-					new = g_strconcat(text != NULL ? text : "",
+					new = g_strconcat(g_strchomp(text),
 							  "\n", NULL);
 				g_free(text);
 				text = new;
