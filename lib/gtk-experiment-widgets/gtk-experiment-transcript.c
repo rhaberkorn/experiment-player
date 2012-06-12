@@ -406,7 +406,7 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 {
 	GtkWidget *widget = GTK_WIDGET(trans);
 
-	gint64 current_time = 0;
+	gint64 current_time = 0, current_time_px;
 	gint last_contrib_y = -1;
 
 	gdk_draw_rectangle(GDK_DRAWABLE(trans->priv->layer_text),
@@ -427,6 +427,7 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 
 	if (trans->priv->time_adjustment != NULL)
 		current_time = (gint64)gtk_adjustment_get_value(GTK_ADJUSTMENT(trans->priv->time_adjustment));
+	current_time_px = TIME_TO_PX(current_time);
 
 	for (GList *cur = experiment_reader_get_contribution_by_time(
 							trans->priv->contribs,
@@ -437,7 +438,7 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 						   cur->data;
 
 		gint y = widget->allocation.height -
-			 TIME_TO_PX(current_time - contrib->start_time);
+			 (current_time_px - TIME_TO_PX(contrib->start_time));
 		int logical_height;
 
 		PangoAttrList *attrib_list;
