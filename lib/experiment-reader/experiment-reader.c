@@ -354,7 +354,7 @@ experiment_reader_get_contributions_by_speaker(ExperimentReader *reader,
  * @brief Get a contribution by time
  *
  * Gets the closest contribution after the specified time or the last one
- * if there is no contribution after or at the specified time.
+ * if there is no contribution after the specified time.
  * The contribution is returned as a pointer into the contribution list
  * so that the list may be traversed by the caller.
  *
@@ -371,7 +371,7 @@ experiment_reader_get_contribution_by_time(GList *contribs, gint64 timept)
 		ExperimentReaderContrib *contrib =
 					(ExperimentReaderContrib *)cur->data;
 
-		if (contrib->start_time >= timept ||
+		if (contrib->start_time > timept ||
 		    cur->next == NULL)
 			return cur;
 	}

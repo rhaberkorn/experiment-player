@@ -58,8 +58,6 @@ struct _GtkExperimentTranscriptPrivate {
 #define DEFAULT_WIDTH		100
 #define DEFAULT_HEIGHT		200
 
-#define LAYER_TEXT_INVISIBLE	100
-
 /** @todo scale should be configurable */
 #define PX_PER_SECOND		15
 #define TIME_TO_PX(TIME)	((TIME)/(1000/PX_PER_SECOND))

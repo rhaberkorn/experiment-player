@@ -392,7 +392,7 @@ gtk_experiment_transcript_reconfigure(GtkExperimentTranscript *trans)
 	GOBJECT_UNREF_SAFE(trans->priv->layer_text);
 	trans->priv->layer_text = gdk_pixmap_new(gtk_widget_get_window(widget),
 						 widget->allocation.width,
-						 widget->allocation.height + LAYER_TEXT_INVISIBLE,
+						 widget->allocation.height,
 						 -1);
 	pango_layout_set_width(trans->priv->layer_text_layout,
 			       widget->allocation.width*PANGO_SCALE);
@@ -407,14 +407,14 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 	GtkWidget *widget = GTK_WIDGET(trans);
 
 	gint64 current_time = 0;
-	gint last_contrib_y;
+	gint last_contrib_y = -1;
 
 	gdk_draw_rectangle(GDK_DRAWABLE(trans->priv->layer_text),
 			   widget->style->bg_gc[gtk_widget_get_state(widget)],
 			   TRUE,
 			   0, 0,
 			   widget->allocation.width,
-			   widget->allocation.height + LAYER_TEXT_INVISIBLE);
+			   widget->allocation.height);
 
 	gtk_widget_queue_draw_area(widget, 0, 0,
 				   widget->allocation.width,
@@ -427,13 +427,14 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 
 	if (trans->priv->time_adjustment != NULL)
 		current_time = (gint64)gtk_adjustment_get_value(GTK_ADJUSTMENT(trans->priv->time_adjustment));
-	last_contrib_y = widget->allocation.height + LAYER_TEXT_INVISIBLE;
 
-	for (GList *cur = experiment_reader_get_contribution_by_time(trans->priv->contribs,
-								     current_time);
+	for (GList *cur = experiment_reader_get_contribution_by_time(
+							trans->priv->contribs,
+							current_time);
 	     cur != NULL;
 	     cur = cur->prev) {
-		ExperimentReaderContrib *contrib = (ExperimentReaderContrib *)cur->data;
+		ExperimentReaderContrib *contrib = (ExperimentReaderContrib *)
+						   cur->data;
 
 		gint y = widget->allocation.height -
 			 TIME_TO_PX(current_time - contrib->start_time);
@@ -441,8 +442,10 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 
 		PangoAttrList *attrib_list;
 
-		if (y > widget->allocation.height + LAYER_TEXT_INVISIBLE)
+		if (y >= widget->allocation.height) {
+			last_contrib_y = y;
 			continue;
+		}
 
 		attrib_list = pango_attr_list_new();
 
@@ -462,8 +465,13 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 
 		pango_layout_set_text(trans->priv->layer_text_layout,
 				      contrib->text, -1);
-		pango_layout_set_height(trans->priv->layer_text_layout,
-					(last_contrib_y - y)*PANGO_SCALE);
+
+		if (last_contrib_y == 1)
+			pango_layout_set_height(trans->priv->layer_text_layout,
+						G_MAXINT);
+		else
+			pango_layout_set_height(trans->priv->layer_text_layout,
+						(last_contrib_y - y)*PANGO_SCALE);
 
 		pango_layout_get_pixel_size(trans->priv->layer_text_layout,
 					    NULL, &logical_height);
@@ -473,6 +481,8 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 		gdk_draw_layout(GDK_DRAWABLE(trans->priv->layer_text),
 				widget->style->text_gc[gtk_widget_get_state(widget)],
 				0, y, trans->priv->layer_text_layout);
+		if (y <= 0)
+			break;
 		last_contrib_y = y;
 	}
 }
