@@ -42,12 +42,19 @@ typedef struct _GtkExperimentTranscriptFormat {
 	PangoAttrList	*attribs;
 } GtkExperimentTranscriptFormat;
 
+/** @private */
+typedef enum {
+	GTK_EXPERIMENT_TRANSCRIPT_REVERSE_MASK = 1 << 0
+} GtkExperimentTranscriptFlagMask;
+
 /**
  * @private
  * Private instance attribute structure.
  * You can access these attributes using \c klass->priv->attribute.
  */
 struct _GtkExperimentTranscriptPrivate {
+	gint		flag_mask;
+
 	GtkObject	*time_adjustment;
 	gulong		time_adj_on_value_changed_id;
 
@@ -59,7 +66,8 @@ struct _GtkExperimentTranscriptPrivate {
 	GtkExperimentTranscriptFormat interactive_format;
 
 	GtkWidget	*menu;			/**< Drop-down menu, doesn't have to be unreferenced manually */
-	GSList		*alignment_group;	/**< GtkRadioMenuItem group (owned by GTK) */
+	GSList		*alignment_group;	/**< GtkRadioMenuItem group for Alignment settings (owned by GTK) */
+	GtkWidget	*menu_reverse_item;
 };
 
 /** @private */

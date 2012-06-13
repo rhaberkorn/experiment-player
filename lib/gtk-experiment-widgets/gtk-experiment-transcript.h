@@ -74,7 +74,6 @@ typedef struct _GtkExperimentTranscript {
 	GtkWidget parent_instance;		/**< Parent instance structure */
 
 	gchar *speaker;				/**< Name of speaker whose contributions are displayed (\b read-only) */
-	gboolean reverse;			/**< Reverse mode activated (\b read-only) */
 
 	/**
 	 * Default formattings to apply for interactive for interactive format
@@ -112,6 +111,10 @@ gboolean gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 					ExperimentReader *exp);
 gboolean gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 						 const gchar *filename);
+
+void gtk_experiment_transcript_set_reverse_mode(GtkExperimentTranscript *trans,
+						gboolean reverse);
+gboolean gtk_experiment_transcript_get_reverse_mode(GtkExperimentTranscript *trans);
 
 void gtk_experiment_transcript_set_alignment(GtkExperimentTranscript *trans,
 					     PangoAlignment alignment);

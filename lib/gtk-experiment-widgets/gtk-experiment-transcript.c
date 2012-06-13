@@ -129,11 +129,12 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	klass->priv = GTK_EXPERIMENT_TRANSCRIPT_GET_PRIVATE(klass);
 
 	klass->speaker = NULL;
-	klass->reverse = FALSE;
 
 	klass->interactive_format.default_font = NULL;
 	klass->interactive_format.default_text_color = NULL;
 	klass->interactive_format.default_bg_color = NULL;
+
+	klass->priv->flag_mask = 0;
 
 	klass->priv->time_adjustment = gtk_adjustment_new(0., 0., 0.,
 							  0., 0., 0.);
@@ -226,11 +227,13 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
 	gtk_widget_show(item);
 
-	item = gtk_check_menu_item_new_with_mnemonic("_Reverse");
-	g_signal_connect(item, "activate",
+	klass->priv->menu_reverse_item =
+			gtk_check_menu_item_new_with_mnemonic("_Reverse");
+	g_signal_connect(klass->priv->menu_reverse_item, "activate",
 			 G_CALLBACK(reverse_activated), klass);
-	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu), item);
-	gtk_widget_show(item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu),
+			      klass->priv->menu_reverse_item);
+	gtk_widget_show(klass->priv->menu_reverse_item);
 }
 
 /**
@@ -545,8 +548,9 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 		current_time = (gint64)gtk_adjustment_get_value(GTK_ADJUSTMENT(trans->priv->time_adjustment));
 	current_time_px = TIME_TO_PX(current_time);
 
-	renderer = trans->reverse ? render_contribution_topdown
-				  : render_contribution_bottomup;
+	renderer = gtk_experiment_transcript_get_reverse_mode(trans)
+			? render_contribution_topdown
+			: render_contribution_bottomup;
 
 	for (GList *cur = experiment_reader_get_contribution_by_time(
 							trans->priv->contribs,
@@ -739,8 +743,9 @@ reverse_activated(GtkWidget *widget, gpointer data)
 {
 	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(data);
 
-	trans->reverse =
-		gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+	trans->priv->flag_mask &= ~GTK_EXPERIMENT_TRANSCRIPT_REVERSE_MASK;
+	if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+		trans->priv->flag_mask |= GTK_EXPERIMENT_TRANSCRIPT_REVERSE_MASK;
 
 	if (gtk_widget_get_realized(GTK_WIDGET(trans)) &&
 	    trans->priv->layer_text != NULL)
@@ -822,6 +827,38 @@ gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 	}
 
 	return res;
+}
+
+/**
+ * @brief Set or unset reverse (top-down) render mode
+ *
+ * The render mode defaults to bottom-up mode for new widget instances.
+ *
+ * @param trans   Widget instance
+ * @param reverse Activate reverse-mode (\c TRUE), or deactivate (\c FALSE)
+ */
+void
+gtk_experiment_transcript_set_reverse_mode(GtkExperimentTranscript *trans,
+					   gboolean reverse)
+{
+	GtkCheckMenuItem *item =
+			GTK_CHECK_MENU_ITEM(trans->priv->menu_reverse_item);
+
+	gtk_check_menu_item_set_active(item, reverse);
+}
+
+/**
+ * @brief Get current reverse (top-down) render mode state
+ *
+ * @sa gtk_experiment_transcript_set_reverse_mode
+ *
+ * @param trans Widget instance
+ * @return \c TRUE if reverse-mode is active, else \c FALSE
+ */
+gboolean
+gtk_experiment_transcript_get_reverse_mode(GtkExperimentTranscript *trans)
+{
+	return trans->priv->flag_mask & GTK_EXPERIMENT_TRANSCRIPT_REVERSE_MASK;
 }
 
 /**

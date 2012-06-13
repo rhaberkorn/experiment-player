@@ -187,6 +187,20 @@ config_generic_get_transcript_color(const gchar *actor, const gchar *key,
 }
 
 void
+config_set_transcript_reverse_mode(const gchar *actor, gboolean reverse)
+{
+	g_key_file_set_boolean(keyfile, get_group_by_actor(actor),
+			       "Widget-Reverse-Mode", reverse);
+}
+
+gboolean
+config_get_transcript_reverse_mode(const gchar *actor)
+{
+	return g_key_file_get_boolean(keyfile, get_group_by_actor(actor),
+				      "Widget-Reverse-Mode", NULL);
+}
+
+void
 config_set_transcript_alignment(const gchar *actor, PangoAlignment alignment)
 {
 	static gchar **values = NULL;

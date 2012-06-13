@@ -307,6 +307,7 @@ main(int argc, char *argv[])
 
 	GtkAdjustment *adj;
 	PangoFontDescription *font_desc;
+	gboolean reverse;
 	PangoAlignment alignment;
 	GdkColor color;
 	GtkRcStyle *modified_style;
@@ -401,6 +402,9 @@ main(int argc, char *argv[])
 		gtk_widget_modify_bg(transcript_wizard_widget,
 				     GTK_STATE_NORMAL, &color);
 
+	reverse = config_get_transcript_reverse_mode(SPEAKER_WIZARD);
+	gtk_experiment_transcript_set_reverse_mode(transcript_wizard, reverse);
+
 	alignment = config_get_transcript_alignment(SPEAKER_WIZARD);
 	gtk_experiment_transcript_set_alignment(transcript_wizard, alignment);
 
@@ -423,6 +427,9 @@ main(int argc, char *argv[])
 	if (config_get_transcript_bg_color(SPEAKER_PROBAND, &color))
 		gtk_widget_modify_bg(transcript_proband_widget,
 				     GTK_STATE_NORMAL, &color);
+
+	reverse = config_get_transcript_reverse_mode(SPEAKER_PROBAND);
+	gtk_experiment_transcript_set_reverse_mode(transcript_proband, reverse);
 
 	alignment = config_get_transcript_alignment(SPEAKER_PROBAND);
 	gtk_experiment_transcript_set_alignment(transcript_proband, alignment);
@@ -457,6 +464,9 @@ main(int argc, char *argv[])
 						: NULL);
 	g_object_unref(modified_style);
 
+	reverse = gtk_experiment_transcript_get_reverse_mode(transcript_wizard);
+	config_set_transcript_reverse_mode(SPEAKER_WIZARD, reverse);
+
 	alignment = gtk_experiment_transcript_get_alignment(transcript_wizard);
 	config_set_transcript_alignment(SPEAKER_WIZARD, alignment);
 
@@ -478,6 +488,9 @@ main(int argc, char *argv[])
 						? &modified_style->bg[GTK_STATE_NORMAL]
 						: NULL);
 	g_object_unref(modified_style);
+
+	reverse = gtk_experiment_transcript_get_reverse_mode(transcript_proband);
+	config_set_transcript_reverse_mode(SPEAKER_PROBAND, reverse);
 
 	alignment = gtk_experiment_transcript_get_alignment(transcript_proband);
 	config_set_transcript_alignment(SPEAKER_PROBAND, alignment);
