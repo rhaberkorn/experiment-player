@@ -26,7 +26,6 @@
 #endif
 
 #include <assert.h>
-#include <inttypes.h>
 
 #include <glib.h>
 #include <glib/gprintf.h>
@@ -321,7 +320,7 @@ time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 
 	/** @todo Improve readability (e.g. h:mm:ss) */
 	/** @todo Do we always want to render the time column??? */
-	g_snprintf(buf, sizeof(buf), "%" PRId64 "ms", time_val);
+	g_snprintf(buf, sizeof(buf), "%" G_GINT64_FORMAT "ms", time_val);
 
 	g_object_set(renderer, "text", buf, NULL);
 }
