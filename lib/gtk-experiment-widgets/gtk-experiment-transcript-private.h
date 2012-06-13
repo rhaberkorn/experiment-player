@@ -23,6 +23,13 @@
 #ifndef __GTK_EXPERIMENT_TRANSCRIPT_PRIVATE_H
 #define __GTK_EXPERIMENT_TRANSCRIPT_PRIVATE_H
 
+#include <glib.h>
+
+#include <gdk/gdk.h>
+#include <gtk/gtk.h>
+
+#include <experiment-reader.h>
+
 #include "gtk-experiment-transcript.h"
 
 /** @private */
@@ -54,6 +61,11 @@ struct _GtkExperimentTranscriptPrivate {
 	GtkWidget	*menu;			/**< Drop-down menu, doesn't have to be unreferenced manually */
 	GSList		*alignment_group;	/**< GtkRadioMenuItem group (owned by GTK) */
 };
+
+/** @private */
+typedef gboolean (*GtkExperimentTranscriptContribRenderer)
+		 (GtkExperimentTranscript *, ExperimentReaderContrib *,
+		  gint64, gint64, gint *);
 
 #define DEFAULT_WIDTH		100
 #define DEFAULT_HEIGHT		200

@@ -36,6 +36,7 @@
 
 #include <gtk/gtk.h>
 
+#include "gtk-experiment-transcript.h"
 #include "gtk-experiment-transcript-private.h"
 
 #define FORMAT_REGEX_COMPILE_FLAGS	(G_REGEX_CASELESS)

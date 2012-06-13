@@ -31,10 +31,11 @@
 #include <glib/gprintf.h>
 
 #include <gdk/gdk.h>
-
 #include <gtk/gtk.h>
+
 #include <experiment-reader.h>
 
+#include "gtk-experiment-transcript.h"
 #include "gtk-experiment-transcript-private.h"
 
 static void gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass);
@@ -54,6 +55,20 @@ static void gtk_experiment_transcript_finalize(GObject *gobject);
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
 static void gtk_experiment_transcript_reconfigure(GtkExperimentTranscript *trans);
+
+static gboolean configure_text_layout(GtkExperimentTranscript *trans,
+				      ExperimentReaderContrib *contrib,
+				      gint64 current_time,
+				      gint y, gint last_contrib_y,
+				      int *logical_height);
+static gboolean render_contribution_bottomup(GtkExperimentTranscript *trans,
+					     ExperimentReaderContrib *contrib,
+					     gint64 current_time, gint64 current_time_px,
+					     gint *last_contrib_y);
+static gboolean render_contribution_topdown(GtkExperimentTranscript *trans,
+					    ExperimentReaderContrib *contrib,
+					    gint64 current_time, gint64 current_time_px,
+					    gint *last_contrib_y);
 
 static void state_changed(GtkWidget *widget, GtkStateType state);
 static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
@@ -400,6 +415,107 @@ gtk_experiment_transcript_reconfigure(GtkExperimentTranscript *trans)
 	gtk_experiment_transcript_text_layer_redraw(trans);
 }
 
+static gboolean
+configure_text_layout(GtkExperimentTranscript *trans,
+		      ExperimentReaderContrib *contrib,
+		      gint64 current_time,
+		      gint y, gint last_contrib_y,
+		      int *logical_height)
+{
+	PangoAttrList *attrib_list;
+
+	if (contrib->start_time > current_time)
+		return FALSE;
+
+	attrib_list = pango_attr_list_new();
+
+	for (GSList *cur = trans->priv->formats; cur != NULL; cur = cur->next) {
+		GtkExperimentTranscriptFormat *fmt =
+				(GtkExperimentTranscriptFormat *)cur->data;
+
+		gtk_experiment_transcript_apply_format(fmt, contrib->text,
+						       attrib_list);
+	}
+	gtk_experiment_transcript_apply_format(&trans->priv->interactive_format,
+					       contrib->text, attrib_list);
+
+	pango_layout_set_attributes(trans->priv->layer_text_layout,
+				    attrib_list);
+	pango_attr_list_unref(attrib_list);
+
+	pango_layout_set_text(trans->priv->layer_text_layout,
+			      contrib->text, -1);
+
+	pango_layout_set_height(trans->priv->layer_text_layout,
+				last_contrib_y == -1
+					? G_MAXINT
+					: ABS(last_contrib_y - y)*PANGO_SCALE);
+
+	pango_layout_get_pixel_size(trans->priv->layer_text_layout,
+				    NULL, logical_height);
+
+	return TRUE;
+}
+
+static gboolean
+render_contribution_bottomup(GtkExperimentTranscript *trans,
+			     ExperimentReaderContrib *contrib,
+			     gint64 current_time, gint64 current_time_px,
+			     gint *last_contrib_y)
+{
+	GtkWidget *widget = GTK_WIDGET(trans);
+
+	gint old_last_contrib_y = *last_contrib_y;
+	int logical_height;
+
+	*last_contrib_y = widget->allocation.height -
+			  (current_time_px - TIME_TO_PX(contrib->start_time));
+
+	if (!configure_text_layout(trans, contrib, current_time,
+				   *last_contrib_y, old_last_contrib_y,
+				   &logical_height))
+		return TRUE;
+
+	if (*last_contrib_y + logical_height < 0)
+		return FALSE;
+
+	gdk_draw_layout(GDK_DRAWABLE(trans->priv->layer_text),
+			widget->style->text_gc[gtk_widget_get_state(widget)],
+			0, *last_contrib_y,
+			trans->priv->layer_text_layout);
+
+	return *last_contrib_y > 0;
+}
+
+static gboolean
+render_contribution_topdown(GtkExperimentTranscript *trans,
+			    ExperimentReaderContrib *contrib,
+			    gint64 current_time, gint64 current_time_px,
+			    gint *last_contrib_y)
+{
+	GtkWidget *widget = GTK_WIDGET(trans);
+
+	gint old_last_contrib_y = *last_contrib_y;
+	int logical_height;
+
+	*last_contrib_y = current_time_px - TIME_TO_PX(contrib->start_time);
+
+	if (!configure_text_layout(trans, contrib, current_time,
+				   *last_contrib_y, old_last_contrib_y,
+				   &logical_height))
+		return TRUE;
+
+	if (*last_contrib_y - logical_height > widget->allocation.height)
+		return FALSE;
+
+	gdk_draw_layout(GDK_DRAWABLE(trans->priv->layer_text),
+			widget->style->text_gc[gtk_widget_get_state(widget)],
+			0, *last_contrib_y - logical_height,
+			trans->priv->layer_text_layout);
+
+	return *last_contrib_y < widget->allocation.height;
+}
+
 /** @private */
 void
 gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
@@ -408,6 +524,8 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 
 	gint64 current_time = 0, current_time_px;
 	gint last_contrib_y = -1;
+
+	GtkExperimentTranscriptContribRenderer renderer;
 
 	gdk_draw_rectangle(GDK_DRAWABLE(trans->priv->layer_text),
 			   widget->style->bg_gc[gtk_widget_get_state(widget)],
@@ -423,11 +541,12 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 	if (trans->priv->contribs == NULL)
 		return;
 
-	/** @todo reverse mode */
-
 	if (trans->priv->time_adjustment != NULL)
 		current_time = (gint64)gtk_adjustment_get_value(GTK_ADJUSTMENT(trans->priv->time_adjustment));
 	current_time_px = TIME_TO_PX(current_time);
+
+	renderer = trans->reverse ? render_contribution_topdown
+				  : render_contribution_bottomup;
 
 	for (GList *cur = experiment_reader_get_contribution_by_time(
 							trans->priv->contribs,
@@ -437,54 +556,9 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 		ExperimentReaderContrib *contrib = (ExperimentReaderContrib *)
 						   cur->data;
 
-		gint y = widget->allocation.height -
-			 (current_time_px - TIME_TO_PX(contrib->start_time));
-		int logical_height;
-
-		PangoAttrList *attrib_list;
-
-		if (y >= widget->allocation.height) {
-			last_contrib_y = y;
-			continue;
-		}
-
-		attrib_list = pango_attr_list_new();
-
-		for (GSList *cur = trans->priv->formats; cur != NULL; cur = cur->next) {
-			GtkExperimentTranscriptFormat *fmt =
-				(GtkExperimentTranscriptFormat *)cur->data;
-
-			gtk_experiment_transcript_apply_format(fmt, contrib->text,
-							       attrib_list);
-		}
-		gtk_experiment_transcript_apply_format(&trans->priv->interactive_format,
-						       contrib->text, attrib_list);
-
-		pango_layout_set_attributes(trans->priv->layer_text_layout,
-					    attrib_list);
-		pango_attr_list_unref(attrib_list);
-
-		pango_layout_set_text(trans->priv->layer_text_layout,
-				      contrib->text, -1);
-
-		if (last_contrib_y == 1)
-			pango_layout_set_height(trans->priv->layer_text_layout,
-						G_MAXINT);
-		else
-			pango_layout_set_height(trans->priv->layer_text_layout,
-						(last_contrib_y - y)*PANGO_SCALE);
-
-		pango_layout_get_pixel_size(trans->priv->layer_text_layout,
-					    NULL, &logical_height);
-		if (y + logical_height < 0)
+		if (!renderer(trans, contrib, current_time, current_time_px,
+			      &last_contrib_y))
 			break;
-
-		gdk_draw_layout(GDK_DRAWABLE(trans->priv->layer_text),
-				widget->style->text_gc[gtk_widget_get_state(widget)],
-				0, y, trans->priv->layer_text_layout);
-		if (y <= 0)
-			break;
-		last_contrib_y = y;
 	}
 }
 
@@ -667,6 +741,10 @@ reverse_activated(GtkWidget *widget, gpointer data)
 
 	trans->reverse =
 		gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+
+	if (gtk_widget_get_realized(GTK_WIDGET(trans)) &&
+	    trans->priv->layer_text != NULL)
+		gtk_experiment_transcript_text_layer_redraw(trans);
 }
 
 /*
