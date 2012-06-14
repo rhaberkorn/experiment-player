@@ -319,11 +319,13 @@ audio-volume-medium</property>
                 <child>
                   <object class="GtkExperimentTranscript" id="transcript_wizard_widget">
                     <property name="visible">True</property>
+                    <property name="can_focus">True</property>
                   </object>
                 </child>
                 <child>
                   <object class="GtkExperimentTranscript" id="transcript_proband_widget">
                     <property name="visible">True</property>
+                    <property name="can_focus">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -485,6 +487,9 @@ audio-volume-medium</property>
                     <property name="headers_clickable">False</property>
                     <property name="search_column">0</property>
                     <signal name="time_selected" handler="navigator_widget_time_selected_cb" object="player_widget"/>
+                    <signal name="section_activated" handler="navigator_widget_section_activated_cb"/>
+                    <signal name="focus_in_event" handler="navigator_widget_generic_focus_event_cb"/>
+                    <signal name="focus_out_event" handler="navigator_widget_generic_focus_event_cb"/>
                   </object>
                 </child>
               </object>

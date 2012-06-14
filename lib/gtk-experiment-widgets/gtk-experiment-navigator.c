@@ -48,7 +48,10 @@ static void time_cell_data_cb(GtkTreeViewColumn *col,
 			      gpointer user_data);
 
 
-static inline void select_time(GtkExperimentNavigator *navi, gint64 selected_time);
+static inline void select_time(GtkExperimentNavigator *navi,
+			       gint64 selected_time);
+static inline void activate_section(GtkExperimentNavigator *navi,
+				    gint64 start, gint64 end);
 
 /**
  * @private
@@ -89,6 +92,7 @@ struct _GtkExperimentNavigatorPrivate {
 /** @private */
 enum {
 	TIME_SELECTED_SIGNAL,
+	SECTION_ACTIVATED_SIGNAL,
 	LAST_SIGNAL
 };
 static guint gtk_experiment_navigator_signals[LAST_SIGNAL] = {0};
@@ -117,9 +121,19 @@ static void
 gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
+	GtkTreeViewClass *treeview_class = GTK_TREE_VIEW_CLASS(klass);
 
 	gobject_class->dispose = gtk_experiment_navigator_dispose;
 	gobject_class->finalize = gtk_experiment_navigator_finalize;
+
+	/**
+	 * @todo
+	 * Set signal handlers to respond to row selection (double-click) and
+	 * row activations (single-click) in order to emit the "time-selected"
+	 * and "section-activated" signals on the navigator widget.
+	 * To set a signal handler simply set the \e GtkTreeView's
+	 * class structure fields.
+	 */
 
 	gtk_experiment_navigator_signals[TIME_SELECTED_SIGNAL] =
 		g_signal_new("time-selected",
@@ -129,6 +143,15 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 			     NULL, NULL,
 			     gtk_experiment_widgets_marshal_VOID__INT64,
 			     G_TYPE_NONE, 1, G_TYPE_INT64);
+
+	gtk_experiment_navigator_signals[SECTION_ACTIVATED_SIGNAL] =
+		g_signal_new("section-activated",
+			     G_TYPE_FROM_CLASS(klass),
+			     G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
+			     G_STRUCT_OFFSET(GtkExperimentNavigatorClass, section_activated),
+			     NULL, NULL,
+			     gtk_experiment_widgets_marshal_VOID__INT64_INT64,
+			     G_TYPE_NONE, 2, G_TYPE_INT64, G_TYPE_INT64);
 
 	g_type_class_add_private(klass, sizeof(GtkExperimentNavigatorPrivate));
 }
@@ -216,7 +239,6 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	g_object_unref(store);
 
 	/** @todo better \e TreeViewColumn formatting */
-	/** @todo connect signals to respond to row activations */
 	/**
 	 * @todo
 	 * Initialize necessary \b public and \b private attributes.
@@ -328,7 +350,7 @@ time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 /**
  * @brief Emit "time-selected" signal on a \e GtkExperimentNavigator instance.
  *
- * It should be emitted when a row entry was selected.
+ * It should be emitted when a row entry was selected (double-clicked).
  *
  * @sa GtkExperimentNavigatorClass::time_selected
  *
@@ -340,6 +362,24 @@ select_time(GtkExperimentNavigator *navi, gint64 selected_time)
 {
 	g_signal_emit(navi, gtk_experiment_navigator_signals[TIME_SELECTED_SIGNAL], 0,
 		      selected_time);
+}
+
+/**
+ * @brief Emit "section-activated" signal on a \e GtkExperimentNavigator instance.
+ *
+ * It should be emitted when a row entry was activated (e.g. single-clicked)
+ *
+ * @sa GtkExperimentNavigatorClass::section_activated
+ *
+ * @param navi  Widget to emit the signal on
+ * @param start Start time of section in milliseconds
+ * @param end   End time of section in milliseconds
+ */
+static inline void
+activate_section(GtkExperimentNavigator *navi, gint64 start, gint64 end)
+{
+	g_signal_emit(navi, gtk_experiment_navigator_signals[SECTION_ACTIVATED_SIGNAL], 0,
+		      start, end);
 }
 
 /*

@@ -207,6 +207,57 @@ navigator_widget_time_selected_cb(GtkWidget *widget, gint64 selected_time,
 	gtk_vlc_player_seek(GTK_VLC_PLAYER(widget), selected_time);
 }
 
+static struct {
+	gint64 start;
+	gint64 end;
+} last_activated_section = {-1, -1};
+
+/** @private */
+void
+navigator_widget_section_activated_cb(GtkWidget *widget __attribute__((unused)),
+				      gint64 start, gint64 end,
+				      gpointer user_data __attribute__((unused)))
+{
+	GtkExperimentTranscript *transcript_wizard =
+			GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget);
+	GtkExperimentTranscript *transcript_proband =
+			GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget);
+
+	gtk_experiment_transcript_set_backdrop_area(transcript_wizard,
+						    start, end);
+	gtk_experiment_transcript_set_backdrop_area(transcript_proband,
+						    start, end);
+
+	last_activated_section.start = start;
+	last_activated_section.end = end;
+}
+
+/** @private */
+gboolean
+navigator_widget_generic_focus_event_cb(GtkWidget *widget __attribute__((unused)),
+				        GdkEventFocus *event,
+				        gpointer user_data __attribute__((unused)))
+{
+	GtkExperimentTranscript *transcript_wizard =
+			GTK_EXPERIMENT_TRANSCRIPT(transcript_wizard_widget);
+	GtkExperimentTranscript *transcript_proband =
+			GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget);
+
+	gint64 start = -1, end = -1;
+
+	if (event->in) {
+		start = last_activated_section.start;
+		end = last_activated_section.end;
+	}
+
+	gtk_experiment_transcript_set_backdrop_area(transcript_wizard,
+						    start, end);
+	gtk_experiment_transcript_set_backdrop_area(transcript_proband,
+						    start, end);
+
+	return TRUE;
+}
+
 /** @private */
 void
 generic_quit_cb(GtkWidget *widget __attribute__((unused)),

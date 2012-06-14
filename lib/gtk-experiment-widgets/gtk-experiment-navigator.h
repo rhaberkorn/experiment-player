@@ -76,14 +76,24 @@ typedef struct _GtkExperimentNavigatorClass {
 
 	/**
 	 * Callback function to invoke when emitting the "time-selected"
-	 * signal. Do not set manually.
+	 * signal.
 	 *
 	 * @param self          \e GtkExperimentNavigator the event was emitted on.
 	 * @param selected_time Time selected by the navigator in milliseconds
-	 * @param user_data     Callback user data
 	 */
 	void (*time_selected)(GtkExperimentNavigator *self,
-			      gint64 selected_time, gpointer user_data);
+			      gint64 selected_time);
+
+	/**
+	 * Callback function to invoke when emitting the "section-activated"
+	 * signal.
+	 *
+	 * @param self  \e GtkExperimentNavigator the event was emitted on.
+	 * @param start Start time of section in milliseconds
+	 * @param end   End time of section in milliseconds
+	 */
+	void (*section_activated)(GtkExperimentNavigator *self,
+				  gint64 start, gint64 end);
 } GtkExperimentNavigatorClass;
 
 /** @private */

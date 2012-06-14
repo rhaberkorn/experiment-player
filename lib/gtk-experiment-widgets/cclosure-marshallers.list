@@ -1,2 +1,5 @@
 # Standard marshallers for "time-selected" signal callbacks
 VOID:INT64
+
+# Standard marshallers for "section-activated" signal callbacks
+VOID:INT64,INT64
