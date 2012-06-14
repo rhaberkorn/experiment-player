@@ -61,6 +61,8 @@ GtkWidget *player_widget,
 	  *playpause_button,
 	  *volume_button;
 
+GtkWidget *player_window_statusbar;
+
 GtkWidget *transcript_table,
 	  *transcript_wizard_widget,
 	  *transcript_proband_widget,
@@ -93,6 +95,24 @@ help_menu_about_item_activate_cb(GtkWidget *widget,
 {
 	gtk_dialog_run(GTK_DIALOG(widget));
 	gtk_widget_hide(widget);
+}
+
+/** @private */
+void
+player_widget_length_changed_cb(GtkWidget *widget, gint64 new_length,
+				gpointer data __attribute__((unused)))
+{
+	gtk_label_set_text(GTK_LABEL(widget),
+			   format_timepoint("Length: ", new_length));
+}
+
+/** @private */
+void
+player_widget_time_changed_cb(GtkWidget *widget, gint64 new_time,
+			      gpointer data __attribute__((unused)))
+{
+	gtk_label_set_text(GTK_LABEL(widget),
+			   format_timepoint("Time: ", new_time));
 }
 
 /** @private */
@@ -380,6 +400,8 @@ main(int argc, char *argv[])
 	BUILDER_INIT(builder, scale_widget);
 	BUILDER_INIT(builder, playpause_button);
 	BUILDER_INIT(builder, volume_button);
+
+	BUILDER_INIT(builder, player_window_statusbar);
 
 	BUILDER_INIT(builder, quickopen_menu);
 	BUILDER_INIT(builder, quickopen_menu_empty_item);

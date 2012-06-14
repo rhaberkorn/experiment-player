@@ -58,6 +58,8 @@ extern GtkWidget *player_widget,
 		 *playpause_button,
 		 *volume_button;
 
+extern GtkWidget *player_window_statusbar;
+
 extern GtkWidget *transcript_table,
 		 *transcript_wizard_widget,
 		 *transcript_proband_widget,
@@ -227,6 +229,20 @@ path_strip_extension(const gchar *filename)
 		*p = '\0';
 
 	return ret;
+}
+
+/** @public */
+static inline const gchar *
+format_timepoint(const gchar *prefix, gint64 timept)
+{
+	static gchar buf[255];
+
+	g_snprintf(buf, sizeof(buf),
+		   "%s%" G_GINT64_FORMAT ":%02" G_GINT64_FORMAT,
+		   prefix != NULL ? prefix : "",
+		   timept / (1000*60), (timept/1000) % 60);
+
+	return buf;
 }
 
 #endif

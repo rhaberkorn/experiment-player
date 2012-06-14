@@ -145,6 +145,8 @@
         <child>
           <object class="GtkVlcPlayer" id="player_widget">
             <property name="visible">True</property>
+            <signal name="time_changed" handler="player_widget_time_changed_cb" object="player_window_statusbar_time"/>
+            <signal name="length_changed" handler="player_widget_length_changed_cb" object="player_window_statusbar_length"/>
           </object>
           <packing>
             <property name="position">1</property>
@@ -235,6 +237,42 @@ audio-volume-medium</property>
             <property name="expand">False</property>
             <property name="fill">False</property>
             <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkStatusbar" id="player_window_statusbar">
+            <property name="visible">True</property>
+            <property name="spacing">2</property>
+            <child>
+              <object class="GtkLabel" id="player_window_statusbar_time">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">Time: 0:00</property>
+                <property name="width_chars">15</property>
+                <property name="single_line_mode">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="player_window_statusbar_length">
+                <property name="visible">True</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">Length: 0:00</property>
+                <property name="width_chars">15</property>
+                <property name="single_line_mode">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>
