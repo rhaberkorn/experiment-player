@@ -44,7 +44,8 @@ typedef struct _GtkExperimentTranscriptFormat {
 
 /** @private */
 typedef enum {
-	GTK_EXPERIMENT_TRANSCRIPT_REVERSE_MASK = 1 << 0
+	GTK_EXPERIMENT_TRANSCRIPT_REVERSE_MASK		= 1 << 0,
+	GTK_EXPERIMENT_TRANSCRIPT_USE_BACKDROP_MASK	= 1 << 1
 } GtkExperimentTranscriptFlagMask;
 
 /**

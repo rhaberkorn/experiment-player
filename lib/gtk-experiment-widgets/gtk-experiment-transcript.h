@@ -112,6 +112,9 @@ gboolean gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 gboolean gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 						 const gchar *filename);
 
+void gtk_experiment_transcript_set_use_backdrop_area(GtkExperimentTranscript *trans,
+						     gboolean use);
+gboolean gtk_experiment_transcript_get_use_backdrop_area(GtkExperimentTranscript *trans);
 void gtk_experiment_transcript_set_backdrop_area(GtkExperimentTranscript *trans,
 						 gint64 start, gint64 end);
 

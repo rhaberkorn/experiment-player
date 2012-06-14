@@ -207,11 +207,6 @@ navigator_widget_time_selected_cb(GtkWidget *widget, gint64 selected_time,
 	gtk_vlc_player_seek(GTK_VLC_PLAYER(widget), selected_time);
 }
 
-static struct {
-	gint64 start;
-	gint64 end;
-} last_activated_section = {-1, -1};
-
 /** @private */
 void
 navigator_widget_section_activated_cb(GtkWidget *widget __attribute__((unused)),
@@ -227,9 +222,6 @@ navigator_widget_section_activated_cb(GtkWidget *widget __attribute__((unused)),
 						    start, end);
 	gtk_experiment_transcript_set_backdrop_area(transcript_proband,
 						    start, end);
-
-	last_activated_section.start = start;
-	last_activated_section.end = end;
 }
 
 /** @private */
@@ -243,17 +235,10 @@ navigator_widget_generic_focus_event_cb(GtkWidget *widget __attribute__((unused)
 	GtkExperimentTranscript *transcript_proband =
 			GTK_EXPERIMENT_TRANSCRIPT(transcript_proband_widget);
 
-	gint64 start = -1, end = -1;
-
-	if (event->in) {
-		start = last_activated_section.start;
-		end = last_activated_section.end;
-	}
-
-	gtk_experiment_transcript_set_backdrop_area(transcript_wizard,
-						    start, end);
-	gtk_experiment_transcript_set_backdrop_area(transcript_proband,
-						    start, end);
+	gtk_experiment_transcript_set_use_backdrop_area(transcript_wizard,
+							event->in == TRUE);
+	gtk_experiment_transcript_set_use_backdrop_area(transcript_proband,
+							event->in == TRUE);
 
 	return TRUE;
 }

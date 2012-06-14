@@ -152,7 +152,8 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	pango_layout_set_wrap(klass->priv->layer_text_layout, PANGO_WRAP_WORD_CHAR);
 	pango_layout_set_ellipsize(klass->priv->layer_text_layout, PANGO_ELLIPSIZE_END);
 
-	klass->priv->backdrop.start = klass->priv->backdrop.end = -1;
+	klass->priv->backdrop.start = 0;
+	klass->priv->backdrop.end = 0;
 
 	klass->priv->contribs = NULL;
 	klass->priv->formats = NULL;
@@ -534,8 +535,7 @@ render_backdrop_area(GtkExperimentTranscript *trans, gint64 current_time_px)
 	GdkColor color;
 	GdkColor *bg = &widget->style->bg[gtk_widget_get_state(widget)];
 
-	if (trans->priv->backdrop.start < 0 ||
-	    trans->priv->backdrop.end < 0)
+	if (!gtk_experiment_transcript_get_use_backdrop_area(trans))
 		return;
 
 	if (gtk_experiment_transcript_get_reverse_mode(trans)) {
@@ -892,25 +892,69 @@ gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 }
 
 /**
- * @brief Configure transcript's backdrop area
- *
- * Set or unset a highlighted area of the transcript by specifying start
- * and end timepoints. The highlighted area is drawn with a 16% lighter or
- * darker background color than the widgets current background color.
+ * @brief Enable or disable drawing a backdrop area
  *
  * @param trans Widget instance
- * @param start Start time in milliseconds, or negative value (disable backdrop area)
- * @param end   End time in milliseconds, or negative value (disable backdrop area)
+ * @param use   Whether to enable (\c TRUE) or disable (\c FALSE) the backdrop
+ *              area
+ */
+void
+gtk_experiment_transcript_set_use_backdrop_area(GtkExperimentTranscript *trans,
+						gboolean use)
+{
+	trans->priv->flag_mask &= ~GTK_EXPERIMENT_TRANSCRIPT_USE_BACKDROP_MASK;
+	trans->priv->flag_mask |=
+			use ? GTK_EXPERIMENT_TRANSCRIPT_USE_BACKDROP_MASK : 0;
+
+	if (gtk_widget_get_realized(GTK_WIDGET(trans)) &&
+	    trans->priv->layer_text != NULL)
+		gtk_experiment_transcript_text_layer_redraw(trans);
+}
+
+/**
+ * @brief Retrieve whether a backdrop area is drawn or not
+ *
+ * @param trans Widget instance
+ * @return \c TRUE if it is, else \c FALSE
+ */
+gboolean
+gtk_experiment_transcript_get_use_backdrop_area(GtkExperimentTranscript *trans)
+{
+	return trans->priv->flag_mask &
+	       GTK_EXPERIMENT_TRANSCRIPT_USE_BACKDROP_MASK;
+}
+
+/**
+ * @brief Configure transcript's backdrop area
+ *
+ * Set a highlighted area of the transcript by specifying start
+ * and end timepoints. The highlighted area is drawn with a 16% lighter or
+ * darker background color than the widgets current background color.
+ * It is ownly drawn when the backdrop area is enabled.
+ *
+ * @sa gtk_experiment_transcript_set_use_backdrop_area
+ *
+ * @param trans Widget instance
+ * @param start Start time in milliseconds
+ * @param end   End time in milliseconds
  */
 void
 gtk_experiment_transcript_set_backdrop_area(GtkExperimentTranscript *trans,
 					    gint64 start, gint64 end)
 {
-	if (start > end)
-		start = end = -1;
+	start = MAX(start, 0);
+	end = MAX(end, 0);
 
-	trans->priv->backdrop.start = start;
-	trans->priv->backdrop.end = end;
+	if (start <= end) {
+		trans->priv->backdrop.start = start;
+		trans->priv->backdrop.end = end;
+	} else {
+		trans->priv->backdrop.end = start;
+		trans->priv->backdrop.start = end;
+	}
+
+	if (!gtk_experiment_transcript_get_use_backdrop_area(trans))
+		return;
 
 	if (gtk_widget_get_realized(GTK_WIDGET(trans)) &&
 	    trans->priv->layer_text != NULL)
