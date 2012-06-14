@@ -69,6 +69,8 @@ static gboolean render_contribution_topdown(GtkExperimentTranscript *trans,
 					    ExperimentReaderContrib *contrib,
 					    gint64 current_time, gint64 current_time_px,
 					    gint *last_contrib_y);
+static inline void render_backdrop_area(GtkExperimentTranscript *trans,
+					gint64 current_time_px);
 
 static void state_changed(GtkWidget *widget, GtkStateType state);
 static gboolean button_pressed(GtkWidget *widget, GdkEventButton *event);
@@ -149,6 +151,8 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 		gtk_widget_create_pango_layout(GTK_WIDGET(klass), NULL);
 	pango_layout_set_wrap(klass->priv->layer_text_layout, PANGO_WRAP_WORD_CHAR);
 	pango_layout_set_ellipsize(klass->priv->layer_text_layout, PANGO_ELLIPSIZE_END);
+
+	klass->priv->backdrop.start = klass->priv->backdrop.end = -1;
 
 	klass->priv->contribs = NULL;
 	klass->priv->formats = NULL;
@@ -234,6 +238,8 @@ gtk_experiment_transcript_init(GtkExperimentTranscript *klass)
 	gtk_menu_shell_append(GTK_MENU_SHELL(klass->priv->menu),
 			      klass->priv->menu_reverse_item);
 	gtk_widget_show(klass->priv->menu_reverse_item);
+
+	gtk_widget_set_can_focus(GTK_WIDGET(klass), TRUE);
 }
 
 /**
@@ -519,6 +525,55 @@ render_contribution_topdown(GtkExperimentTranscript *trans,
 	return *last_contrib_y < widget->allocation.height;
 }
 
+static inline void
+render_backdrop_area(GtkExperimentTranscript *trans, gint64 current_time_px)
+{
+	GtkWidget *widget = GTK_WIDGET(trans);
+
+	gint y_start, y_end;
+	GdkColor color;
+	GdkColor *bg = &widget->style->bg[gtk_widget_get_state(widget)];
+
+	if (trans->priv->backdrop.start < 0 ||
+	    trans->priv->backdrop.end < 0)
+		return;
+
+	if (gtk_experiment_transcript_get_reverse_mode(trans)) {
+		y_end = current_time_px - TIME_TO_PX(trans->priv->backdrop.start);
+		y_start = current_time_px - TIME_TO_PX(trans->priv->backdrop.end);
+	} else {
+		y_start = widget->allocation.height -
+			  (current_time_px - TIME_TO_PX(trans->priv->backdrop.start));
+		y_end = widget->allocation.height -
+			(current_time_px - TIME_TO_PX(trans->priv->backdrop.end));
+	}
+
+	if ((y_start < 0 && y_end < 0) ||
+	    (y_start > widget->allocation.height &&
+	     y_end > widget->allocation.height))
+		return;
+
+	y_start = CLAMP(y_start, 0, widget->allocation.height);
+	y_end = CLAMP(y_end, 0, widget->allocation.height);
+
+	color.pixel = 0;
+	color.red = MAX((gint)bg->red - BACKDROP_VALUE, 0);
+	color.blue = MAX((gint)bg->blue - BACKDROP_VALUE, 0);
+	color.green = MAX((gint)bg->green - BACKDROP_VALUE, 0);
+	if (!color.red && !color.blue && !color.green) {
+		color.red = MIN((gint)bg->red + BACKDROP_VALUE, G_MAXUINT16);
+		color.blue = MIN((gint)bg->blue + BACKDROP_VALUE, G_MAXUINT16);
+		color.green = MIN((gint)bg->green + BACKDROP_VALUE, G_MAXUINT16);
+	}
+	gtk_widget_modify_fg(widget, gtk_widget_get_state(widget), &color);
+
+	gdk_draw_rectangle(GDK_DRAWABLE(trans->priv->layer_text),
+			   widget->style->fg_gc[gtk_widget_get_state(widget)],
+			   TRUE,
+			   0, y_start,
+			   widget->allocation.width, y_end - y_start);
+}
+
 /** @private */
 void
 gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
@@ -530,6 +585,13 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 
 	GtkExperimentTranscriptContribRenderer renderer;
 
+	if (trans->priv->time_adjustment != NULL) {
+		GtkAdjustment *adj =
+				GTK_ADJUSTMENT(trans->priv->time_adjustment);
+		current_time = (gint64)gtk_adjustment_get_value(adj);
+	}
+	current_time_px = TIME_TO_PX(current_time);
+
 	gdk_draw_rectangle(GDK_DRAWABLE(trans->priv->layer_text),
 			   widget->style->bg_gc[gtk_widget_get_state(widget)],
 			   TRUE,
@@ -537,16 +599,14 @@ gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 			   widget->allocation.width,
 			   widget->allocation.height);
 
+	render_backdrop_area(trans, current_time_px);
+
 	gtk_widget_queue_draw_area(widget, 0, 0,
 				   widget->allocation.width,
 				   widget->allocation.height);
 
 	if (trans->priv->contribs == NULL)
 		return;
-
-	if (trans->priv->time_adjustment != NULL)
-		current_time = (gint64)gtk_adjustment_get_value(GTK_ADJUSTMENT(trans->priv->time_adjustment));
-	current_time_px = TIME_TO_PX(current_time);
 
 	renderer = gtk_experiment_transcript_get_reverse_mode(trans)
 			? render_contribution_topdown
@@ -580,6 +640,8 @@ static gboolean
 button_pressed(GtkWidget *widget, GdkEventButton *event)
 {
 	GtkExperimentTranscript *trans = GTK_EXPERIMENT_TRANSCRIPT(widget);
+
+	gtk_widget_grab_focus(widget);
 
 	/* Ignore double-clicks and triple-clicks */
 	if (event->button != 3 || event->type != GDK_BUTTON_PRESS)
@@ -827,6 +889,32 @@ gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 	}
 
 	return res;
+}
+
+/**
+ * @brief Configure transcript's backdrop area
+ *
+ * Set or unset a highlighted area of the transcript by specifying start
+ * and end timepoints. The highlighted area is drawn with a 16% lighter or
+ * darker background color than the widgets current background color.
+ *
+ * @param trans Widget instance
+ * @param start Start time in milliseconds, or negative value (disable backdrop area)
+ * @param end   End time in milliseconds, or negative value (disable backdrop area)
+ */
+void
+gtk_experiment_transcript_set_backdrop_area(GtkExperimentTranscript *trans,
+					    gint64 start, gint64 end)
+{
+	if (start > end)
+		start = end = -1;
+
+	trans->priv->backdrop.start = start;
+	trans->priv->backdrop.end = end;
+
+	if (gtk_widget_get_realized(GTK_WIDGET(trans)) &&
+	    trans->priv->layer_text != NULL)
+		gtk_experiment_transcript_text_layer_redraw(trans);
 }
 
 /**

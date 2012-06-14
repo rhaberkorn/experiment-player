@@ -61,6 +61,11 @@ struct _GtkExperimentTranscriptPrivate {
 	GdkPixmap	*layer_text;
 	PangoLayout	*layer_text_layout;
 
+	struct _GtkExperimentTranscriptBackdropArea {
+		gint64	start;
+		gint64	end;
+	} backdrop;
+
 	GList		*contribs;
 	GSList		*formats;
 	GtkExperimentTranscriptFormat interactive_format;
@@ -82,6 +87,9 @@ typedef gboolean (*GtkExperimentTranscriptContribRenderer)
 #define PX_PER_SECOND		15
 #define TIME_TO_PX(TIME)	((TIME)/(1000/PX_PER_SECOND))
 #define PX_TO_TIME(PX)		(((PX)*1000)/PX_PER_SECOND)
+
+#define BACKDROP_VALUE \
+	((G_MAXUINT16*GTK_EXPERIMENT_TRANSCRIPT_BACKDROP)/100)
 
 /**
  * @private

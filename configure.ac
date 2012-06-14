@@ -220,6 +220,8 @@ AC_DEFINE(GTK_VLC_PLAYER_TIME_ADJ_PAGE,	[30000.],	[VLC Player time adjustment pa
 AC_DEFINE(GTK_VLC_PLAYER_VOL_ADJ_STEP,	[0.02],		[VLC Player volume adjustment step increment])
 AC_DEFINE(GTK_VLC_PLAYER_VOL_ADJ_PAGE,	[0.],		[VLC Player volume adjustment page increment])
 
+AC_DEFINE(GTK_EXPERIMENT_TRANSCRIPT_BACKDROP, [16],	[Experiment Transcript backdrop area color change (percent)])
+
 AC_DEFINE(DEFAULT_QUICKOPEN_DIR,	["."],		[Default directory for listing experiments])
 AC_DEFINE(EXPERIMENT_MOVIE_FILTER,	["*.mp4;*.avi"], [Filters for (quick) opening movies])
 AC_DEFINE(EXPERIMENT_TRANSCRIPT_EXT,	["xml"],	[File extension of experiment transcripts])

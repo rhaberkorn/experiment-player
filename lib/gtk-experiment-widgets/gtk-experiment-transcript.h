@@ -112,6 +112,9 @@ gboolean gtk_experiment_transcript_load(GtkExperimentTranscript *trans,
 gboolean gtk_experiment_transcript_load_filename(GtkExperimentTranscript *trans,
 						 const gchar *filename);
 
+void gtk_experiment_transcript_set_backdrop_area(GtkExperimentTranscript *trans,
+						 gint64 start, gint64 end);
+
 void gtk_experiment_transcript_set_reverse_mode(GtkExperimentTranscript *trans,
 						gboolean reverse);
 gboolean gtk_experiment_transcript_get_reverse_mode(GtkExperimentTranscript *trans);
