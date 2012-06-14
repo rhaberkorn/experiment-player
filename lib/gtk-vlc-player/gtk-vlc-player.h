@@ -68,23 +68,21 @@ typedef struct _GtkVlcPlayerClass {
 
 	/**
 	 * Callback function to invoke when emitting the "time-changed"
-	 * signal. Do not set manually.
+	 * signal.
 	 *
 	 * @param self      \e GtkVlcPlayer widget that emitted the signal
 	 * @param new_time  New (current) position of playback in milliseconds
-	 * @param user_data Callback user data
 	 */
-	void (*time_changed)	(GtkVlcPlayer *self, gint64 new_time, gpointer user_data);
+	void (*time_changed)	(GtkVlcPlayer *self, gint64 new_time);
 
 	/**
 	 * Callback function to invoke when emitting the "length-changed"
-	 * signal. Do not set manually.
+	 * signal.
 	 *
 	 * @param self       \e GtkVlcPlayer widget that emitted the signal
 	 * @param new_length New (current) length of media loaded into player (milliseconds)
-	 * @param user_data  Callback user data
 	 */
-	void (*length_changed)	(GtkVlcPlayer *self, gint64 new_length, gpointer user_data);
+	void (*length_changed)	(GtkVlcPlayer *self, gint64 new_length);
 } GtkVlcPlayerClass;
 
 /** @private */
