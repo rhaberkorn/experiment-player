@@ -104,7 +104,8 @@ static guint gtk_experiment_navigator_signals[LAST_SIGNAL] = {0};
  */
 enum {
 	COL_NAME,	/**< Name of the section, subsection or topic (\c G_TYPE_STRING) */
-	COL_START_TIME,	/**< Start time of the entity (\c G_TYPE_UINT64 in milliseconds) */
+	COL_START_TIME,	/**< Start time of the entity (\c G_TYPE_INT64 in milliseconds) */
+	COL_END_TIME,	/**< End time of the entity (\c G_TYPE_INT64 in milliseconds) */
 	NUM_COLS	/**< Number of columns */
 
 	/** @todo Add additional tree store columns as necessary */
@@ -131,8 +132,14 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 	 * Set signal handlers to respond to row selection (double-click) and
 	 * row activations (single-click) in order to emit the "time-selected"
 	 * and "section-activated" signals on the navigator widget.
+	 *
 	 * To set a signal handler simply set the \e GtkTreeView's
-	 * class structure fields.
+	 * class structure fields. For instance,
+	 * @code
+	 *	treeview_class->row_activated = gtk_experiment_navigator_row_activated;
+	 *	treeview_class->cursor_changed = gtk_experiment_navigator_cursor_changed;
+	 * @endcode
+	 * Note that these signal handlers do not get any "user_data" argument.
 	 */
 
 	gtk_experiment_navigator_signals[TIME_SELECTED_SIGNAL] =
@@ -183,7 +190,8 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	 * NOTE: GtkTreeStore is directly derived from GObject and has a
 	 * reference count of 1 after creation.
 	 */
-	store = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING, G_TYPE_UINT64);
+	store = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING,
+				   G_TYPE_INT64, G_TYPE_INT64);
 
 	/*
 	 * Create some sample(!) store rows and content
@@ -197,7 +205,8 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	gtk_tree_store_append(store, &child, &toplevel);
 	gtk_tree_store_set(store, &child,
 			   COL_NAME,		"bz_1",
-			   COL_START_TIME,	(gint64)5*60*1000 /* 5 minutes */,
+			   COL_START_TIME,	(gint64)5*60*1000  /* 5 minutes */,
+			   COL_END_TIME,	(gint64)10*60*1000 /* 10 minutes */,
 			   -1);
 
 	/*
@@ -222,14 +231,32 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	 * TreeStore column \c COL_START_TIME
 	 */
 	col = gtk_tree_view_column_new();
-	gtk_tree_view_column_set_title(col, "Time");
+	gtk_tree_view_column_set_title(col, "Start");
 	gtk_tree_view_append_column(view, col);
 
 	renderer = gtk_cell_renderer_text_new();
 	gtk_tree_view_column_pack_start(col, renderer, TRUE);
 	/* Cell data function for custom formatting */
-	gtk_tree_view_column_set_cell_data_func(col, renderer, time_cell_data_cb,
-						NULL, NULL);
+	gtk_tree_view_column_set_cell_data_func(col, renderer,
+						time_cell_data_cb,
+						GINT_TO_POINTER(COL_START_TIME),
+						NULL);
+
+	/*
+	 * Create TreeView column corresponding to the
+	 * TreeStore column \c COL_END_TIME
+	 */
+	col = gtk_tree_view_column_new();
+	gtk_tree_view_column_set_title(col, "End");
+	gtk_tree_view_append_column(view, col);
+
+	renderer = gtk_cell_renderer_text_new();
+	gtk_tree_view_column_pack_start(col, renderer, TRUE);
+	/* Cell data function for custom formatting */
+	gtk_tree_view_column_set_cell_data_func(col, renderer,
+						time_cell_data_cb,
+						GINT_TO_POINTER(COL_END_TIME),
+						NULL);
 
 	/*
 	 * Set TreeView model to store's model
@@ -320,7 +347,8 @@ gtk_experiment_navigator_finalize(GObject *gobject)
 }
 
 /**
- * @brief Cell data function to invoke when rendering the "Time" column.
+ * @brief Cell data function to invoke when rendering the "Start" and
+ *        "End" columns.
  *
  * @param col       \e GtkTreeViewColumn to render for
  * @param renderer  Cell renderer to use for rendering
@@ -332,16 +360,17 @@ static void
 time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 		  GtkCellRenderer *renderer,
 		  GtkTreeModel *model, GtkTreeIter *iter,
-		  gpointer user_data __attribute__((unused)))
+		  gpointer user_data)
 {
+	gint column = GPOINTER_TO_INT(user_data);
+
 	gint64	time_val;
 	gchar	buf[20];
 
 	gtk_tree_model_get(model, iter,
-			   COL_START_TIME, &time_val, -1);
+			   column, &time_val, -1);
 
-	/** @todo Improve readability (e.g. h:mm:ss) */
-	/** @todo Do we always want to render the time column??? */
+	/** @todo Improve readability (e.g. mm:ss) */
 	g_snprintf(buf, sizeof(buf), "%" G_GINT64_FORMAT "ms", time_val);
 
 	g_object_set(renderer, "text", buf, NULL);
