@@ -78,12 +78,14 @@ GType experiment_reader_get_type(void);
  * @param reader     \e ExperimentReader the information refers to
  * @param topic_id   Symbolic identifier of experiment \b topic
  * @param start_time Beginning of first \b contribution in \e topic (milliseconds)
+ * @param end_time   End of last \b contribution in \e topic (milliseconds)
  * @param data       Callback user data
  */
 /** @todo Perhaps we should use CClosures */
 typedef void (*ExperimentReaderTopicCallback)(ExperimentReader *reader,
 					      const gchar *topic_id,
 					      gint64 start_time,
+					      gint64 end_time,
 					      gpointer data);
 
 /**

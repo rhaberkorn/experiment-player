@@ -49,6 +49,7 @@ static void
 test_foreach_greeting_topic_values_cb(ExperimentReader *reader,
 				      const gchar *topic_id,
 				      gint64 start_time,
+				      gint64 end_time,
 				      gpointer data)
 {
 	gint *i = (gint *)data;
@@ -60,6 +61,7 @@ test_foreach_greeting_topic_values_cb(ExperimentReader *reader,
 	case 0:
 		g_assert_cmpstr(topic_id, ==, "bz_2");
 		g_assert_cmpint(start_time, ==, 13648);
+		g_assert_cmpint(end_time, ==, 36908);
 		break;
 	default:
 		g_assert_not_reached();

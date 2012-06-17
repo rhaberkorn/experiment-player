@@ -44,6 +44,8 @@ static void experiment_reader_finalize(GObject *gobject);
 
 static gint64 get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref);
 static xmlNode *get_first_element(xmlNode *children, const gchar *name);
+static xmlNode *get_last_element(xmlNode *children, const gchar *name);
+
 static gboolean generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 				      ExperimentReaderTopicCallback callback,
 				      gpointer data);
@@ -146,6 +148,19 @@ get_first_element(xmlNode *children, const gchar *name)
 	return NULL;
 }
 
+static xmlNode *
+get_last_element(xmlNode *children, const gchar *name)
+{
+	xmlNode *ret = NULL;
+
+	for (xmlNode *cur = children; cur != NULL; cur = cur->next)
+		if (cur->type == XML_ELEMENT_NODE &&
+		    !g_strcmp0((const gchar *)cur->name, name))
+			ret = cur;
+
+	return ret;
+}
+
 static gboolean
 generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 		      ExperimentReaderTopicCallback callback, gpointer data)
@@ -155,24 +170,38 @@ generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 
 	for (int i = 0; i < nodes->nodeNr; i++) {
 		xmlNode *cur = nodes->nodeTab[i];
-		xmlNode *contrib = get_first_element(cur->children,
-						     "contribution");
 		assert(cur != NULL && cur->type == XML_ELEMENT_NODE);
+
+		xmlNode *first_contrib = get_first_element(cur->children,
+							   "contribution");
+		xmlNode *last_contrib = get_last_element(cur->children,
+							 "contribution");
 
 		xmlChar	*topic_id = xmlGetProp(cur, XML_CHAR("id"));
 		gint64	start_time = -1;
+		gint64	end_time = -1;
 
-		if (contrib != NULL) {
+		if (first_contrib != NULL) {
 			xmlChar *contrib_start_ref;
 
-			contrib_start_ref = xmlGetProp(contrib,
+			contrib_start_ref = xmlGetProp(first_contrib,
 						       XML_CHAR("start-reference"));
 			start_time = get_timepoint_by_ref(reader->priv->doc,
 							  contrib_start_ref);
 			xmlFree(contrib_start_ref);
 		}
+		if (last_contrib != NULL) {
+			xmlChar *contrib_end_ref;
 
-		callback(reader, (const gchar *)topic_id, start_time, data);
+			contrib_end_ref = xmlGetProp(last_contrib,
+						     XML_CHAR("end-reference"));
+			end_time = get_timepoint_by_ref(reader->priv->doc,
+							contrib_end_ref);
+			xmlFree(contrib_end_ref);
+		}
+
+		callback(reader, (const gchar *)topic_id,
+			 start_time, end_time, data);
 
 		xmlFree(topic_id);
 	}
