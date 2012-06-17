@@ -28,6 +28,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include <glib-object.h>
 #include <glib.h>
 #include <glib/gprintf.h>
 
@@ -36,6 +37,7 @@
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 
+#include "cclosure-marshallers.h"
 #include "experiment-reader.h"
 
 static void experiment_reader_class_init(ExperimentReaderClass *klass);
@@ -46,9 +48,15 @@ static gint64 get_timepoint_by_ref(xmlDoc *doc, xmlChar *ref);
 static xmlNode *get_first_element(xmlNode *children, const gchar *name);
 static xmlNode *get_last_element(xmlNode *children, const gchar *name);
 
+static GClosure *experiment_reader_topic_callback_new(ExperimentReaderTopicCallback,
+						      gpointer);
+static void experiment_reader_topic_callback_invoke(ExperimentReader *reader,
+						    GClosure *closure,
+						    const gchar *topic_id,
+						    gint64 start_time,
+						    gint64 end_time);
 static gboolean generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
-				      ExperimentReaderTopicCallback callback,
-				      gpointer data);
+				      GClosure *closure);
 
 static gint experiment_reader_contrib_cmp(const ExperimentReaderContrib *a,
 					  const ExperimentReaderContrib *b);
@@ -161,9 +169,47 @@ get_last_element(xmlNode *children, const gchar *name)
 	return ret;
 }
 
+static GClosure *
+experiment_reader_topic_callback_new(ExperimentReaderTopicCallback callback,
+				     gpointer data)
+{
+	GClosure *closure = g_cclosure_new(G_CALLBACK(callback), data, NULL);
+
+	g_closure_set_marshal(closure,
+			      experiment_reader_marshal_VOID__STRING_INT64_INT64);
+	g_closure_ref(closure);
+	g_closure_sink(closure);
+
+	return closure;
+}
+
+static void
+experiment_reader_topic_callback_invoke(ExperimentReader *reader,
+					GClosure *closure,
+					const gchar *topic_id,
+					gint64 start_time, gint64 end_time)
+{
+	GValue params[4];
+
+	memset(params, 0, sizeof(params));
+	g_value_init(params + 0, G_TYPE_OBJECT);
+	g_value_set_object(params + 0, reader);
+	g_value_init(params + 1, G_TYPE_STRING);
+	g_value_set_string(params + 1, topic_id);
+	g_value_init(params + 2, G_TYPE_INT64);
+	g_value_set_int64(params + 2, start_time);
+	g_value_init(params + 3, G_TYPE_INT64);
+	g_value_set_int64(params + 3, end_time);
+
+	g_closure_invoke(closure, NULL, G_N_ELEMENTS(params), params, NULL);
+
+	for (gint i = 0; i < G_N_ELEMENTS(params); i++)
+		g_value_unset(params + i);
+}
+
 static gboolean
 generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
-		      ExperimentReaderTopicCallback callback, gpointer data)
+		      GClosure *closure)
 {
 	if (nodes == NULL)
 		return TRUE;
@@ -200,8 +246,9 @@ generic_foreach_topic(ExperimentReader *reader, xmlNodeSet *nodes,
 			xmlFree(contrib_end_ref);
 		}
 
-		callback(reader, (const gchar *)topic_id,
-			 start_time, end_time, data);
+		experiment_reader_topic_callback_invoke(reader, closure,
+							(const gchar *)topic_id,
+							start_time, end_time);
 
 		xmlFree(topic_id);
 	}
@@ -444,13 +491,15 @@ experiment_reader_foreach_greeting_topic(ExperimentReader *reader,
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
+	GClosure	*closure;
 
 	xpathCtx = xmlXPathNewContext(reader->priv->doc);
 	xpathObj = xmlXPathEvalExpression(XML_CHAR("/session/greeting/topic"),
 					  xpathCtx);
 
-	generic_foreach_topic(reader, xpathObj->nodesetval,
-			      callback, userdata);
+	closure = experiment_reader_topic_callback_new(callback, userdata);
+	generic_foreach_topic(reader, xpathObj->nodesetval, closure);
+	g_closure_unref(closure);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
@@ -473,14 +522,16 @@ experiment_reader_foreach_exp_initial_narrative_topic(reader, callback, userdata
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
+	GClosure	*closure;
 
 	xpathCtx = xmlXPathNewContext(reader->priv->doc);
 	xpathObj = xmlXPathEvalExpression(XML_CHAR("/session/experiment/"
 						   "initial-narrative/topic"),
 					  xpathCtx);
 
-	generic_foreach_topic(reader, xpathObj->nodesetval,
-			      callback, userdata);
+	closure = experiment_reader_topic_callback_new(callback, userdata);
+	generic_foreach_topic(reader, xpathObj->nodesetval, closure);
+	g_closure_unref(closure);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
@@ -505,6 +556,7 @@ experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, u
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
+	GClosure	*closure;
 
 	xmlChar expr[255];
 
@@ -517,8 +569,9 @@ experiment_reader_foreach_exp_last_minute_phase_topic(reader, phase, callback, u
 		     phase);
 	xpathObj = xmlXPathEvalExpression(expr, xpathCtx);
 
-	generic_foreach_topic(reader, xpathObj->nodesetval,
-			      callback, userdata);
+	closure = experiment_reader_topic_callback_new(callback, userdata);
+	generic_foreach_topic(reader, xpathObj->nodesetval, closure);
+	g_closure_unref(closure);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
@@ -539,13 +592,15 @@ experiment_reader_foreach_farewell_topic(ExperimentReader *reader,
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
+	GClosure	*closure;
 
 	xpathCtx = xmlXPathNewContext(reader->priv->doc);
 	xpathObj = xmlXPathEvalExpression(XML_CHAR("/session/farewell/topic"),
 					  xpathCtx);
 
-	generic_foreach_topic(reader, xpathObj->nodesetval,
-			      callback, userdata);
+	closure = experiment_reader_topic_callback_new(callback, userdata);
+	generic_foreach_topic(reader, xpathObj->nodesetval, closure);
+	g_closure_unref(closure);
 
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);

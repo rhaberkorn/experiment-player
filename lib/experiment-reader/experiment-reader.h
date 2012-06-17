@@ -81,7 +81,6 @@ GType experiment_reader_get_type(void);
  * @param end_time   End of last \b contribution in \e topic (milliseconds)
  * @param data       Callback user data
  */
-/** @todo Perhaps we should use CClosures */
 typedef void (*ExperimentReaderTopicCallback)(ExperimentReader *reader,
 					      const gchar *topic_id,
 					      gint64 start_time,
