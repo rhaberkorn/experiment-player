@@ -102,17 +102,19 @@ typedef gboolean (*GtkExperimentTranscriptContribRenderer)
  *
  * @param VAR Variable to unreference
  */
-#define GOBJECT_UNREF_SAFE(VAR) do {	\
-	if ((VAR) != NULL) {		\
-		g_object_unref(VAR);	\
-		VAR = NULL;		\
-	}				\
-} while (0)
+#define GOBJECT_UNREF_SAFE(VAR) G_STMT_START {	\
+	if ((VAR) != NULL) {			\
+		g_object_unref(VAR);		\
+		VAR = NULL;			\
+	}					\
+} G_STMT_END
 
 /** @private */
+G_GNUC_INTERNAL
 void gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans);
 
 /** @private */
+G_GNUC_INTERNAL
 void gtk_experiment_transcript_apply_format(GtkExperimentTranscriptFormat *fmt,
 					    const gchar *text,
 					    PangoAttrList *attrib_list);

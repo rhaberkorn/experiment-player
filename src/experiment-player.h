@@ -214,9 +214,9 @@ extern GtkWidget *transcript_wizard_combo,
  * macros and inline functions
  */
 /** @private */
-#define BUILDER_INIT(BUILDER, VAR) do {					\
+#define BUILDER_INIT(BUILDER, VAR) G_STMT_START {			\
 	VAR = GTK_WIDGET(gtk_builder_get_object(BUILDER, #VAR));	\
-} while (0)
+} G_STMT_END
 
 /** @public */
 static inline gchar *

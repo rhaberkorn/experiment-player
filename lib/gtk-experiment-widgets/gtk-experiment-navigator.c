@@ -63,12 +63,12 @@ static inline void activate_section(GtkExperimentNavigator *navi,
  *
  * @param VAR Variable to unreference
  */
-#define GOBJECT_UNREF_SAFE(VAR) do {	\
-	if ((VAR) != NULL) {		\
-		g_object_unref(VAR);	\
-		VAR = NULL;		\
-	}				\
-} while (0)
+#define GOBJECT_UNREF_SAFE(VAR) G_STMT_START {	\
+	if ((VAR) != NULL) {			\
+		g_object_unref(VAR);		\
+		VAR = NULL;			\
+	}					\
+} G_STMT_END
 
 /** @private */
 #define GTK_EXPERIMENT_NAVIGATOR_GET_PRIVATE(obj) \

@@ -30,7 +30,7 @@
 #include <assert.h>
 
 #include <gtk/gtk.h>
-#ifdef __WIN32__
+#ifdef G_OS_WIN32
 #include <gdk/gdkwin32.h>
 #else
 #include <gdk/gdkx.h>
@@ -63,12 +63,12 @@ static void vlc_length_changed(const struct libvlc_event_t *event, void *userdat
 static void vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media);
 
 /** @private */
-#define GOBJECT_UNREF_SAFE(VAR) do {	\
-	if ((VAR) != NULL) {		\
-		g_object_unref(VAR);	\
-		VAR = NULL;		\
-	}				\
-} while (0)
+#define GOBJECT_UNREF_SAFE(VAR) G_STMT_START {	\
+	if ((VAR) != NULL) {			\
+		g_object_unref(VAR);		\
+		VAR = NULL;			\
+	}					\
+} G_STMT_END
 
 /** @private */
 #define GTK_VLC_PLAYER_GET_PRIVATE(obj) \
@@ -252,7 +252,7 @@ widget_on_realize(GtkWidget *widget, gpointer user_data)
 	GtkVlcPlayer *player = GTK_VLC_PLAYER(user_data);
 	GdkWindow *window = gtk_widget_get_window(widget);
 
-#ifdef __WIN32__
+#ifdef G_OS_WIN32
 	libvlc_media_player_set_hwnd(player->priv->media_player,
 				     GDK_WINDOW_HWND(window));
 #else

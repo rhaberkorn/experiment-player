@@ -105,7 +105,7 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 }
 
 /** @private */
-void
+G_GNUC_INTERNAL void
 gtk_experiment_transcript_apply_format(GtkExperimentTranscriptFormat *fmt,
 				       const gchar *text,
 				       PangoAttrList *attrib_list)

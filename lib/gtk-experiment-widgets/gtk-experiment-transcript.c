@@ -575,7 +575,7 @@ render_backdrop_area(GtkExperimentTranscript *trans, gint64 current_time_px)
 }
 
 /** @private */
-void
+G_GNUC_INTERNAL void
 gtk_experiment_transcript_text_layer_redraw(GtkExperimentTranscript *trans)
 {
 	GtkWidget *widget = GTK_WIDGET(trans);

@@ -369,7 +369,7 @@ main(int argc, char *argv[])
 	GtkRcStyle *modified_style;
 
 	/* FIXME: support internationalization instead of enforcing English */
-#ifdef __WIN32__
+#ifdef G_OS_WIN32
 	g_setenv("LC_ALL", "English", TRUE);
 #else
 	g_setenv("LC_ALL", "en", TRUE);
