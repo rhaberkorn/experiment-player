@@ -607,8 +607,14 @@ gboolean
 gtk_experiment_navigator_load_filename(GtkExperimentNavigator *navi,
 				       const gchar *exp)
 {
-	/** @todo Clear contents */
-	/** @todo Process XML file and fill \e TreeViewStore */
-
-	return TRUE;
+	gboolean returnvalue;
+	ExperimentReader *expread = experiment_reader_new(exp);
+	
+	if (expread == NULL)
+		return FALSE;
+	returnvalue = gtk_experiment_navigator_load(navi, expread);
+	
+	g_object_unref(expread);
+	
+	return returnvalue;
 }
