@@ -82,7 +82,7 @@ gtk_vlc_player_catalogsdir=${glade3_catalogsdir:-$gtk_vlc_player_datadir/catalog
 AC_SUBST(gtk_vlc_player_catalogsdir)
 
 # FIXME: further restrict libvlc version
-PKG_CHECK_MODULES(LIBVLC, [libvlc >= 1.1.13 vlc-plugin])
+PKG_CHECK_MODULES(LIBVLC, [libvlc >= 1.1.10 vlc-plugin])
 
 PKG_CHECK_MODULES(LIBXML2, [libxml-2.0], , [
 	AC_CHECK_PROG(XML2_CONFIG, xml2-config, xml2-config)

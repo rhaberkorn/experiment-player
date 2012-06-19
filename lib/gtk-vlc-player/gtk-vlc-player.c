@@ -37,11 +37,13 @@
 #endif
 
 #include <vlc/vlc.h>
+#include <vlc/libvlc_version.h>
 
 #include "cclosure-marshallers.h"
 #include "gtk-vlc-player.h"
 
 static void gtk_vlc_player_class_init(GtkVlcPlayerClass *klass);
+static inline libvlc_instance_t *create_vlc_instance(void);
 static void gtk_vlc_player_init(GtkVlcPlayer *klass);
 
 static void gtk_vlc_player_dispose(GObject *gobject);
@@ -134,6 +136,34 @@ gtk_vlc_player_class_init(GtkVlcPlayerClass *klass)
 	g_type_class_add_private(klass, sizeof(GtkVlcPlayerPrivate));
 }
 
+static inline libvlc_instance_t *
+create_vlc_instance(void)
+{
+	gchar	**vlc_argv;
+	gint	vlc_argc = 0;
+
+	libvlc_instance_t *ret;
+
+	vlc_argv = g_malloc_n(2, sizeof(vlc_argv[0]));
+	vlc_argv[vlc_argc++] = g_strdup(g_get_prgname());
+
+#if LIBVLC_VERSION_INT < LIBVLC_VERSION(2,0,0,0)
+	if (g_getenv("VLC_PLUGIN_PATH") != NULL) {
+		vlc_argv = g_realloc_n(vlc_argv,
+				       vlc_argc + 2 + 1, sizeof(vlc_argv[0]));
+		vlc_argv[vlc_argc++] = g_strdup("--plugin-path");
+		vlc_argv[vlc_argc++] = g_strdup(g_getenv("VLC_PLUGIN_PATH"));
+	}
+#endif
+
+	vlc_argv[vlc_argc] = NULL;
+
+	ret = libvlc_new((int)vlc_argc, (const char *const *)vlc_argv);
+
+	g_strfreev(vlc_argv);
+	return ret;
+}
+
 static void
 gtk_vlc_player_init(GtkVlcPlayer *klass)
 {
@@ -189,7 +219,7 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 				 "value-changed",
 				 G_CALLBACK(vol_adj_on_value_changed), klass);
 
-	klass->priv->vlc_inst = libvlc_new(0, NULL);
+	klass->priv->vlc_inst = create_vlc_instance();
 	klass->priv->media_player = libvlc_media_player_new(klass->priv->vlc_inst);
 
 	/* sign up for time updates */
