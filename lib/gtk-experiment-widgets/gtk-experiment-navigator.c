@@ -334,6 +334,13 @@ gtk_experiment_navigator_finalize(GObject *gobject)
 	G_OBJECT_CLASS(gtk_experiment_navigator_parent_class)->finalize(gobject);
 }
 
+/**
+ * Send time-selected Signal when a row is double-clicked
+ * 
+ * @param tree_view   the object on which the signal is emitted
+ * @param path        the GtkTreePath for the activated row
+ * @param column      the GtkTreeViewColumn in which the activation occurred
+ */	
 static void
 gtk_experiment_navigator_row_activated(GtkTreeView *tree_view,
 				       GtkTreePath *path,
@@ -351,6 +358,11 @@ gtk_experiment_navigator_row_activated(GtkTreeView *tree_view,
 	select_time(GTK_EXPERIMENT_NAVIGATOR(tree_view), start_time);
 }
 
+/**
+ * Send cursor-changed when the cursor has changed
+ * 
+ * @param tree_view   the object on which the signal is emitted
+ */
 static void
 gtk_experiment_navigator_cursor_changed(GtkTreeView *tree_view)
 {
@@ -438,9 +450,14 @@ activate_section(GtkExperimentNavigator *navi, gint64 start, gint64 end)
 }
 
 /**
- * Callback - legt neue Row an und fügt diese in sotre ein
- * übergibt Spaltenname und Startzeit aus Userdata
- * @todo: übersetzen
+ * Callback function insert new row in GtkTreeStore
+ * initialised colomb name and start time out of userdata
+ * 
+ * @param reader     \e ExperimentReader the information refers to
+ * @param topic_id   Symbolic identifier of experiment \b topic
+ * @param start_time Beginning of first \b contribution in \e topic (milliseconds)
+ * @param end_time   End of last \b contribution in \e topic (milliseconds)
+ * @param data       Callback user data
  */
 static void
 topic_row_callback(ExperimentReader *reader,
