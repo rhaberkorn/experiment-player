@@ -203,6 +203,7 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	 */
 	col = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_title(col, "Name");
+	gtk_tree_view_column_set_expand(col, TRUE);
 	gtk_tree_view_append_column(view, col);
 
 	renderer = gtk_cell_renderer_text_new();
