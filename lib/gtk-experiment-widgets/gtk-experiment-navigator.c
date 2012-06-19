@@ -42,16 +42,26 @@ static void gtk_experiment_navigator_init(GtkExperimentNavigator *klass);
 static void gtk_experiment_navigator_dispose(GObject *gobject);
 static void gtk_experiment_navigator_finalize(GObject *gobject);
 
+static void gtk_experiment_navigator_row_activated(GtkTreeView *tree_view,
+						   GtkTreePath *path,
+						   GtkTreeViewColumn *column);
+static void gtk_experiment_navigator_cursor_changed(GtkTreeView *tree_view);
+
 static void time_cell_data_cb(GtkTreeViewColumn *col,
 			      GtkCellRenderer *renderer,
 			      GtkTreeModel *model, GtkTreeIter *iter,
 			      gpointer user_data);
 
-
 static inline void select_time(GtkExperimentNavigator *navi,
 			       gint64 selected_time);
 static inline void activate_section(GtkExperimentNavigator *navi,
 				    gint64 start, gint64 end);
+
+static void topic_row_callback(ExperimentReader *reader,
+			const gchar *topic_id,
+			gint64 start_time,
+			gint64 end_time,
+			gpointer data);
 
 /**
  * @private
@@ -87,6 +97,13 @@ struct _GtkExperimentNavigatorPrivate {
 	 * Add necessary \b private instance attributes. They must be
 	 * initialized in the instance initializer function.
 	 */
+};
+
+struct TopicCallbackData {
+	GtkTreeIter iter;
+	GtkTreeStore *store;
+	gint64 start_time;
+	gint64 end_time;
 };
 
 /** @private */
@@ -127,20 +144,8 @@ gtk_experiment_navigator_class_init(GtkExperimentNavigatorClass *klass)
 	gobject_class->dispose = gtk_experiment_navigator_dispose;
 	gobject_class->finalize = gtk_experiment_navigator_finalize;
 
-	/**
-	 * @todo
-	 * Set signal handlers to respond to row selection (double-click) and
-	 * row activations (single-click) in order to emit the "time-selected"
-	 * and "section-activated" signals on the navigator widget.
-	 *
-	 * To set a signal handler simply set the \e GtkTreeView's
-	 * class structure fields. For instance,
-	 * @code
-	 *	treeview_class->row_activated = gtk_experiment_navigator_row_activated;
-	 *	treeview_class->cursor_changed = gtk_experiment_navigator_cursor_changed;
-	 * @endcode
-	 * Note that these signal handlers do not get any "user_data" argument.
-	 */
+	treeview_class->row_activated = gtk_experiment_navigator_row_activated;
+	treeview_class->cursor_changed = gtk_experiment_navigator_cursor_changed;
 
 	gtk_experiment_navigator_signals[TIME_SELECTED_SIGNAL] =
 		g_signal_new("time-selected",
@@ -182,7 +187,6 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	GtkCellRenderer		*renderer;
 
 	GtkTreeStore	*store;
-	GtkTreeIter	toplevel, child;
 
 	klass->priv = GTK_EXPERIMENT_NAVIGATOR_GET_PRIVATE(klass);
 	/*
@@ -192,22 +196,6 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 	 */
 	store = gtk_tree_store_new(NUM_COLS, G_TYPE_STRING,
 				   G_TYPE_INT64, G_TYPE_INT64);
-
-	/*
-	 * Create some sample(!) store rows and content
-	 */
-	/** @todo remove sample code */
-	gtk_tree_store_append(store, &toplevel, NULL);
-	gtk_tree_store_set(store, &toplevel,
-			   COL_NAME,		"greeting",
-			   -1);
-
-	gtk_tree_store_append(store, &child, &toplevel);
-	gtk_tree_store_set(store, &child,
-			   COL_NAME,		"bz_1",
-			   COL_START_TIME,	(gint64)5*60*1000  /* 5 minutes */,
-			   COL_END_TIME,	(gint64)10*60*1000 /* 10 minutes */,
-			   -1);
 
 	/*
 	 * Create TreeView column corresponding to the
@@ -346,6 +334,44 @@ gtk_experiment_navigator_finalize(GObject *gobject)
 	G_OBJECT_CLASS(gtk_experiment_navigator_parent_class)->finalize(gobject);
 }
 
+static void
+gtk_experiment_navigator_row_activated(GtkTreeView *tree_view,
+				       GtkTreePath *path,
+				       GtkTreeViewColumn *column __attribute__((unused)))
+{
+	GtkTreeModel *treemodel = gtk_tree_view_get_model(tree_view);
+	gint64 start_time;
+	GtkTreeIter treeiter;
+
+	gtk_tree_model_get_iter(treemodel, &treeiter, path);
+	gtk_tree_model_get(treemodel, &treeiter,
+			   COL_START_TIME, &start_time,
+			   -1);
+
+	select_time(GTK_EXPERIMENT_NAVIGATOR(tree_view), start_time);
+}
+
+static void
+gtk_experiment_navigator_cursor_changed(GtkTreeView *tree_view)
+{
+	GtkTreeModel *treemodel = gtk_tree_view_get_model(tree_view);
+	GtkTreePath *treepath;
+	GtkTreeIter treeiter;
+	gint64 start_time;
+	gint64 end_time;
+
+	gtk_tree_view_get_cursor(tree_view, &treepath, NULL);
+	gtk_tree_model_get_iter(treemodel, &treeiter, treepath);
+	gtk_tree_path_free(treepath);
+
+	gtk_tree_model_get(treemodel, &treeiter,
+			   COL_START_TIME, &start_time,
+			   COL_END_TIME, &end_time,
+			   -1);
+
+	activate_section(GTK_EXPERIMENT_NAVIGATOR(tree_view), start_time, end_time);
+}
+
 /**
  * @brief Cell data function to invoke when rendering the "Start" and
  *        "End" columns.
@@ -370,8 +396,8 @@ time_cell_data_cb(GtkTreeViewColumn *col __attribute__((unused)),
 	gtk_tree_model_get(model, iter,
 			   column, &time_val, -1);
 
-	/** @todo Improve readability (e.g. mm:ss) */
-	g_snprintf(buf, sizeof(buf), "%" G_GINT64_FORMAT "ms", time_val);
+	g_snprintf(buf, sizeof(buf), "%" G_GINT64_FORMAT ":%02" G_GINT64_FORMAT ,
+				time_val /1000/60, time_val/1000 % 60);
 
 	g_object_set(renderer, "text", buf, NULL);
 }
@@ -411,6 +437,33 @@ activate_section(GtkExperimentNavigator *navi, gint64 start, gint64 end)
 		      start, end);
 }
 
+/**
+ * Callback - legt neue Row an und fügt diese in sotre ein
+ * übergibt Spaltenname und Startzeit aus Userdata
+ * @todo: übersetzen
+ */
+static void
+topic_row_callback(ExperimentReader *reader,
+		   const gchar *topic_id,
+		   gint64 start_time,
+		   gint64 end_time,
+		   gpointer data)
+{
+	struct TopicCallbackData *tcb = (struct TopicCallbackData *) data;
+	GtkTreeIter topic;
+
+	if (tcb->start_time < 0)
+		tcb->start_time = start_time;
+	tcb->end_time = end_time;
+
+	gtk_tree_store_append(tcb->store, &topic, &tcb->iter);
+	gtk_tree_store_set(tcb->store, &topic,
+			   COL_NAME, topic_id,
+			   COL_START_TIME, start_time,
+			   COL_END_TIME, end_time,
+			   -1);
+}
+
 /*
  * API
  */
@@ -439,8 +492,101 @@ gboolean
 gtk_experiment_navigator_load(GtkExperimentNavigator *navi,
 			      ExperimentReader *exp)
 {
-	/** @todo Clear contents */
-	/** @todo Process XML file and fill \e TreeViewStore */
+	struct TopicCallbackData tcd;
+	GtkTreeIter experiment_level;
+	GtkTreeIter last_minute_level;
+
+	tcd.store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(navi)));
+	gtk_tree_store_clear(tcd.store);
+
+	/* greeting */
+	gtk_tree_store_append(tcd.store, &tcd.iter, NULL);
+
+	tcd.start_time = -1;
+	experiment_reader_foreach_greeting_topic(exp, topic_row_callback, &tcd);
+
+	gtk_tree_store_set(tcd.store, &tcd.iter,
+			   COL_NAME,		"greeting",
+			   COL_START_TIME,	tcd.start_time,
+			   COL_END_TIME,	tcd.end_time,
+			   -1);
+
+	/* experiment */
+	gtk_tree_store_append(tcd.store, &experiment_level, NULL);
+	gtk_tree_store_set(tcd.store, &experiment_level,
+			   COL_NAME,		"experiment",
+			   -1);
+
+	gtk_tree_store_append(tcd.store, &tcd.iter, &experiment_level);
+
+	tcd.start_time = -1;
+	experiment_reader_foreach_exp_initial_narrative_topic(exp,
+							      topic_row_callback,
+							      &tcd);
+
+	gtk_tree_store_set(tcd.store, &tcd.iter,
+			   COL_NAME,		"initial-narrative",
+			   COL_START_TIME,	tcd.start_time < 0 ? tcd.end_time
+							           : tcd.start_time,
+			   COL_END_TIME,	tcd.end_time,
+			   -1);
+
+	gtk_tree_store_set(tcd.store, &experiment_level,
+			   COL_START_TIME, tcd.start_time < 0 ? tcd.end_time
+							      : tcd.start_time,
+			   -1);
+
+	gtk_tree_store_append(tcd.store, &last_minute_level, &experiment_level);
+	gtk_tree_store_set(tcd.store, &last_minute_level,
+			   COL_NAME, "last minute",
+			   -1);
+
+	for (gint i = 1; i <= 6; i++) {
+		gchar phasename[8];
+
+		g_snprintf(phasename, sizeof(phasename), "phase %d", i);
+		gtk_tree_store_append(tcd.store,
+				      &tcd.iter,
+				      &last_minute_level);
+
+		tcd.start_time = -1;
+		experiment_reader_foreach_exp_last_minute_phase_topic(exp, i, topic_row_callback, &tcd);
+
+		gtk_tree_store_set(tcd.store, &tcd.iter,
+				   COL_NAME, phasename,
+				   COL_START_TIME, tcd.start_time < 0 ? tcd.end_time
+								      : tcd.start_time,
+				   COL_END_TIME, tcd.end_time,
+				   -1);
+
+		if (i == 1) {
+			gtk_tree_store_set(tcd.store, &last_minute_level,
+					   COL_START_TIME,
+					   tcd.start_time < 0 ? tcd.end_time
+							      : tcd.start_time,
+					   -1);
+		}
+	}
+
+	gtk_tree_store_set(tcd.store, &last_minute_level,
+			   COL_END_TIME, tcd.end_time,
+			   -1);
+
+	gtk_tree_store_set(tcd.store, &experiment_level,
+			   COL_END_TIME, tcd.end_time,
+			   -1);
+
+	/* farewell */
+	gtk_tree_store_append(tcd.store, &tcd.iter, NULL);
+
+	tcd.start_time = -1;
+	experiment_reader_foreach_farewell_topic(exp, topic_row_callback, &tcd);
+
+	gtk_tree_store_set(tcd.store, &tcd.iter,
+			   COL_NAME,		"farewell",
+			   COL_START_TIME,	tcd.start_time,
+			   COL_END_TIME,	tcd.end_time,
+			   -1);
 
 	return TRUE;
 }
