@@ -131,7 +131,7 @@ case $host in
 	AC_CHECK_HEADERS([windows.h], , [
 		AC_MSG_ERROR([Missing Windows headers!])
 	])
-	AC_CHECK_HEADERS([shellapi.h], , [
+	AC_CHECK_HEADERS([shellapi.h winuser.h], , [
 		AC_MSG_ERROR([Missing Windows headers!])
 	], [
 		#include <windows.h>

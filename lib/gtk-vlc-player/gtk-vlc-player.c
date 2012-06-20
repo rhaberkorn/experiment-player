@@ -29,6 +29,14 @@
 
 #include <assert.h>
 
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#include <winuser.h>
+#endif
+
+#include <glib.h>
+#include <glib/gprintf.h>
+
 #include <gtk/gtk.h>
 #ifdef G_OS_WIN32
 #include <gdk/gdkwin32.h>
@@ -49,6 +57,10 @@ static void gtk_vlc_player_init(GtkVlcPlayer *klass);
 static void gtk_vlc_player_dispose(GObject *gobject);
 static void gtk_vlc_player_finalize(GObject *gobject);
 
+#ifdef G_OS_WIN32
+static BOOL CALLBACK enumerate_vlc_windows_cb(HWND hWndvlc, LPARAM lParam);
+static gboolean poll_vlc_event_window_cb(gpointer data);
+#endif
 static void widget_on_realize(GtkWidget *widget, gpointer data);
 static gboolean widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer data);
 
@@ -63,6 +75,8 @@ static void vlc_time_changed(const struct libvlc_event_t *event, void *userdata)
 static void vlc_length_changed(const struct libvlc_event_t *event, void *userdata);
 
 static void vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media);
+
+#define POLL_VLC_EVENT_WINDOW_INTERVAL 100 /* milliseconds */
 
 /** @private */
 #define GOBJECT_UNREF_SAFE(VAR) G_STMT_START {	\
@@ -276,32 +290,71 @@ gtk_vlc_player_finalize(GObject *gobject)
 	G_OBJECT_CLASS(gtk_vlc_player_parent_class)->finalize(gobject);
 }
 
+#ifdef G_OS_WIN32
+
+static BOOL CALLBACK
+enumerate_vlc_windows_cb(HWND hWndvlc, LPARAM lParam)
+{
+	EnableWindow(hWndvlc, FALSE);
+	*(gboolean *)lParam = FALSE;
+
+	return TRUE;
+}
+
+/**
+ * @brief Callback for polling the availability of a libVLC event window.
+ *
+ * If found, it is disabled and the polling stops. This results in mouse click
+ * events being delivered to the GtkDrawingArea widget.
+ *
+ * @param data User data (\e GtkVlcPlayer widget)
+ * @return \c TRUE to continue polling, \c FALSE to stop
+ */
+static gboolean
+poll_vlc_event_window_cb(gpointer data)
+{
+	GtkWidget *drawing_area = gtk_bin_get_child(GTK_BIN(data));
+	GdkWindow *window = gtk_widget_get_window(drawing_area);
+
+	gboolean ret = TRUE;
+
+	EnumChildWindows(GDK_WINDOW_HWND(window),
+			 enumerate_vlc_windows_cb, (LPARAM)&ret);
+
+	return ret;
+}
+
 static void
 widget_on_realize(GtkWidget *widget, gpointer user_data)
 {
 	GtkVlcPlayer *player = GTK_VLC_PLAYER(user_data);
 	GdkWindow *window = gtk_widget_get_window(widget);
 
-#ifdef G_OS_WIN32
 	libvlc_media_player_set_hwnd(player->priv->media_player,
 				     GDK_WINDOW_HWND(window));
-#else
-	libvlc_media_player_set_xwindow(player->priv->media_player,
-					GDK_WINDOW_XID(window));
-#endif
 }
 
-/**
- * @bug
- * We don't get the signal on Windows (MinGW), after a movie starts playing.
- * Using GtkEventBoxes does \b NOT help.
- */
+#else
+
+static void
+widget_on_realize(GtkWidget *widget, gpointer user_data)
+{
+	GtkVlcPlayer *player = GTK_VLC_PLAYER(user_data);
+	GdkWindow *window = gtk_widget_get_window(widget);
+
+	libvlc_media_player_set_xwindow(player->priv->media_player,
+					GDK_WINDOW_XID(window));
+}
+
+#endif
+
 static gboolean
 widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
 	GtkVlcPlayer *player = GTK_VLC_PLAYER(user_data);
+	GtkWidget *fullscreen_window = player->priv->fullscreen_window;
 
-	if (player->priv->fullscreen_window == NULL)
+	if (fullscreen_window == NULL)
 		return TRUE;
 
 	if (event->type != GDK_2BUTTON_PRESS || event->button != 1)
@@ -310,14 +363,14 @@ widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 	if (player->priv->isFullscreen) {
 		gtk_widget_reparent(widget, GTK_WIDGET(player));
 		gtk_widget_show(widget);
-		gtk_widget_hide(player->priv->fullscreen_window);
-		gtk_window_unfullscreen(GTK_WINDOW(player->priv->fullscreen_window));
+		gtk_window_unfullscreen(GTK_WINDOW(fullscreen_window));
+		gtk_widget_hide(fullscreen_window);
 
 		player->priv->isFullscreen = FALSE;
 	} else {
-		gtk_window_fullscreen(GTK_WINDOW(player->priv->fullscreen_window));
-		gtk_widget_show(player->priv->fullscreen_window);
-		gtk_widget_reparent(widget, player->priv->fullscreen_window);
+		gtk_window_fullscreen(GTK_WINDOW(fullscreen_window));
+		gtk_widget_show(fullscreen_window);
+		gtk_widget_reparent(widget, fullscreen_window);
 		gtk_widget_show(widget);
 
 		player->priv->isFullscreen = TRUE;
@@ -505,7 +558,21 @@ gtk_vlc_player_load_uri(GtkVlcPlayer *player, const gchar *uri)
 void
 gtk_vlc_player_play(GtkVlcPlayer *player)
 {
-	libvlc_media_player_play(player->priv->media_player);
+	if (libvlc_media_player_play(player->priv->media_player) < 0)
+		return;
+
+	/*
+	 * Workaround to get mouse click events on the drawing area widget
+	 * that provides the low-level window for libVLC.
+	 * On Win32, libVLC creates an event window (in a different thread)
+	 * after playback start that "swallows" all click events.
+	 * So we have to poll for the availability of that window and disable
+	 * it.
+	 */
+#ifdef G_OS_WIN32
+	g_timeout_add(POLL_VLC_EVENT_WINDOW_INTERVAL,
+		      poll_vlc_event_window_cb, player);
+#endif
 }
 
 /**
