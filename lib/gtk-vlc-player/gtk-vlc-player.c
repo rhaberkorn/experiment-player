@@ -76,6 +76,7 @@ static void vlc_length_changed(const struct libvlc_event_t *event, void *userdat
 
 static void vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media);
 
+/** @private */
 #define POLL_VLC_EVENT_WINDOW_INTERVAL 100 /* milliseconds */
 
 /** @private */
@@ -247,6 +248,17 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 	klass->priv->isFullscreen = FALSE;
 	klass->priv->fullscreen_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	g_object_ref_sink(klass->priv->fullscreen_window);
+
+	gtk_window_set_deletable(GTK_WINDOW(klass->priv->fullscreen_window),
+				 FALSE);
+	gtk_window_set_decorated(GTK_WINDOW(klass->priv->fullscreen_window),
+				 FALSE);
+	gtk_window_set_resizable(GTK_WINDOW(klass->priv->fullscreen_window),
+				 FALSE);
+	gtk_window_set_skip_taskbar_hint(GTK_WINDOW(klass->priv->fullscreen_window),
+					 TRUE);
+	gtk_window_set_skip_pager_hint(GTK_WINDOW(klass->priv->fullscreen_window),
+				       TRUE);
 }
 
 static void
