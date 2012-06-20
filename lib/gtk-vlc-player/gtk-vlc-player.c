@@ -257,6 +257,8 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 					 TRUE);
 	gtk_window_set_skip_pager_hint(GTK_WINDOW(klass->priv->fullscreen_window),
 				       TRUE);
+	gtk_window_set_keep_above(GTK_WINDOW(klass->priv->fullscreen_window),
+				  TRUE);
 }
 
 static void
