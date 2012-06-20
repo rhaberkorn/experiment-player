@@ -253,8 +253,6 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 				 FALSE);
 	gtk_window_set_decorated(GTK_WINDOW(klass->priv->fullscreen_window),
 				 FALSE);
-	gtk_window_set_resizable(GTK_WINDOW(klass->priv->fullscreen_window),
-				 FALSE);
 	gtk_window_set_skip_taskbar_hint(GTK_WINDOW(klass->priv->fullscreen_window),
 					 TRUE);
 	gtk_window_set_skip_pager_hint(GTK_WINDOW(klass->priv->fullscreen_window),
