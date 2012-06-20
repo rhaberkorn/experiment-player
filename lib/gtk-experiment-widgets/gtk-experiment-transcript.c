@@ -678,7 +678,7 @@ scrolled(GtkWidget *widget, GdkEventScroll *event)
 		break;
 	}
 
-	gtk_adjustment_set_value(adj, value > real_upper ? real_upper : value);
+	gtk_adjustment_set_value(adj, MIN(value, real_upper));
 
 	return TRUE;
 }
