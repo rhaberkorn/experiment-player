@@ -112,7 +112,7 @@ enum {
 	SECTION_ACTIVATED_SIGNAL,
 	LAST_SIGNAL
 };
-static guint gtk_experiment_navigator_signals[LAST_SIGNAL] = {0};
+static guint gtk_experiment_navigator_signals[LAST_SIGNAL] = {0, 0};
 
 /**
  * @private
