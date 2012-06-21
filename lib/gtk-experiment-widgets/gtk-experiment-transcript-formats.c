@@ -42,7 +42,6 @@
 #define FORMAT_REGEX_COMPILE_FLAGS	(G_REGEX_CASELESS)
 #define FORMAT_REGEX_MATCH_FLAGS	(0)
 
-/** @bug regexp after end of markup is ignored (e.g. "\b<u>ich</u>\b") */
 static gboolean
 gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 				       const gchar *str,
@@ -50,6 +49,7 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 {
 	PangoAttrIterator *iter;
 
+	/** @bug will crash for long patterns */
 	gchar *pattern, pattern_captures[255], *p;
 	gint capture_count = 0;
 
@@ -65,8 +65,10 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 		gint start, end;
 
 		pango_attr_iterator_range(iter, &start, &end);
+		if (end == G_MAXINT)
+			end = strlen(pattern);
 
-		if (end < G_MAXINT) {
+		if (end - start > 0) {
 			*p++ = '(';
 			strncpy(p, pattern + start, end - start);
 			p += end - start;
@@ -119,35 +121,36 @@ gtk_experiment_transcript_apply_format(GtkExperimentTranscriptFormat *fmt,
 
 	while (g_match_info_matches(match_info)) {
 		PangoAttrIterator *iter;
-		gint match_num = 1;
+		gint match_num = 0;
 
 		iter = pango_attr_list_get_iterator(fmt->attribs);
 		do {
 			gint start, end;
+			GSList *attribs;
 
 			pango_attr_iterator_range(iter, &start, &end);
 			if (end == G_MAXINT)
+				end = strlen(g_regex_get_pattern(fmt->regexp));
+
+			if (end - start == 0)
 				continue;
 
 			start = end = -1;
-			g_match_info_fetch_pos(match_info, match_num,
+			g_match_info_fetch_pos(match_info, ++match_num,
 					       &start, &end);
-			if (start >= 0 && end >= 0) {
-				GSList *attribs;
+			if (start < 0 || end < 0)
+				continue;
 
-				attribs = pango_attr_iterator_get_attrs(iter);
-				for (GSList *cur = attribs; cur != NULL; cur = cur->next) {
-					PangoAttribute *attrib;
+			attribs = pango_attr_iterator_get_attrs(iter);
+			for (GSList *cur = attribs; cur != NULL; cur = cur->next) {
+				PangoAttribute *attrib;
 
-					attrib = pango_attribute_copy((PangoAttribute *)cur->data);
-					attrib->start_index = (guint)start;
-					attrib->end_index = (guint)end;
-					pango_attr_list_change(attrib_list, attrib);
-				}
-				g_slist_free(attribs);
+				attrib = pango_attribute_copy((PangoAttribute *)cur->data);
+				attrib->start_index = (guint)start;
+				attrib->end_index = (guint)end;
+				pango_attr_list_change(attrib_list, attrib);
 			}
-
-			match_num++;
+			g_slist_free(attribs);
 		} while (pango_attr_iterator_next(iter));
 		pango_attr_iterator_destroy(iter);
 
@@ -230,14 +233,16 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 		cur_line++;
 		g_strchug(buf);
 
-		switch (*buf) {
-		case '#':
-		case '\r':
-		case '\n':
-		case '\0':
-			continue;
+		/* strip new line chars from end of `buf' */
+		for (gchar *p = buf + strlen(buf) - 1; p >= buf; p--) {
+			if (*p != '\r' && *p != '\n')
+				break;
+
+			*p = '\0';
 		}
-		/** @todo null-terminate buf at line end to avoid confusing Pango parse errors referring to line 2 */
+
+		if (*buf == '#' || *buf == '\0')
+			continue;
 
 		fmt = g_new(GtkExperimentTranscriptFormat, 1);
 
