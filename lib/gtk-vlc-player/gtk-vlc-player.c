@@ -62,17 +62,23 @@ static BOOL CALLBACK enumerate_vlc_windows_cb(HWND hWndvlc, LPARAM lParam);
 static gboolean poll_vlc_event_window_cb(gpointer data);
 #endif
 static void widget_on_realize(GtkWidget *widget, gpointer data);
-static gboolean widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer data);
+static gboolean widget_on_click(GtkWidget *widget, GdkEventButton *event,
+				gpointer data);
 
 static void time_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 static void time_adj_on_changed(GtkAdjustment *adj, gpointer user_data);
 static void vol_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data);
 
-static inline void update_time(GtkVlcPlayer *player, gint64 new_time);
-static inline void update_length(GtkVlcPlayer *player, gint64 new_length);
+static inline void set_transient_toplevel_window(GtkWindow *target,
+						 GtkWidget *widget);
 
-static void vlc_time_changed(const struct libvlc_event_t *event, void *userdata);
-static void vlc_length_changed(const struct libvlc_event_t *event, void *userdata);
+static void update_time(GtkVlcPlayer *player, gint64 new_time);
+static void update_length(GtkVlcPlayer *player, gint64 new_length);
+
+static void vlc_time_changed(const struct libvlc_event_t *event,
+			     void *userdata);
+static void vlc_length_changed(const struct libvlc_event_t *event,
+			       void *userdata);
 
 static void vlc_player_load_media(GtkVlcPlayer *player, libvlc_media_t *media);
 
@@ -190,7 +196,7 @@ gtk_vlc_player_init(GtkVlcPlayer *klass)
 	gtk_alignment_set(GTK_ALIGNMENT(klass), 0., 0., 1., 1.);
 
 	drawing_area = gtk_drawing_area_new();
-	/** @todo use styles */
+
 	gdk_color_parse("black", &color);
 	gtk_widget_modify_bg(drawing_area, GTK_STATE_NORMAL, &color);
 
@@ -380,6 +386,9 @@ widget_on_click(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 
 		player->priv->isFullscreen = FALSE;
 	} else {
+		set_transient_toplevel_window(GTK_WINDOW(fullscreen_window),
+					      GTK_WIDGET(player));
+
 		gtk_window_fullscreen(GTK_WINDOW(fullscreen_window));
 		gtk_widget_show(fullscreen_window);
 		gtk_widget_reparent(widget, fullscreen_window);
@@ -420,6 +429,15 @@ vol_adj_on_value_changed(GtkAdjustment *adj, gpointer user_data)
 }
 
 static inline void
+set_transient_toplevel_window(GtkWindow *target, GtkWidget *widget)
+{
+	GtkWidget *toplevel = gtk_widget_get_toplevel(widget);
+
+	if (gtk_widget_is_toplevel(toplevel) && GTK_IS_WINDOW(toplevel))
+		gtk_window_set_transient_for(target, GTK_WINDOW(toplevel));
+}
+
+static void
 update_time(GtkVlcPlayer *player, gint64 new_time)
 {
 	g_signal_emit(player, gtk_vlc_player_signals[TIME_CHANGED_SIGNAL], 0,
@@ -436,7 +454,7 @@ update_time(GtkVlcPlayer *player, gint64 new_time)
 	}
 }
 
-static inline void
+static void
 update_length(GtkVlcPlayer *player, gint64 new_length)
 {
 	g_signal_emit(player, gtk_vlc_player_signals[LENGTH_CHANGED_SIGNAL], 0,
