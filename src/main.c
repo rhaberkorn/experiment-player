@@ -73,6 +73,9 @@ GtkWidget *navigator_scrolledwindow,
 
 gchar *current_filename = NULL;
 
+#define TOOLTIP_PLAY	"Start video playback"
+#define TOOLTIP_PAUSE	"Pause video playback"
+
 #define SPEAKER_WIZARD	"Wizard"
 #define SPEAKER_PROBAND	"Proband"
 
@@ -124,6 +127,9 @@ playpause_button_clicked_cb(GtkWidget *widget, gpointer data)
 	button_image_set_from_stock(GTK_BUTTON(data),
 				    is_playing ? GTK_STOCK_MEDIA_PLAY
 					       : GTK_STOCK_MEDIA_PAUSE);
+	gtk_widget_set_tooltip_text(GTK_WIDGET(data),
+				    is_playing ? TOOLTIP_PLAY
+					       : TOOLTIP_PAUSE);
 }
 
 /** @private */
@@ -134,6 +140,7 @@ stop_button_clicked_cb(GtkWidget *widget,
 	gtk_vlc_player_stop(GTK_VLC_PLAYER(widget));
 	button_image_set_from_stock(GTK_BUTTON(playpause_button),
 				    GTK_STOCK_MEDIA_PLAY);
+	gtk_widget_set_tooltip_text(playpause_button, TOOLTIP_PLAY);
 }
 
 /** @private */
@@ -143,7 +150,7 @@ file_menu_openmovie_item_activate_cb(GtkWidget *widget,
 {
 	GtkWidget *dialog;
 
-	dialog = gtk_file_chooser_dialog_new("Open Movie...", GTK_WINDOW(widget),
+	dialog = gtk_file_chooser_dialog_new("Open Video...", GTK_WINDOW(widget),
 					     GTK_FILE_CHOOSER_ACTION_OPEN,
 					     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 					     GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
@@ -293,6 +300,7 @@ load_media_file(const gchar *file)
 
 	button_image_set_from_stock(GTK_BUTTON(playpause_button),
 				    GTK_STOCK_MEDIA_PLAY);
+	gtk_widget_set_tooltip_text(playpause_button, TOOLTIP_PLAY);
 
 	return TRUE;
 }

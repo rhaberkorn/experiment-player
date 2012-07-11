@@ -26,7 +26,7 @@
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkImageMenuItem" id="file_menu_openmovie_item">
-                        <property name="label" translatable="yes">Open _Movie...</property>
+                        <property name="label" translatable="yes">Open _Video...</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="image">image1</property>
@@ -165,6 +165,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Start video playback</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="playpause_button_clicked_cb" object="player_widget"/>
@@ -187,6 +188,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Stop video playback</property>
                 <property name="relief">none</property>
                 <property name="focus_on_click">False</property>
                 <signal name="clicked" handler="stop_button_clicked_cb" object="player_widget"/>
@@ -208,6 +210,7 @@
               <object class="GtkHScale" id="scale_widget">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="tooltip_text" translatable="yes">Current playback position</property>
                 <property name="restrict_to_fill_level">False</property>
                 <property name="draw_value">False</property>
               </object>
@@ -389,6 +392,7 @@ audio-volume-medium</property>
                 <child>
                   <object class="GtkComboBox" id="transcript_proband_combo">
                     <property name="visible">True</property>
+                    <property name="tooltip_text" translatable="yes">Currently applied format file</property>
                     <signal name="changed" handler="generic_transcript_combo_changed_cb" object="transcript_proband_widget"/>
                   </object>
                   <packing>
@@ -402,6 +406,7 @@ audio-volume-medium</property>
                 <child>
                   <object class="GtkComboBox" id="transcript_wizard_combo">
                     <property name="visible">True</property>
+                    <property name="tooltip_text" translatable="yes">Currently applied format file</property>
                     <signal name="changed" handler="generic_transcript_combo_changed_cb" object="transcript_wizard_widget"/>
                   </object>
                   <packing>
@@ -417,6 +422,7 @@ audio-volume-medium</property>
                       <object class="GtkEntry" id="transcript_wizard_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">Format expression</property>
                         <property name="invisible_char">&#x25CF;</property>
                         <property name="primary_icon_stock">gtk-apply</property>
                         <signal name="changed" handler="generic_transcript_entry_changed_cb" object="transcript_wizard_widget"/>
@@ -441,6 +447,7 @@ audio-volume-medium</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Allow Pango markup in format expression</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="generic_transcript_entry_check_toggled_cb" object="transcript_wizard_entry"/>
                       </object>
@@ -463,6 +470,7 @@ audio-volume-medium</property>
                       <object class="GtkEntry" id="transcript_proband_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="tooltip_text" translatable="yes">Format expression</property>
                         <property name="invisible_char">&#x25CF;</property>
                         <property name="primary_icon_stock">gtk-apply</property>
                         <signal name="changed" handler="generic_transcript_entry_changed_cb" object="transcript_proband_widget"/>
@@ -487,6 +495,7 @@ audio-volume-medium</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Allow Pango markup in format expression</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="generic_transcript_entry_check_toggled_cb" object="transcript_proband_entry"/>
                       </object>
