@@ -15,17 +15,156 @@
 		</copyright>
 
 		<abstract><para>
-			The following document describes how to use the experiment player...
-			<!-- TODO -->
+			The following document is an overview of various experiment-player features.			
 		</para></abstract>
+		
+		<address>
+			<uri>
+				<link xlink:href="https://github.com/rhaberkorn/experiment-player">https://github.com/rhaberkorn/experiment-player</link></uri>
+		</address>
 	</info>
 
-	<preface>
-		<title>Introduction</title>
-
+	<chapter>
+		<title>Installation</title>
+		<section>
+			<title>Linux</title>
+			<para>
+				To install the experiment-player on a Linux based operation system
+				the sources have to be downloaded from the 
+				<link xlink:href="https://github.com/rhaberkorn/experiment-player/downloads">git-repository download page</link>.
+				After that follow the instruction given by the <filename>INSTALL</filename> file.
+			</para>
+		</section>
+		<section>
+			<title>Windows</title>
+			<para>
+				To install the experiment-player on a Windows operation system a ZIP-file
+				can be downloaded from the
+				<link xlink:href="https://github.com/rhaberkorn/experiment-player/downloads">git-repository download page</link>.
+				It contains all nessessary binaries to run the experiment-player except 
+				of the GTK+ widget toolkit. GTK+ 2.24.10 will also be needed to run the experiment-player on 
+				Windows. The Installer and instructions can be downloaded from the GTK homepage.
+				After installing GTK unzip the ZIP-file in any directory and excecute 
+				experiment-player.exe to run the experiment-player.
+			</para>
+		</section>
+	</chapter>
+	<chapter>
+		<title>First Steps</title>
 		<para>
-			Bla Bla...
-			<!-- TODO -->
+			After starting the experiment-player video-files and transcripts can be
+			loaded. To open files first choose a directory in menue QuickOpen entry 
+			Choose directory. Select any directory that contains the desired data. 
+			If there are a XML-file and an AVI or MP4-file with an identical name the 
+			data will bei listed under QuickOpen. For example <filename>20111117.xml</filename> and <filename>20111117.mp4</filename>.
+			The last chosen directory will be saved as default value and will be
+			selelected automaticly the at the next start.
 		</para>
-	</preface>
+	</chapter>
+	<chapter>
+		<title>Transcript</title>
+		<para>
+			If the transcript is opened and a files was selected the transcript widget 
+			shows the dialog between proband and wizard. The dialog monitor is divided 
+			up into two seperate widgets so there can be different settings and fonts
+			at each widget. Also it is possible to markup matches separate from each other.
+			There two way to search matches: regular expressions and format files.
+		</para>
+		<section>
+			<title>Regular Expressions</title>
+			<para>
+				For more information how to use regular expressions have a look at
+				<link xlink:href="http://developer.gnome.org/glib/stable/glib-Perl-compatible-regular-expressions.html">glib documentation for Perl compatible regular expression</link>.
+				Regular expressions are case-insensitive so both lower-case and upper-case character
+				will match the same expression. Regular expression matches will be formated bold by default. 
+				Captures are not be supported.
+			</para>
+		</section>
+		<section>
+			<title>Format Expression</title>
+			<para>
+				By default a search term will be regarded as regular expression. If the
+				markup toggle is activated the input expression will be regarded as 
+				format expression which is a combination of regular expression and Pango mark up. 
+				That means if the regular expression matchs at the text the markup 
+				expressions will apply.
+				For more information refer to the <link xlink:href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html">Pango Markup documentation.</link>.
+			</para>
+		</section>
+		<section>
+			<title>Format Files</title>
+			<para>
+				Format files are collection of multiple format expressions. At first there
+				has to be selected a quick open directory in menue Format entry Choose Directory. 
+				After that all available format files in the selected directory will be listed
+				under menue Formats. To create an own format file care the following:
+				<itemizedlist mark='bullet'>
+					<listitem>
+						<para>Each line will regarded as a single mark up statement.
+						</para>
+					</listitem>
+					<listitem>
+						<para>Leading whitespace characters will be ignored.
+						</para>
+					</listitem>
+					<listitem>
+						<para>A line beginning with '<filename>#</filename>' will be ignored complete.
+						</para>
+					</listitem>
+					<listitem>
+						<para>Only whole lines can be ignored.
+						</para>
+					</listitem>
+					<listitem>
+						<para>The format file has to save as a FMT-file (<filename>*.fmt</filename>).
+						</para>
+					</listitem>
+					<listitem>
+						<para>Incorrect lines will cause an error message.
+						</para>
+					</listitem>
+				</itemizedlist>
+				Let be the whole text referring to a single time stamp a text fragment.
+				For each text fragment each format expression in the format file will be 
+				iterated and the associated regular expression will matched. 
+				For each match all associated mark ups will apply cumulatively at the 
+				matching text.
+			</para>
+		</section>
+	</chapter>
+	<chapter>
+		<title>Config File</title>
+		<para>
+			The config file is located in the users default directory where each config 
+			files are. By editing the config-file default keys which can not changed via 
+			gui can set. More details about the structure of the config file can be 
+			found in the
+			<link xlink:href="developer.gnome.org/glib/unstable/glib-Key-value-file-parser.html">glib documentation</link>.
+			
+			The following table shows all additional keys :
+			
+			<table border="1">
+				<thead border="1">
+					<tr>
+						<td>Key</td>
+						<td>Description</td>
+					</tr>
+				</thead>
+				<tbody border="1">
+					<tr>
+						<td><filename>Default-Format-Font</filename></td>
+						<td>For detailed information follow <link xlink:href="http://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string">pango font description</link></td>
+					</tr>
+					<tr>
+						<td><filename>Default-Format-Text-Color</filename></td>
+						<td>An RGB color specification such as '#00FF00' or a color name such as 'red'</td>
+					</tr>
+					<tr>
+						<td><filename>Default-Format-BG-Color</filename></td>
+						<td>An RGB color specification such as '#00FF00' or a color name such as 'red'</td>
+					</tr>
+				</tbody>
+			</table>
+		</para>
+	</chapter>
 </book>
