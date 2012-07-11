@@ -55,6 +55,7 @@
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="generic_quit_cb"/>
                       </object>
                     </child>
@@ -89,6 +90,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">image3</property>
                         <property name="use_stock">False</property>
+                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="quickopen_menu_choosedir_item_activate_cb" object="player_window"/>
                       </object>
                     </child>
@@ -98,6 +100,7 @@
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="quickopen_menu_refresh_item_activate_cb" object="quickopen_menu"/>
                       </object>
                     </child>
@@ -115,11 +118,12 @@
                     <property name="visible">True</property>
                     <child>
                       <object class="GtkImageMenuItem" id="help_menu_manual_item">
-                        <property name="label" translatable="yes">Read _Manual...</property>
+                        <property name="label" translatable="yes">_Help</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="image">image4</property>
                         <property name="use_stock">False</property>
+                        <accelerator key="F1" signal="activate"/>
                         <signal name="activate" handler="help_menu_manual_item_activate_cb"/>
                       </object>
                     </child>
@@ -321,6 +325,7 @@ audio-volume-medium</property>
                         <property name="use_underline">True</property>
                         <property name="image">image5</property>
                         <property name="use_stock">False</property>
+                        <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="formats_menu_choosedir_item_activate_cb" object="info_window"/>
                       </object>
                     </child>
@@ -330,6 +335,7 @@ audio-volume-medium</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="formats_menu_refresh_item_activate_cb" object="transcript_wizard_combo"/>
                       </object>
                     </child>
