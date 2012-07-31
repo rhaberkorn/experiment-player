@@ -220,9 +220,17 @@ refresh_quickopen_menu(GtkMenu *menu)
 static void
 reconfigure_all_check_menu_items_cb(GtkWidget *widget, gpointer user_data)
 {
-	if (GTK_IS_CHECK_MENU_ITEM(widget))
-		gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget),
-					       widget == GTK_WIDGET(user_data));
+	if (!GTK_IS_CHECK_MENU_ITEM(widget))
+		return;
+
+	g_signal_handlers_block_matched(widget, G_SIGNAL_MATCH_FUNC,
+					0, 0, NULL,
+					quickopen_item_on_activate, NULL);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget),
+				       widget == GTK_WIDGET(user_data));
+	g_signal_handlers_unblock_matched(widget, G_SIGNAL_MATCH_FUNC,
+					  0, 0, NULL,
+					  quickopen_item_on_activate, NULL);
 }
 
 static void
