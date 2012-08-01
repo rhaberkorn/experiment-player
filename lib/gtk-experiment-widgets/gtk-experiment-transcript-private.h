@@ -81,9 +81,6 @@ typedef gboolean (*GtkExperimentTranscriptContribRenderer)
 		 (GtkExperimentTranscript *, ExperimentReaderContrib *,
 		  gint64, gint64, gint *);
 
-#define DEFAULT_WIDTH		100
-#define DEFAULT_HEIGHT		200
-
 /** @todo scale should be configurable */
 #define PX_PER_SECOND		15
 #define TIME_TO_PX(TIME)	((TIME)/(1000/PX_PER_SECOND))

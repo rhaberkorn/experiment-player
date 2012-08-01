@@ -42,8 +42,6 @@ static void gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *k
 static void gtk_experiment_transcript_init(GtkExperimentTranscript *klass);
 
 static void gtk_experiment_transcript_realize(GtkWidget *widget);
-static void gtk_experiment_transcript_size_request(GtkWidget *widget,
-						   GtkRequisition *requisition);
 static void gtk_experiment_transcript_size_allocate(GtkWidget *widget,
 						    GtkAllocation *allocation);
 static gboolean gtk_experiment_transcript_expose(GtkWidget *widget,
@@ -108,7 +106,6 @@ gtk_experiment_transcript_class_init(GtkExperimentTranscriptClass *klass)
 
 	widget_class->realize = gtk_experiment_transcript_realize;
 	widget_class->expose_event = gtk_experiment_transcript_expose;
-	widget_class->size_request = gtk_experiment_transcript_size_request;
 	widget_class->size_allocate = gtk_experiment_transcript_size_allocate;
 
 	widget_class->state_changed = state_changed;
@@ -348,14 +345,6 @@ gtk_experiment_transcript_realize(GtkWidget *widget)
 	gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
 
 	gtk_experiment_transcript_reconfigure(GTK_EXPERIMENT_TRANSCRIPT(widget));
-}
-
-static void 
-gtk_experiment_transcript_size_request(GtkWidget *widget __attribute__((unused)),
-				       GtkRequisition *requisition)
-{
-	requisition->width = DEFAULT_WIDTH;
-	requisition->height = DEFAULT_HEIGHT;
 }
 
 static void
