@@ -53,7 +53,9 @@
 static inline void button_image_set_from_stock(GtkButton *widget,
 					       const gchar *name);
 
-GtkWidget *about_dialog;
+GtkWidget *player_window,
+	  *info_window,
+	  *about_dialog;
 
 GtkWidget *player_widget,
 	  *controls_hbox,
@@ -227,6 +229,18 @@ help_menu_manual_item_activate_cb(GtkWidget *widget __attribute__((unused)),
 }
 
 /** @private */
+gboolean
+player_window_delete_event_cb(GtkWidget *widget __attribute__((unused)),
+			      GdkEvent *event __attribute__((unused)),
+			      gpointer user_data __attribute__((unused)))
+{
+	gtk_main_quit();
+
+	/* do not destroy window (yet) */
+	return TRUE;
+}
+
+/** @private */
 void
 navigator_widget_time_selected_cb(GtkWidget *widget, gint64 selected_time,
 				  gpointer user_data __attribute__((unused)))
@@ -362,6 +376,20 @@ show_message_dialog_gerror(GError *err)
 	gtk_widget_destroy(dialog);
 }
 
+const gchar *
+window_get_geometry(GtkWindow *window)
+{
+	static gchar geometry[255];
+	gint width, height, x, y;
+
+	gtk_window_get_size(window, &width, &height);
+	gtk_window_get_position(window, &x, &y);
+	g_snprintf(geometry, sizeof(geometry), "%dx%d+%d+%d",
+		   width, height, x, y);
+
+	return geometry;
+}
+
 /** @private */
 int
 main(int argc, char *argv[])
@@ -401,6 +429,8 @@ main(int argc, char *argv[])
 	gtk_builder_add_from_file(builder, DEFAULT_UI, NULL);
 	gtk_builder_connect_signals(builder, NULL);
 
+	BUILDER_INIT(builder, player_window);
+	BUILDER_INIT(builder, info_window);
 	BUILDER_INIT(builder, about_dialog);
 
 	BUILDER_INIT(builder, player_widget);
@@ -511,6 +541,29 @@ main(int argc, char *argv[])
 
 	refresh_quickopen_menu(GTK_MENU(quickopen_menu));
 
+	/* configure windows */
+	gtk_window_set_gravity(GTK_WINDOW(player_window), GDK_GRAVITY_STATIC);
+	gtk_window_set_gravity(GTK_WINDOW(info_window), GDK_GRAVITY_STATIC);
+
+	if (config_get_save_window_properties()) {
+		gchar *geometry;
+
+		geometry = config_get_window_geometry("Player");
+		if (geometry != NULL)
+			gtk_window_parse_geometry(GTK_WINDOW(player_window),
+						  geometry);
+		g_free(geometry);
+
+		geometry = config_get_window_geometry("Info");
+		if (geometry != NULL)
+			gtk_window_parse_geometry(GTK_WINDOW(info_window),
+						  geometry);
+		g_free(geometry);
+	}
+
+	gtk_widget_show(player_window);
+	gtk_widget_show(info_window);
+
 	gdk_threads_enter();
 	gtk_main();
 	gdk_threads_leave();
@@ -518,6 +571,16 @@ main(int argc, char *argv[])
 	/*
 	 * update config file
 	 */
+	if (config_get_save_window_properties()) {
+		const gchar *geometry;
+
+		geometry = window_get_geometry(GTK_WINDOW(player_window));
+		config_set_window_geometry("Player", geometry);
+
+		geometry = window_get_geometry(GTK_WINDOW(info_window));
+		config_set_window_geometry("Info", geometry);
+	}
+
 	modified_style = gtk_widget_get_modifier_style(transcript_wizard_widget);
 	config_set_transcript_font(SPEAKER_WIZARD, modified_style->font_desc);
 	config_set_transcript_text_color(SPEAKER_WIZARD,
@@ -569,6 +632,10 @@ main(int argc, char *argv[])
 						      transcript_proband->interactive_format.default_bg_color);
 
 	config_save_key_file();
+
+	/* destroy all widgets (clean up) */
+	gtk_widget_destroy(player_window);
+	gtk_widget_destroy(info_window);
 
 	return 0;
 }

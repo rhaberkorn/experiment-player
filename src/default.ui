@@ -5,11 +5,10 @@
   <!-- interface-requires gtk-experiment-widgets 0.0 -->
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="player_window">
-    <property name="visible">True</property>
     <property name="title" translatable="yes">Experiment Player</property>
     <property name="default_width">400</property>
     <property name="default_height">300</property>
-    <signal name="destroy" handler="generic_quit_cb"/>
+    <signal name="delete_event" handler="player_window_delete_event_cb"/>
     <child>
       <object class="GtkVBox" id="player_window_vbox">
         <property name="visible">True</property>
@@ -302,7 +301,6 @@ audio-volume-medium</property>
     <property name="stock">gtk-help</property>
   </object>
   <object class="GtkWindow" id="info_window">
-    <property name="visible">True</property>
     <property name="title" translatable="yes">Experiment Data</property>
     <property name="default_width">680</property>
     <property name="default_height">700</property>

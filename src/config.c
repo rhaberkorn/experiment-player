@@ -36,7 +36,11 @@
 
 static inline void set_default_string(const gchar *group_name, const gchar *key,
 				      const gchar *string);
+static inline void set_default_boolean(const gchar *group_name, const gchar *key,
+				       gboolean boolean);
+
 static const gchar *get_group_by_actor(const gchar *actor);
+static const gchar *get_group_by_window(const gchar *window);
 
 static GKeyFile	*keyfile;
 static gchar	*filename = NULL;
@@ -55,6 +59,8 @@ config_init_key_file(void)
 					    CONFIG_KEY_FILE, NULL);
 
 	/* initialize defaults */
+	set_default_boolean("Global", "Save-Window-Properties", TRUE);
+
 	set_default_string("Directories", "Quick-Open", DEFAULT_QUICKOPEN_DIR);
 	set_default_string("Directories", "Formats", DEFAULT_FORMATS_DIR);
 
@@ -84,6 +90,51 @@ set_default_string(const gchar *group_name, const gchar *key,
 {
 	if (!g_key_file_has_key(keyfile, group_name, key, NULL))
 		g_key_file_set_string(keyfile, group_name, key, string);
+}
+
+static inline void
+set_default_boolean(const gchar *group_name, const gchar *key,
+		    gboolean boolean)
+{
+	if (!g_key_file_has_key(keyfile, group_name, key, NULL))
+		g_key_file_set_boolean(keyfile, group_name, key, boolean);
+}
+
+void
+config_set_save_window_properties(gboolean enabled)
+{
+	g_key_file_set_boolean(keyfile, "Global",
+			       "Save-Window-Properties", enabled);
+}
+
+gboolean
+config_get_save_window_properties(void)
+{
+	return g_key_file_get_boolean(keyfile, "Global",
+				      "Save-Window-Properties", NULL);
+}
+
+static const gchar *
+get_group_by_window(const gchar *window)
+{
+	static gchar group[255];
+
+	g_snprintf(group, sizeof(group), "%s Window", window);
+	return group;
+}
+
+void
+config_set_window_geometry(const gchar *window, const gchar *geometry)
+{
+	g_key_file_set_string(keyfile, get_group_by_window(window),
+			      "Geometry", geometry);
+}
+
+gchar *
+config_get_window_geometry(const gchar *window)
+{
+	return g_key_file_get_string(keyfile, get_group_by_window(window),
+				     "Geometry", NULL);
 }
 
 void

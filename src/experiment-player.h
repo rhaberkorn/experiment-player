@@ -50,7 +50,11 @@ gboolean load_transcript_file(const gchar *file);
 
 void show_message_dialog_gerror(GError *err);
 
-extern GtkWidget *about_dialog;
+const gchar *window_get_geometry(GtkWindow *window);
+
+extern GtkWidget *player_window,
+		 *info_window,
+		 *about_dialog;
 
 extern GtkWidget *player_widget,
 		 *controls_hbox,
@@ -74,6 +78,11 @@ extern gchar *current_filename;
  * config.c
  */
 void config_init_key_file(void);
+
+void config_set_save_window_properties(gboolean enabled);
+gboolean config_get_save_window_properties(void);
+void config_set_window_geometry(const gchar *window, const gchar *geometry);
+gchar *config_get_window_geometry(const gchar *window);
 
 void config_set_quickopen_directory(const gchar *dir);
 gchar *config_get_quickopen_directory(void);
