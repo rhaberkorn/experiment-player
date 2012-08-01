@@ -301,9 +301,12 @@ gtk_experiment_transcript_finalize(GObject *gobject)
 
 	g_free(trans->speaker);
 
-	pango_font_description_free(trans->interactive_format.default_font);
-	gdk_color_free(trans->interactive_format.default_text_color);
-	gdk_color_free(trans->interactive_format.default_bg_color);
+	if (trans->interactive_format.default_font != NULL)
+		pango_font_description_free(trans->interactive_format.default_font);
+	if (trans->interactive_format.default_text_color != NULL)
+		gdk_color_free(trans->interactive_format.default_text_color);
+	if (trans->interactive_format.default_bg_color != NULL)
+		gdk_color_free(trans->interactive_format.default_bg_color);
 
 	experiment_reader_free_contributions(trans->priv->contribs);
 	gtk_experiment_transcript_free_formats(trans->priv->formats);
