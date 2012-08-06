@@ -39,8 +39,27 @@
 #include "gtk-experiment-transcript.h"
 #include "gtk-experiment-transcript-private.h"
 
+static inline gint attr_list_get_length(PangoAttrList *list);
+static gboolean gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
+						       const gchar *str,
+						       GError **error);
+
 #define FORMAT_REGEX_COMPILE_FLAGS	(G_REGEX_CASELESS)
 #define FORMAT_REGEX_MATCH_FLAGS	(0)
+
+static inline gint
+attr_list_get_length(PangoAttrList *list)
+{
+	PangoAttrIterator *iter = pango_attr_list_get_iterator(list);
+	gint length = 0;
+
+	do
+		length++;
+	while (pango_attr_iterator_next(iter));
+	pango_attr_iterator_destroy(iter);
+
+	return length;
+}
 
 static gboolean
 gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
@@ -49,8 +68,7 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 {
 	PangoAttrIterator *iter;
 
-	/** @bug will crash for long patterns */
-	gchar *pattern, pattern_captures[255], *p;
+	gchar *pattern, *pattern_captures, *p;
 	gint capture_count = 0;
 
 	g_return_val_if_fail(error == NULL || *error == NULL, FALSE);
@@ -59,7 +77,8 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 				NULL, error))
 		return FALSE;
 
-	p = pattern_captures;
+	p = pattern_captures = g_malloc(strlen(pattern) + 1 +
+					2*attr_list_get_length(fmt->attribs));
 	iter = pango_attr_list_get_iterator(fmt->attribs);
 	do {
 		gint start, end;
@@ -83,6 +102,7 @@ gtk_experiment_transcript_parse_format(GtkExperimentTranscriptFormat *fmt,
 
 	fmt->regexp = g_regex_new(pattern_captures,
 				  FORMAT_REGEX_COMPILE_FLAGS, 0, error);
+	g_free(pattern_captures);
 	if (fmt->regexp == NULL) {
 		gtk_experiment_transcript_free_format(fmt);
 		fmt->attribs = NULL;
@@ -161,7 +181,7 @@ gtk_experiment_transcript_apply_format(GtkExperimentTranscriptFormat *fmt,
 }
 
 /** @private */
-void
+G_GNUC_INTERNAL void
 gtk_experiment_transcript_free_formats(GSList *formats)
 {
 	for (GSList *cur = formats; cur != NULL; cur = cur->next) {

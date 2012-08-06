@@ -127,6 +127,7 @@ gtk_experiment_transcript_free_format(GtkExperimentTranscriptFormat *format)
 }
 
 /** @private */
+G_GNUC_INTERNAL
 void gtk_experiment_transcript_free_formats(GSList *formats);
 
 #endif
