@@ -41,7 +41,8 @@ G_BEGIN_DECLS
 /** \e GtkExperimentTranscript error codes */
 typedef enum {
 	GTK_EXPERIMENT_TRANSCRIPT_ERROR_FILEOPEN,	/**< Error opening file */
-	GTK_EXPERIMENT_TRANSCRIPT_ERROR_REGEXCAPTURES	/**< Additional regular expression captures used */
+	GTK_EXPERIMENT_TRANSCRIPT_ERROR_REGEXCAPTURES,	/**< Additional regular expression captures used */
+	GTK_EXPERIMENT_TRANSCRIPT_ERROR_LINELENGTH	/**< Line read is too long */
 } GtkExperimentTranscriptError;
 
 /** \e GtkExperimentTranscript type */

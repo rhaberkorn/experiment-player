@@ -221,7 +221,7 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 				       GError **error)
 {
 	FILE *file;
-	gchar buf[255];
+	gchar buf[1024];
 	gint cur_line = 0;
 
 	gboolean res = FALSE;
@@ -246,20 +246,33 @@ gtk_experiment_transcript_load_formats(GtkExperimentTranscript *trans,
 		goto redraw;
 	}
 
-	/** @bug will fail for lines longer than sizeof(buf)-1 */
 	while (fgets((char *)buf, sizeof(buf), file) != NULL) {
 		GtkExperimentTranscriptFormat *fmt;
 
 		cur_line++;
+
+		if (!feof(file) && !is_newline(buf[strlen(buf) - 1])) {
+			g_set_error(error,
+				    GTK_EXPERIMENT_TRANSCRIPT_ERROR,
+				    GTK_EXPERIMENT_TRANSCRIPT_ERROR_LINELENGTH,
+				    "Line %d in file \"%s\" is too long. "
+				    "It must be less than %d characters.",
+				    cur_line, filename, (int)sizeof(buf));
+
+			fclose(file);
+			gtk_experiment_transcript_free_formats(trans->priv->formats);
+			trans->priv->formats = NULL;
+
+			goto redraw;
+		}
+
 		g_strchug(buf);
 
 		/* strip new line chars from end of `buf' */
-		for (gchar *p = buf + strlen(buf) - 1; p >= buf; p--) {
-			if (*p != '\r' && *p != '\n')
-				break;
-
+		for (gchar *p = buf + strlen(buf) - 1;
+		     p >= buf && is_newline(*p);
+		     p--)
 			*p = '\0';
-		}
 
 		if (*buf == '#' || *buf == '\0')
 			continue;

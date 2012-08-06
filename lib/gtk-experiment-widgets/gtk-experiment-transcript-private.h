@@ -130,4 +130,11 @@ gtk_experiment_transcript_free_format(GtkExperimentTranscriptFormat *format)
 G_GNUC_INTERNAL
 void gtk_experiment_transcript_free_formats(GSList *formats);
 
+/** @private */
+static inline gboolean
+is_newline(gchar c)
+{
+	return c == '\r' || c == '\n';
+}
+
 #endif
