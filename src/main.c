@@ -635,6 +635,10 @@ main(int argc, char *argv[])
 
 	/* destroy all widgets (clean up) */
 	gtk_widget_destroy(player_window);
+	/**
+	 * @bug some g_object_unref during transcript widget destruction
+	 *      results in assertions
+	 */
 	gtk_widget_destroy(info_window);
 
 	return 0;
