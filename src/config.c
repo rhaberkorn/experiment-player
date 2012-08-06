@@ -138,6 +138,20 @@ config_get_window_geometry(const gchar *window)
 }
 
 void
+config_set_window_state(const gchar *window, GdkWindowState state)
+{
+	g_key_file_set_integer(keyfile, get_group_by_window(window),
+			       "State", state);
+}
+
+GdkWindowState
+config_get_window_state(const gchar *window)
+{
+	return g_key_file_get_integer(keyfile, get_group_by_window(window),
+				      "State", NULL);
+}
+
+void
 config_set_quickopen_directory(const gchar *dir)
 {
 	g_key_file_set_string(keyfile, "Directories", "Quick-Open", dir);

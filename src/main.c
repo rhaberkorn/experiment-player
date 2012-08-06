@@ -390,6 +390,40 @@ window_get_geometry(GtkWindow *window)
 	return geometry;
 }
 
+void
+window_set_state(GtkWindow *window, GdkWindowState state)
+{
+	/* the GDK_WINDOW_STATE_WITHDRAWN flag is ignored */
+
+	if (state & GDK_WINDOW_STATE_ICONIFIED)
+		gtk_window_iconify(window);
+	else
+		gtk_window_deiconify(window);
+
+	if (state & GDK_WINDOW_STATE_MAXIMIZED)
+		gtk_window_maximize(window);
+	else
+		gtk_window_unmaximize(window);
+
+	if (state & GDK_WINDOW_STATE_STICKY)
+		gtk_window_stick(window);
+	else
+		gtk_window_unstick(window);
+
+	if (state & GDK_WINDOW_STATE_FULLSCREEN)
+		gtk_window_fullscreen(window);
+	else
+		gtk_window_unfullscreen(window);
+
+	if (state & GDK_WINDOW_STATE_ICONIFIED)
+		gtk_window_iconify(window);
+	else
+		gtk_window_deiconify(window);
+
+	gtk_window_set_keep_above(window, state & GDK_WINDOW_STATE_ABOVE);
+	gtk_window_set_keep_below(window, state & GDK_WINDOW_STATE_BELOW);
+}
+
 /** @private */
 int
 main(int argc, char *argv[])
@@ -554,11 +588,17 @@ main(int argc, char *argv[])
 						  geometry);
 		g_free(geometry);
 
+		window_set_state(GTK_WINDOW(player_window),
+				 config_get_window_state("Player"));
+
 		geometry = config_get_window_geometry("Info");
 		if (geometry != NULL)
 			gtk_window_parse_geometry(GTK_WINDOW(info_window),
 						  geometry);
 		g_free(geometry);
+
+		window_set_state(GTK_WINDOW(info_window),
+				 config_get_window_state("Info"));
 	}
 
 	gtk_widget_show(player_window);
@@ -572,13 +612,20 @@ main(int argc, char *argv[])
 	 * update config file
 	 */
 	if (config_get_save_window_properties()) {
-		const gchar *geometry;
+		const gchar	*geometry;
+		GdkWindowState	state;
 
 		geometry = window_get_geometry(GTK_WINDOW(player_window));
 		config_set_window_geometry("Player", geometry);
 
+		state = gdk_window_get_state(gtk_widget_get_window(player_window));
+		config_set_window_state("Player", state);
+
 		geometry = window_get_geometry(GTK_WINDOW(info_window));
 		config_set_window_geometry("Info", geometry);
+
+		state = gdk_window_get_state(gtk_widget_get_window(info_window));
+		config_set_window_state("Info", state);
 	}
 
 	modified_style = gtk_widget_get_modifier_style(transcript_wizard_widget);
