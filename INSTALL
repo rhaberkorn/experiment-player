@@ -3,6 +3,7 @@ Installation Instructions
 
 Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002, 2004, 2005,
 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+Copyright (C) 2012 Otto-von-Guericke Universität Magdeburg
 
    Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
@@ -363,3 +364,48 @@ operates.
 `configure' also accepts some other, not widely useful, options.  Run
 `configure --help' for more details.
 
+Installing on Ubuntu
+====================
+
+   Installing the experiment-player on Ubuntu is straight forward. If you
+would like to build from a tar-ball, first install all necessary packages:
+
+     sudo apt-get install build-essential xsltproc \
+                          libgtk2.0-dev libvlc-dev libxml2-dev libx11-dev
+
+   If you build from a Git repository (without prebuilt ./configure) you will
+also need autoconf, automake, etc:
+
+     sudo apt-get install autoconf automake libtool
+
+   If necessary create ./configure by invoking autoreconf:
+
+     autoreconf -i
+
+   Then you can install the package as usual. An `experiment-player` binary
+will be installed into /usr/local/bin:
+
+     ./configure
+     make
+     sudo make install
+
+   If you plan to develop the experiment-player it is recommended to install
+additional packages which will be found by ./configure automatically:
+
+     sudo apt-get install doxygen libgladeui-1-dev glade \
+                          docbook-xsl docbook5-xml
+
+   The experiment-player can then be configured to generate Doxygen
+documentation, install Glade catalog files into the appropriate directory and
+build using debug information. Also generating the user documentation using
+Docbook will be much faster now:
+
+     ./configure --enable-doxygen-doc --enable-doxygen-extract-private \
+                 CFLAGS="-g -O0"
+     make
+     sudo make install
+
+   There are even some gtester test suites that will be invoked automatically
+with the standard "check" target. To run the test suites, use
+
+     make check
