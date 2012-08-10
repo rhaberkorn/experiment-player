@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.65)
-AC_INIT([Experiment Player], [dev],
+AC_INIT([Experiment Player], [0.9],
 	[robin.haberkorn@st.ovgu.de],
 	[experiment-player],
 	[https://github.com/rhaberkorn/experiment-player])
