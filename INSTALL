@@ -409,3 +409,189 @@ Docbook will be much faster now:
 with the standard "check" target. To run the test suites, use
 
      make check
+
+Installing on Windows
+=====================
+
+   The program also builds and runs on 32-bit Windows NT (2000 and later) using
+Minimalist GNU for Windows (MinGW).
+Unfortunately, installation is not as trivial as on modern Unices since you
+have to install many dependencies on your own.
+ * Since there is no gtester for Windows, test suites cannot be run
+   automatically.
+ * The program may or may not work with different versions of tools and
+   libraries. Sometimes there will be notes about different versions in this
+   guide. However for the sake of simplicity, the command line examples assume
+   specific versions (with which it has been tested).
+
+   To prepare your MinGW/MSYS environment and build the program follow
+these steps:
+
+   1) Download and run the graphical MinGW installer:
+http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
+It is assumed by the following steps that you install into C:\MinGW.
+Select the following packages:
+ * C Compiler
+ * MSYS Basic System
+ * MinGW Developer ToolKit
+
+   2) Open a MSYS shell ("MinGW Shell" in the Start Menu) and install some
+additional MinGW packages:
+
+     mingw-get install mingw32-bsdtar zip unzip msys-wget
+
+   For doing development you are recommended to install the GNU Debugger:
+
+     mingw-get install mingw32-gdb
+
+   3) Download and install the GTK+ 2.0 All-in-one bundle from
+http://www.gtk.org/download/win32.php:
+
+     wget http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip
+     unzip gtk+-bundle_2.24.10-20120208_win32.zip -d /mingw/
+
+   4) Download and intall libxml2. Windows binaries are provided here:
+http://www.zlatkovic.com/libxml.en.html:
+
+     wget ftp://ftp.zlatkovic.com/pub/libxml/libxml2-2.7.8.win32.zip
+     unzip libxml2-2.7.8.win32.zip
+     cp libxml2-2.7.8.win32/bin/* /mingw/bin/
+     cp libxml2-2.7.8.win32/bin/libxml2.dll /mingw/lib/
+     cp -r libxml2-2.7.8.win32/include/libxml/ /mingw/include/
+
+   5) Download and install libxslt2. Actually we only need the xsltproc tool
+at build time.
+
+     wget ftp://ftp.zlatkovic.com/pub/libxml/libxslt-1.1.26.win32.zip
+     unzip libxslt-1.1.26.win32.zip
+     cp libxslt-1.1.26.win32/bin/* /mingw/bin/
+
+   6) Download and install libVLC (http://www.videolan.org/vlc/index.html).
+Every VLC version beginning with v1.1.10 should work - it has been tested
+with v1.1.10, v1.1.11 and v2.0.0. The libVLC SDK is packaged with the ZIP
+file download.
+
+     wget http://downloads.sourceforge.net/project/vlc/2.0.0/win32/vlc-2.0.0-win32.zip
+     unzip vlc-2.0.0-win32.zip
+     cp vlc-2.0.0/libvlc*.dll /mingw/bin/
+     cp -r vlc-2.0.0/sdk/include/vlc/ /mingw/include/
+     cp -r vlc-2.0.0/sdk/lib/* /mingw/lib/
+     mkdir /mingw/lib/vlc
+     cp -r vlc-2.0.0/plugins/ /mingw/lib/vlc/
+
+   In order to execute the experiment-player from the MSYS Shell, libVLC has to
+find the plugins you just installed. The easiest way to achieve that is to
+set the "VLC_PLUGIN_PATH" environment variable. Using your favourite editor,
+add the following line to /etc/profile:
+
+     export VLC_PLUGIN_PATH=/mingw/lib/vlc/plugins
+
+   Please note that the editor must support Unix line-breaks. You may use VIM
+which should already be installed.
+
+   7) It is recommended but optional to install the Docbook XSL stylesheets
+(http://docbook.sourceforge.net/) which speeds up the generation of the user
+documentation.
+
+     wget http://downloads.sourceforge.net/project/docbook/docbook-xsl/1.76.1/docbook-xsl-1.76.1.zip
+     unzip docbook-xsl-1.76.1.zip
+     cd docbook-xsl-1.76.1
+     ./install.sh
+
+   The XML_CATALOG_FILES environment variable must be updated so the XSLT
+processor (xsltproc) can find the locally installed stylesheets. To do so,
+use your favourite editor to add the following line to ~/.profile:
+
+     . ~/docbook-xsl-1.76.1/.profile.incl
+
+   8) For doing actual development you will probably want to generate
+code documentation using Doxygen (www.doxygen.org).
+You can download a GUI installer from
+ftp://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.1.2-setup.exe
+The installer will extend the PATH variable so there is nothing else for
+you to do - Doxygen will be found by ./configure!
+
+   9) For designing the user interface you will need Glade 3
+(http://glade.gnome.org/). There is a Windows GUI installer available from
+http://ftp.gnome.org/pub/GNOME/binaries/win32/glade3/3.6/glade3-3.6.7-with-GTK+.exe
+The installer modifies PATH but generally *should* not interfere with the MinGW
+GTK+ installation.
+Glade should always be executed from the MSYS shell since the program's UI
+definition uses custom widgets whose DLLs, Glade catalog files and dependencies
+are installed into the MinGW hierarchy. In order for Glade to find the widget
+DLLs and catalogs you should add these lines to /etc/profile:
+
+     export GLADE_CATALOG_PATH="\mingw\share\gtk-vlc-player\catalogs:\mingw\share\experiment-player\catalogs"
+     export GLADE_MODULE_PATH="\mingw\bin"
+
+Additional notes:
+ * Even though, the UI was designed using Glade 3.6.7, there seem to be
+   incompatibilities between the Linux and Windows versions of Glade. When
+   opening the UI definition, it may look screwed and has to be fixed by hand
+   (e.g. you will have to set explicitly that a VBox is vertical...).
+ * You may have to execute Glade giving an absolute path, e.g.:
+   /c/Program\ Files/Gtk+/glade-3.exe
+
+   10) The experiment-player is versioned using Git (http://git-scm.com/).
+If you need Git you could install it using a graphical installer that can
+be downloaded here:
+http://code.google.com/p/msysgit/downloads/list?q=full+installer+official+git
+This provides a graphical Git client that may be used right away. There is
+also a "Git Bash" based on MSYS that can be used. Unfortunately
+"Git for Windows" comes with its own MSYS shell. To use the command line
+client with the MinGW/MSYS installation that you have just prepared, you may
+add the following line to /etc/profile (may differ for your Git installation):
+
+     export PATH=$PATH:/c/Program\ Files/Git/bin
+
+   11) You may now build the experiment-player binaries. Restart your MSYS shell
+if you have not already!
+It may be built like any other Autoconf-based project but there are some
+Windows-specified flags (like --enable-console). Also there are some things
+to keep in mind when building deployment binaries. Therefore two helper scripts
+are provided. For doing a typical development installation you should execute
+something like this from the source code directory:
+
+     ./makemake_mingw_dev.sh
+     make install
+
+   This will build and install the experiment-player binaries into the MinGW
+hierarchy.
+ * "experiment-player" can be executed everywhere (just like on Linux/Unix).
+ * It includes a console (which does not make sense for a normal Windows GUI
+   application).
+ * It will be built with no optimizations and with debugging symbols.
+ * A complete developer documentation will be generated for you (doc/doxygen/).
+
+   To build deployment binaries you can execute the ./build_mingw_binaries.sh
+script. It will completely clean the build directories, build the deployment
+binaries and create a ZIP file (experiment-player-win32.zip).
+This ZIP file can then be simply unpacked by the user - no installer
+is required.
+The ZIP file also contains all dependency DLLs, except GTK+. GTK+ must be
+installed by the user! You are recommended to point the user to the
+"GTK+ for Windows Runtime Environment Installer" (http://gtk-win.sourceforge.net/).
+ * Only the runtime installer is required.
+ * The user may also download the themes installer, enabling the user to
+   change the look-and-feel of programs using the runtime (i.e. the experiment
+   player). The default "MS Windows" look however should be sufficient...
+
+Notes on Windows 2000
+=====================
+
+   The guide above applies to Windows versions beginning with Windows XP.
+While the program can be built on Windows 2000 just fine by following the steps
+above, you will need additional compatibility DLLs to execute it.
+
+   1) GDI+ is required. Unfortunately, Microsoft does no longer seem to provide
+the GDI+ redistributable for older Windows versions.
+However it can be downloaded here:
+http://download.cnet.com/Platform-SDK-Redistributable-GDI/3000-2206_4-10726511.html
+The "gdiplus.dll" must be placed in the application directory.
+
+   2) The "Windows 2000 XP API Wrapper Pack" is required. Download from
+http://w2k.flxsrv.org/cgi-bin/dl.cgi?file=win2k_xp_v1_10.zip
+Follow the instructions given in the README. There is an INSTALL_WRAPPER.BAT
+script and various Visual Basic Scripts to update your registry.
+In the end, only "WS2_32.DLL" (bin\ws2_32.dll) has to be placed in the
+application directory.
