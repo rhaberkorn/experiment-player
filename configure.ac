@@ -122,11 +122,6 @@ PKG_CHECK_MODULES(LIBXML2, [libxml-2.0], , [
 AC_HEADER_STDC
 
 case $host in
-*-*-linux*)
-	AC_CHECK_HEADERS([X11/Xlib.h], , [
-		AC_MSG_ERROR([Missing X11/Xlib.h!])
-	])
-	;;
 *-*-mingw*)
 	AC_CHECK_HEADERS([windows.h], , [
 		AC_MSG_ERROR([Missing Windows headers!])

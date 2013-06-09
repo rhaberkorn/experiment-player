@@ -27,10 +27,6 @@
 
 #include <locale.h>
 
-#ifdef HAVE_X11_XLIB_H
-#include <X11/Xlib.h>
-#endif
-
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #include <shellapi.h>
@@ -447,9 +443,6 @@ main(int argc, char *argv[])
 	setlocale(LC_ALL, "");
 
 	/* init threads */
-#ifdef HAVE_X11_XLIB_H
-	XInitThreads(); /* FIXME: really required??? */
-#endif
 	g_thread_init(NULL);
 	gdk_threads_init();
 
