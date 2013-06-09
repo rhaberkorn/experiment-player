@@ -291,7 +291,7 @@ gtk_experiment_navigator_init(GtkExperimentNavigator *klass)
 static void
 gtk_experiment_navigator_dispose(GObject *gobject)
 {
-	GtkExperimentNavigator *navi = GTK_EXPERIMENT_NAVIGATOR(gobject);
+	//GtkExperimentNavigator *navi = GTK_EXPERIMENT_NAVIGATOR(gobject);
 
 	/*
 	 * destroy might be called more than once, but we have only one
@@ -327,7 +327,7 @@ gtk_experiment_navigator_dispose(GObject *gobject)
 static void
 gtk_experiment_navigator_finalize(GObject *gobject)
 {
-	GtkExperimentNavigator *navi = GTK_EXPERIMENT_NAVIGATOR(gobject);
+	//GtkExperimentNavigator *navi = GTK_EXPERIMENT_NAVIGATOR(gobject);
 
 	/** @todo Free all memory referenced in public and private attributes */
 
