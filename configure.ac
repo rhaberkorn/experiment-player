@@ -66,7 +66,7 @@ AM_CONDITIONAL(USE_W32_RES, [test x$RC != x])
 #
 # Checks for libraries.
 #
-PKG_CHECK_MODULES(LIBGLIB, [gobject-2.0 glib-2.0])
+PKG_CHECK_MODULES(LIBGLIB, [gobject-2.0 gthread-2.0 glib-2.0])
 
 PKG_CHECK_MODULES(LIBGTK, [gtk+-2.0])
 
