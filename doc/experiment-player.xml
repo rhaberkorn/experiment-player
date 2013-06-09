@@ -68,6 +68,68 @@
 		</section>
 	</chapter>
 	<chapter>
+		<title>Graphical User Interface</title>
+		<para>
+			After startup there will be two windows, a <emphasis>player</emphasis>
+			window and a <emphasis>data</emphasis> window.
+			They are explained in the following sections.
+		</para>
+		<section>
+			<title>Player Window</title>
+			<screenshot>
+				<!-- <title>Player Window after startup</title> -->
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/player-window-new.png"/>
+					</imageobject>
+					<caption>Player Window after startup</caption>
+				</mediaobject>
+			</screenshot>
+			<para>
+				The image above depicts the player window after startup.
+				No experiment is yet opened in the application, so several
+				controls are greyed out.
+			</para><para>
+				Experiments can be opened via the <guimenu>File</guimenu> menu
+				or the <guimenu>Quick Open</guimenu> menu.
+				The process of opening experiments via the <guimenu>Quick Open</guimenu> menu
+				is explained later on.
+				The remaining interface components are self-explanatory.
+			</para>
+		</section>
+		<section>
+			<title>Data Window</title>
+			<screenshot>
+				<!-- <title>Data Window after startup</title> -->
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="images/data-window-new.png"/>
+					</imageobject>
+					<caption>Data Window after startup</caption>
+				</mediaobject>
+			</screenshot>
+			<para>
+				The image above depicts the data window after startup.
+				The data window is used to display additional information of an
+				experiment.
+				This information is time-dependant and synchronized with other
+				time-dependant data, like the current video position.
+				If the time is changed in one component, it changes in all the
+				other ones as well.
+			</para><para>
+				The current implementation is able to display an experiment
+				transcript (in the Transcript view area).
+				The transcript view is divided up into a left part showing the
+				proband's text contributions and a right part showing the
+				wizard's text contributions.
+				The different experiment phases are displayed hierachically
+				in the Transcript navigation area.
+				Transcripts can also be highlighted but this feature is
+				explained later on.
+			</para>
+		</section>
+	</chapter>
+	<chapter>
 		<title>First Steps</title>
 		<para>
 			After starting the experiment-player video-files and transcripts can be
