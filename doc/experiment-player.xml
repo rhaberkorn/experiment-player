@@ -4,48 +4,66 @@
       xmlns:xlink="http://www.w3.org/1999/xlink">
 	<info>
 		<title>Experiment Player</title>
-		<subtitle>A tool for analyzing experiments...</subtitle>
+		<subtitle>A tool to analyze audiovisual experiment recordings and transcripts</subtitle>
 
 		<author>
 			<personname><firstname>Jens</firstname> <surname>Lammert</surname></personname>
 			<email>jens.lammert@st.ovgu.de</email>
 		</author>
 		<copyright>
-			<year>2012</year><holder>Otto-von-Guericke Universität Magdeburg</holder>
+			<year>2012</year>
+			<year>2013</year>
+			<holder>Otto-von-Guericke Universität Magdeburg</holder>
 		</copyright>
 
 		<abstract><para>
-			The following document is an overview of various experiment-player features.			
+			The following document illustrates how to install, configure
+			and use the Experiment Player to analyze experiments.
 		</para></abstract>
 		
 		<address>
 			<uri>
-				<link xlink:href="https://github.com/rhaberkorn/experiment-player">https://github.com/rhaberkorn/experiment-player</link></uri>
+				<link xlink:href="https://github.com/rhaberkorn/experiment-player">https://github.com/rhaberkorn/experiment-player</link>
+			</uri>
 		</address>
 	</info>
 
 	<chapter>
 		<title>Installation</title>
 		<section>
-			<title>Linux</title>
+			<title>Windows</title>
 			<para>
-				To install the experiment-player on a Linux based operation system
-				the sources have to be downloaded from the 
-				<link xlink:href="https://github.com/rhaberkorn/experiment-player/downloads">git-repository download page</link>.
-				After that follow the instruction given by the <filename>INSTALL</filename> file.
+				To install the <productname>Experiment Player</productname> on a Windows-based operating system,
+				the GTK+ 2 widget toolkit must first be downloaded and installed.
+				A convenient GTK+ installer can be downloaded from the
+				<link xlink:href="http://gtk-win.sourceforge.net/home/index.php/Main/Downloads">
+				"GTK+ for Windows Runtime Environment Installer" project page</link>.
+				It is only necessary to install the
+				<link xlink:href="http://downloads.sourceforge.net/gtk-win/gtk2-runtime-2.24.10-2012-10-10-ash.exe?download">
+				GTK+ runtime</link>.
+				<link xlink:href="http://downloads.sourceforge.net/gtk-win/gtk2-themes-2009-09-07-ash.exe?download">
+				Additional themes</link> may be installed as well - but the default GTK+ theme should be sufficient.
+			</para><para>
+				Precompiled Windows 32-bit binaries of the <productname>Experiment Player</productname> itself
+				are available as ZIP archives from the
+				<link xlink:href="http://sourceforge.net/projects/exp-player/files/bin/">Sourceforge project page</link>.
+				The ZIP archive merely has to be extracted somewhere.
+				Afterwards the included <filename>experiment-player.exe</filename> can be executed.
+				All library dependencies except GTK+ are included in the ZIP archive.
 			</para>
 		</section>
 		<section>
-			<title>Windows</title>
+			<title>Linux</title>
 			<para>
-				To install the experiment-player on a Windows operation system a ZIP-file
-				can be downloaded from the
-				<link xlink:href="https://github.com/rhaberkorn/experiment-player/downloads">git-repository download page</link>.
-				It contains all nessessary binaries to run the experiment-player except 
-				of the GTK+ widget toolkit. GTK+ 2.24.10 will also be needed to run the experiment-player on 
-				Windows. The Installer and instructions can be downloaded from the GTK homepage.
-				After installing GTK unzip the ZIP-file in any directory and excecute 
-				experiment-player.exe to run the experiment-player.
+				To install the <productname>Experiment Player</productname> on a Linux-based operating system,
+				it first has to be built from source.
+				It can either be built from a local
+				<link xlink:href="https://github.com/rhaberkorn/experiment-player">Git repository</link> clone,
+				or from a source code package that can be downloaded from the
+				<link xlink:href="http://sourceforge.net/projects/exp-player/files/src/">project's download archive
+				on Sourceforge</link>.
+				In either case, further build instructions are given in the included
+				<filename>INSTALL</filename> file.
 			</para>
 		</section>
 	</chapter>
