@@ -570,7 +570,7 @@ audio-volume-medium</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="transient_for">player_window</property>
-    <property name="copyright">Copyright (C) 2012 Otto-von-Guericke-Universit&#xE4;t Magdeburg</property>
+    <property name="copyright">Copyright (C) 2012-2013 Otto-von-Guericke-Universit&#xE4;t Magdeburg</property>
     <property name="license">This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
