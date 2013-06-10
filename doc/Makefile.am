@@ -6,7 +6,9 @@
 DB_URI = http://docbook.sourceforge.net/release/xsl/current
 
 if BUILD_HTML
-dist_html_DATA = experiment-player.html
+nobase_dist_html_DATA = experiment-player.html \
+			images/data-window-new.png images/player-window-new.png \
+			images/quick-open-empty.png images/quick-open.png
 endif
 CLEANFILES = experiment-player.html html_titlepage.xsl
 EXTRA_DIST = experiment-player.xml html_custom.xsl html_titlepage.spec.xml
