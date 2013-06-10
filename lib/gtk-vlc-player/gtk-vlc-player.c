@@ -38,6 +38,7 @@
 #include <glib/gprintf.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #ifdef G_OS_WIN32
 #include <gdk/gdkwin32.h>
 #else
@@ -56,6 +57,9 @@ static void gtk_vlc_player_init(GtkVlcPlayer *klass);
 
 static void gtk_vlc_player_dispose(GObject *gobject);
 static void gtk_vlc_player_finalize(GObject *gobject);
+
+static inline void maybe_lock_gdk(void);
+static inline void maybe_unlock_gdk(void);
 
 #ifdef G_OS_WIN32
 static BOOL CALLBACK enumerate_vlc_windows_cb(HWND hWndvlc, LPARAM lParam);
@@ -308,6 +312,34 @@ gtk_vlc_player_finalize(GObject *gobject)
 	G_OBJECT_CLASS(gtk_vlc_player_parent_class)->finalize(gobject);
 }
 
+/**
+ * @brief Locks GDK mutex if necessary.
+ *
+ * When GTK+ functions are invoked from another than the main
+ * thread (the one with the \e gtk_main() event loop),
+ * \e gdk_threads_enter() must be called.
+ * This auxiliary function is for callers (like VLC callbacks) that
+ * may or may not be invoked from the main event loop to avoid dead locks.
+ */
+static inline void
+maybe_lock_gdk(void)
+{
+	if (!g_main_context_is_owner(g_main_context_default()))
+		gdk_threads_enter();
+}
+
+/**
+ * @brief Unlocks GDK mutex if necessary.
+ *
+ * @see maybe_lock_gdk
+ */
+static inline void
+maybe_unlock_gdk(void)
+{
+	if (!g_main_context_is_owner(g_main_context_default()))
+		gdk_threads_leave();
+}
+
 #ifdef G_OS_WIN32
 
 static BOOL CALLBACK
@@ -478,11 +510,11 @@ vlc_time_changed(const struct libvlc_event_t *event, void *user_data)
 {
 	assert(event->type == libvlc_MediaPlayerTimeChanged);
 
-	/* VLC callbacks are invoked from another thread! */
-	gdk_threads_enter();
+	/* VLC callbacks may be invoked from another thread! */
+	maybe_lock_gdk();
 	update_time(GTK_VLC_PLAYER(user_data),
 		    (gint64)event->u.media_player_time_changed.new_time);
-	gdk_threads_leave();
+	maybe_unlock_gdk();
 }
 
 static void
@@ -490,11 +522,11 @@ vlc_length_changed(const struct libvlc_event_t *event, void *user_data)
 {
 	assert(event->type == libvlc_MediaPlayerLengthChanged);
 
-	/* VLC callbacks are invoked from another thread! */
-	gdk_threads_enter();
+	/* VLC callbacks may be invoked from another thread! */
+	maybe_lock_gdk();
 	update_length(GTK_VLC_PLAYER(user_data),
 		      (gint64)event->u.media_player_length_changed.new_length);
-    	gdk_threads_leave();
+	maybe_unlock_gdk();
 }
 
 static void
