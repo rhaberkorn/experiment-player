@@ -20,7 +20,7 @@
 			The following document illustrates how to install, configure
 			and use the Experiment Player to analyze experiments.
 		</para></abstract>
-		
+
 		<address>
 			<uri>
 				<link xlink:href="https://github.com/rhaberkorn/experiment-player">https://github.com/rhaberkorn/experiment-player</link>
@@ -80,7 +80,7 @@
 		</para>
 		<section>
 			<title>Player Window</title>
-			<screenshot>
+			<screenshot xml:id="player-window">
 				<!-- <title>Player Window after startup</title> -->
 				<mediaobject>
 					<imageobject>
@@ -97,13 +97,13 @@
 				Experiments can be opened via the <guimenu>File</guimenu> menu
 				or the <guimenu>Quick Open</guimenu> menu.
 				The process of opening experiments via the <guimenu>Quick Open</guimenu> menu
-				is explained later on.
+				is <link linkend="quick-open">explained later on</link>.
 				The remaining interface components are self-explanatory.
 			</para>
 		</section>
 		<section>
 			<title>Data Window</title>
-			<screenshot>
+			<screenshot xml:id="data-window-new">
 				<!-- <title>Data Window after startup</title> -->
 				<mediaobject>
 					<imageobject>
@@ -123,25 +123,57 @@
 			</para><para>
 				The current implementation is able to display an experiment
 				transcript (in the Transcript view area).
-				The transcript view is divided up into a left part showing the
-				proband's text contributions and a right part showing the
-				wizard's text contributions.
+				The transcript view is divided into a left part showing the
+				wizard's text contributions and a right part showing the
+				proband's text contributions.
 				The different experiment phases are displayed hierachically
 				in the Transcript navigation area.
-				Transcripts can also be highlighted but this feature is
-				explained later on.
+				Transcripts may also be searched and highlighted but this feature is
+				<link linkend="highlighting">explained later on</link>.
+			</para><para>
+				Furthermore the look of the Transcript View may be customized
+				after loading an experiment by right-clicking the Transcript view.
+				Foreground and background colors, text alignment and scroll direction
+				can be changed this way.
+			</para><para>
+				The playback position of the experiment may be influenced in the
+				following ways:
+				<itemizedlist>
+					<listitem><para>
+						by clicking or scrolling the slider in the
+						<link linkend="data-window-new">data window</link> with the mouse
+						wheel,
+					</para></listitem>
+					<listitem><para>
+						by scrolling the transcript widgets with the mouse wheel,
+					</para></listitem>
+					<listitem><para>
+						by using the transcript view's scroll bar, or
+					</para></listitem>
+					<listitem><para>
+						by double-clicking an entry in the navigation hierarchy.
+					</para></listitem>
+				</itemizedlist>
+				Single clicking an entry in the navigation hierarchy
+				mereley highlights that part of the transcript by the shading the
+				transcript view's background.
 			</para>
 		</section>
 	</chapter>
 	<chapter>
 		<title>Getting Started</title>
-		<section>
+		<section xml:id="quick-open">
 			<title>How to load a file with Quick Open</title>
 			<para>
-				A video recording of an experiment and its related transcript file
+				A video recording of an experiment and its correspondig transcript file
 				are considered as an experiment. A video is an AVI or MP4 file
-				while transcript files are special XML applications.
-				The experiment's files can be opened separately or by using the
+				while transcript files are special XML applications generated from
+				<link xlink:href="http://agd.ids-mannheim.de/download/Folker_Schema.xsd">
+				FOLKER XML transcripts</link>.
+				Transcript XML files must conform to the <filename>session.dtd</filename>
+				schema shipped with the <application>Experiment Player</application>
+				application.
+				Experiment's files can be opened separately or by using the
 				<emphasis>Quick Open</emphasis> feature.
 			</para>
 			<screenshot>
@@ -179,111 +211,240 @@
 				persists after application restarts.
 			</para>
 		</section>
-		<section>
+		<section xml:id="highlighting">
 			<title>Transcript Highlighting</title>
 			<para>
-				If the transcript is opened and a files was selected the transcript widget 
-				shows the dialog between proband and wizard. The dialog monitor is divided 
-				up into two seperate widgets so there can be different settings and fonts
-				at each widget. Also it is possible to markup matches separate from each other.
-				There two way to search matches: regular expressions and format files.
+				To analyze the dialog between proband and wizard the Experiment-Player offers
+				a feature to search for text patterns in the dialog and for highlighting the matches
+				in the transcript.
+				After loading an experiment via the <guimenu>Quick Open</guimenu> menu,
+				the dialog between proband and wizard will be displayed in the transcript widgets.
+				The highlighting feature can be used for both the wizard's and the proband's part
+				of the dialog independently of each other.
+				By entering a search expression in the
+				<link linkend="data-window-new">text boxes for interactive highlighting</link>
+				of the transcript will be highlighted on the fly.
+				The syntax of these search expressions and their exact semantics are
+				described in the following sections.
 			</para>
-			<section>
+			<section xml:id="regexp">
 				<title>Regular Expressions</title>
 				<para>
-					For more information how to use regular expressions have a look at
-					<link xlink:href="http://developer.gnome.org/glib/stable/glib-Perl-compatible-regular-expressions.html">glib documentation for Perl compatible regular expression</link>.
-					Regular expressions are case-insensitive so both lower-case and upper-case character
-					will match the same expression. Regular expression matches will be formated bold by default. 
-					Captures are not be supported.
+					By default, if the <guibutton>Markup</guibutton> toggles are inactive,
+					search expressions are interpreted as <emphasis>regular expressions</emphasis>.
+					The system will iterate all text fragments (dialog contributions
+					with distinct timestamps) and tries to match the regular expression
+					against them.
+					All the matches will be highlighted.
+					By default they will be formatted bold, but this may be changed
+					in the <link linkend="config-file">configuration file</link>.
+					<emphasis>Regular Expressions</emphasis>
+					are case-insensitive so both lower-case and upper-case character
+					will match both lower and upper case text.
+					For more information about the <emphasis>Regular Expression</emphasis>
+					syntax supported by the program, have a look at the
+					<link xlink:href="http://developer.gnome.org/glib/stable/glib-Perl-compatible-regular-expressions.html">
+					glib documentation for Perl compatible Regular Expression</link>.
+					All constructs are supported, except captures.
+				</para><para>
+					An icon next to the pattern entry box signals well-formedness of
+					the entered search expression.
 				</para>
 			</section>
 			<section>
 				<title>Format Expression</title>
 				<para>
-					By default a search term will be regarded as regular expression. If the
-					markup toggle is activated the input expression will be regarded as 
-					format expression which is a combination of regular expression and Pango mark up. 
-					That means if the regular expression matchs at the text the markup 
-					expressions will apply.
-					For more information refer to the <link xlink:href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html">Pango Markup documentation.</link>.
+					By default a search term will be regarded as
+					<emphasis>Regular Expression</emphasis> and matches found
+					will be highlighted bold.
+					However if the <guibutton>Markup</guibutton> toggle is activated
+					the input expression will be regarded as a
+					<emphasis>Format Expression</emphasis> which is a combination of
+					<emphasis>Regular Expression</emphasis> and <emphasis>Pango Markup</emphasis>.
+					<emphasis>Pango Markup</emphasis> is a simple HTML-like formatting
+					markup language.
+				</para><para>
+					Just like with plain regular expressions, all text fragments are iterated
+					and the format expression is matched against each of them.
+					The markup does not matter for matching but only the regular expressions
+					contained <emphasis>within</emphasis> the markup tags.
+					For every match in each of the text fragments, the markup will be applied
+					to all of the text matched by the regular expression within the
+					corresponding markup tag.
+					So for instance the format expression
+					<code><![CDATA[<b>A<i>B</i>C</b>]]></code>,
+					case-insensitively matches against all occurrences of <literal>ABC</literal>,
+					formatting all the characters bold and only <literal>B</literal> in italics.
+				</para><para>
+					The following screenshot shows a transcript with all consonants followed
+					by vowels highlighted
+					(expression <code><![CDATA[<span color="red">[^aeiou]</span><span color="blue">[aeiou]</span>]]></code>):
+				</para>
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/format-expressions.png"/>
+						</imageobject>
+					</mediaobject>
+				</screenshot>
+				<para>
+					For more information about <emphasis>Pango Markup</emphasis>, please read the
+					<link xlink:href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html">
+					Pango Markup documentation</link>.
 				</para>
 			</section>
 			<section>
 				<title>Format Files</title>
 				<para>
-					Format files are collection of multiple format expressions. At first there
-					has to be selected a quick open directory in menue Format entry Choose Directory. 
-					After that all available format files in the selected directory will be listed
-					under menue Formats. To create an own format file care the following:
-					<itemizedlist mark='bullet'>
-						<listitem>
-							<para>Each line will regarded as a single mark up statement.
-							</para>
-						</listitem>
-						<listitem>
-							<para>Leading whitespace characters will be ignored.
-							</para>
-						</listitem>
-						<listitem>
-							<para>A line beginning with '<filename>#</filename>' will be ignored complete.
-							</para>
-						</listitem>
-						<listitem>
-							<para>Only whole lines can be ignored.
-							</para>
-						</listitem>
-						<listitem>
-							<para>The format file has to save as a FMT-file (<filename>*.fmt</filename>).
-							</para>
-						</listitem>
-						<listitem>
-							<para>Incorrect lines will cause an error message.
-							</para>
-						</listitem>
+					<emphasis>Format Files</emphasis> are files which contain a sequence of
+					<emphasis>format expressions</emphasis>.
+					So any collection of format expressions for
+					analyzing dialogs can be saved in those files and used with different
+					experiments.
+				</para>
+				<example xml:id="sample.fmt">
+					<title>Sample Format File (sample.fmt)</title>
+					<programlisting><![CDATA[# The samples from last section combined into one file:
+<b>A<i>B</i>C</b>
+<span color="red">[^aeiou]</span><span color="blue">[aeiou]</span>]]></programlisting>
+				</example>
+				<para>
+					<emphasis>Format Files</emphasis> are loaded in a similar manner as experiments
+					when using the <emphasis>Quick Open</emphasis> feature.
+					First a directory containing format files must be chosen via the
+					<guimenuitem>Choose Directory...</guimenuitem> item in the <guimenu>Formats</guimenu>
+					menu of the data window.
+				</para>
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/format-menu.png"/>
+						</imageobject>
+						<caption>"Formats" menu</caption>
+					</mediaobject>
+				</screenshot>
+				<para>
+					A format file may then be selected via the drop-down boxes below the
+					transcript view area.
+					The first entry of those boxes is always empty and may be selected to
+					disable format file processing.
+					The following screenshot shows
+					<link linkend="sample.fmt"><filename>sample.fmt</filename></link>
+					being selected:
+				</para>
+				<screenshot>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/format-file-selection.png"/>
+						</imageobject>
+					</mediaobject>
+				</screenshot>
+				<para>
+					If a format file is selected, for each text fragment every format expression
+					in the format file is evaluated (highlighting all matches as described earlier).
+					At last, any interactively entered search expression (plain regular expression or
+					format expression) is evaluated for each text fragment after the format expressions
+					in the currently selected <emphasis>Format File</emphasis>.
+					All formattings are applied cumulatively.
+					Where subsequent styles cannot be merged, later ones overwrite earlier ones.
+					For instance, when loading the following format file, the word <emphasis>program</emphasis>
+					is formatted blue instead of red:
+				</para>
+				<programlisting><![CDATA[<span color="red">programm</span>
+<span color="blue">programm</span>]]></programlisting>
+				<para>
+					The syntax of format files is as follows:
+					<itemizedlist>
+						<listitem><para>
+							<emphasis>Format Files</emphasis> have the file extension
+							<literal>fmt</literal>.
+						</para></listitem>
+						<listitem><para>
+							Every line will be regarded as a distinct
+							<emphasis>Format Expression</emphasis>.
+						</para></listitem>
+						<listitem><para>
+							Leading whitespace characters are ignored.
+						</para></listitem>
+						<listitem><para>
+							A line beginning with <literal>#</literal>
+							is ignored completely (comment line).
+						</para></listitem>
+						<listitem><para>
+							Empty lines are ignored.
+						</para></listitem>
+						<listitem><para>
+							Incorrect lines will cause an error message.
+						</para></listitem>
 					</itemizedlist>
-					Let be the whole text referring to a single time stamp a text fragment.
-					For each text fragment each format expression in the format file will be 
-					iterated and the associated regular expression will matched. 
-					For each match all associated mark ups will apply cumulatively at the 
-					matching text.
 				</para>
 			</section>
 		</section>
 	</chapter>
-	<chapter>
+	<chapter xml:id="config-file">
 		<title>Config File</title>
 		<para>
-			The config file is located in the users default directory where each config 
-			files are. By editing the config-file default keys which can not changed via 
-			gui can set. More details about the structure of the config file can be 
-			found in the
-			<link xlink:href="developer.gnome.org/glib/unstable/glib-Key-value-file-parser.html">glib documentation</link>.
-			
-			The following table shows all additional keys :
-			
-			<table border="1">
-				<thead border="1">
-					<tr>
-						<td>Key</td>
-						<td>Description</td>
-					</tr>
-				</thead>
-				<tbody border="1">
-					<tr>
-						<td><filename>Default-Format-Font</filename></td>
-						<td>For detailed information follow <link xlink:href="http://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string">pango font description</link></td>
-					</tr>
-					<tr>
-						<td><filename>Default-Format-Text-Color</filename></td>
-						<td>An RGB color specification such as '#00FF00' or a color name such as 'red'</td>
-					</tr>
-					<tr>
-						<td><filename>Default-Format-BG-Color</filename></td>
-						<td>An RGB color specification such as '#00FF00' or a color name such as 'red'</td>
-					</tr>
-				</tbody>
-			</table>
+			The <application>Experiment Player's</application> configuration file
+			is located in different locations depending on the platform:
 		</para>
+		<itemizedlist>
+			<listitem><para>
+				Under Linux, it will be located in the user's data directory as specified
+				in the <link xlink:href="http://www.freedesktop.org/Standards/basedir-spec">
+				XDG Base Directory Specification</link>
+				(usually <filename>$HOME/.local/share/.experiment-player</filename>).
+			</para></listitem>
+			<listitem><para>
+				Under Windows, it will be located in the local application data directory
+				(usually <filename>C:\Documents and Settings\%USERNAME%\Local Settings\Application Data\.experiment-player</filename>).
+			</para></listitem>
+		</itemizedlist>
+		<para>
+			The syntax of the configuration file is documented in the
+			<link xlink:href="developer.gnome.org/glib/unstable/glib-Key-value-file-parser.html">glib documentation</link>.
+		</para><para>
+			Sometimes it is useful to edit the configuration file directly in order to tweak options that are not
+			accessible via the <application>Experiment Player</application> GUI.
+			The following table lists such configuration keys:
+		</para>
+		<table border="1">
+			<title>Configuration Keys</title>
+			<thead border="1">
+				<tr>
+					<td>Key</td>
+					<td>Description</td>
+					<td>Format</td>
+				</tr>
+			</thead>
+			<tbody border="1">
+				<tr>
+					<td><literal>Default-Format-Font</literal></td>
+					<td>
+						The font used for highlighting <link linkend="regexp">plain regular expressions</link>.
+					</td><td>
+						See <link xlink:href="http://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string">
+						Pango Font description</link>
+					</td>
+				</tr>
+				<tr>
+					<td><literal>Default-Format-Text-Color</literal></td>
+					<td>
+						The foreground color used for highlighting <link linkend="regexp">plain regular expressions</link>.
+					</td><td>
+						An RGB color specification such as <literal>#FF0000</literal> or a color name such as
+						<literal>red</literal>.
+					</td>
+				</tr>
+				<tr>
+					<td><literal>Default-Format-BG-Color</literal></td>
+					<td>
+						The background color used for highlighting <link linkend="regexp">plain regular expressions</link>.
+					</td><td>
+						An RGB color specification such as <literal>#FF0000</literal> or a color name such as
+						<literal>red</literal>.
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</chapter>
 </book>
