@@ -19,8 +19,9 @@ make install DESTDIR=$TEMP_TREE
 
 # copy experiment-player files
 cp $TEMP_TREE/usr/bin/* $TEMP_ZIP
-cp $TEMP_TREE/usr/share/doc/experiment-player/* $TEMP_ZIP/doc
+cp -r $TEMP_TREE/usr/share/doc/experiment-player/* $TEMP_ZIP/doc
 cp $TEMP_TREE/usr/share/experiment-player/*.ui $TEMP_ZIP/ui
+cp $TEMP_TREE/usr/share/libexperiment-reader/session.dtd $TEMP_ZIP
 
 # copy required DLLs (except GTK+)
 cp /mingw/bin/libvlc*.dll $TEMP_ZIP
