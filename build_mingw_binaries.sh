@@ -27,6 +27,7 @@ cp $TEMP_TREE/usr/share/libexperiment-reader/session.dtd $TEMP_ZIP
 cp /mingw/bin/libvlc*.dll $TEMP_ZIP
 cp -r /mingw/lib/vlc/plugins $TEMP_ZIP
 cp /mingw/bin/libxml2.dll $TEMP_ZIP
+cp /mingw/bin/iconv.dll $TEMP_ZIP
 
 # zip!
 (cd $TEMP_ZIP; zip -r $ZIP_FILE *)
