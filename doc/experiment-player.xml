@@ -133,7 +133,7 @@
 			</para><para>
 				Furthermore the look of the Transcript View may be customized
 				after loading an experiment by right-clicking the Transcript view.
-				Foreground and background colors, text alignment and scroll direction
+				Font, foreground and background colors, text alignment and scroll direction
 				can be changed this way.
 			</para><para>
 				The playback position of the experiment may be influenced in the
