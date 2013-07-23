@@ -466,6 +466,10 @@ at build time.
      unzip libxslt-1.1.26.win32.zip
      cp libxslt-1.1.26.win32/bin/* /mingw/bin/
 
+   xsltproc requires a DLL not itself shipped with xsltproc:
+
+     cp /mingw/bin/libiconv-2.dll /mingw/bin/iconv.dll
+
    6) Download and install libVLC (http://www.videolan.org/vlc/index.html).
 Every VLC version beginning with v1.1.10 should work - it has been tested
 with v1.1.10, v1.1.11 and v2.0.0. The libVLC SDK is packaged with the ZIP
@@ -478,6 +482,11 @@ file download.
      cp -r vlc-2.0.0/sdk/lib/* /mingw/lib/
      mkdir /mingw/lib/vlc
      cp -r vlc-2.0.0/plugins/ /mingw/lib/vlc/
+
+   Remove the included libtool libraries, since in this case they do more
+harm than help:
+
+     rm /mingw/lib/libvlc.la /mingw/lib/libvlccore.la
 
    In order to execute the experiment-player from the MSYS Shell, libVLC has to
 find the plugins you just installed. The easiest way to achieve that is to
